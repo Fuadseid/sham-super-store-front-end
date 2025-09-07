@@ -1,0 +1,32 @@
+{
+    "title": "الطلبات",
+    "table": {
+        "headers": {
+            "order": "الطلب",
+            "date": "التاريخ",
+            "status": "الحالة",
+            "total": "المجموع",
+            "actions": "الإجراءات"
+        }
+    },
+    "emptyState": {
+        "message": "لم يتم تقديم أي طلبات بعد.",
+        "title": "لا توجد طلبات",
+        "description": "لم تقم بوضع أي طلبات بعد. ابدأ التسوق لرؤية طلباتك هنا."
+    },
+    "actions": {
+        "browseProducts": "تصفح المنتجات",
+        "viewOrder": "عرض",
+        "downloadInvoice": "تحميل",
+        "cancelOrder": "إلغاء",
+        "reorder": "إعادة طلب"
+    },
+    "status": {
+        "pending": "في الانتظار",
+        "processing": "قيد المعالجة",
+        "completed": "مكتمل",
+        "cancelled": "ملغي",
+        "shipped": "تم الشحن",
+        "delivered": "تم التسليم"
+    }
+}

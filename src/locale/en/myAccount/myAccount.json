@@ -1,0 +1,22 @@
+{
+    "navigation": {
+        "dashboard": "Dashboard",
+        "orders": "Orders",
+        "orderTracking": "Order Tracking",
+        "downloads": "Downloads",
+        "addresses": "Addresses",
+        "paymentMethods": "Payment Methods",
+        "accountDetails": "Account Details",
+        "wishlist": "Wishlist",
+        "following": "Following",
+        "supportTickets": "Support Tickets",
+        "contactedSellers": "Contacted Sellers",
+        "lostPassword": "Lost Password"
+    },
+    "actions": {
+        "logout": "Logout"
+    },
+    "userInfo": {
+        "welcome": "Welcome"
+    }
+}

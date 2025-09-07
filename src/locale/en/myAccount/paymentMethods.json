@@ -1,0 +1,40 @@
+{
+    "title": "Payment Methods",
+    "description": "You cannot add a new payment method so no billing address is required.",
+    "currentMethods": {
+        "title": "Available Payment Methods",
+        "cash": {
+            "name": "Cash Payment",
+            "description": "Pay with cash on delivery",
+            "status": "Available"
+        }
+    },
+    "comingSoon": {
+        "title": "Coming Soon",
+        "paySham": {
+            "name": "PaySham",
+            "description": "Digital wallet payment",
+            "status": "Coming Soon"
+        },
+        "visaCard": {
+            "name": "Visa Cards",
+            "description": "Credit and debit card payments",
+            "status": "Coming Soon"
+        },
+        "masterCard": {
+            "name": "MasterCard",
+            "description": "Credit and debit card payments",
+            "status": "Coming Soon"
+        }
+    },
+    "emptyState": {
+        "message": "No saved payment methods found.",
+        "addNew": "Add Payment Method"
+    },
+    "status": {
+        "available": "Available",
+        "comingSoon": "Coming Soon",
+        "active": "Active",
+        "disabled": "Disabled"
+    }
+}

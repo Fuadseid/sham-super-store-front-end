@@ -1,0 +1,23 @@
+{
+    "welcome": {
+        "greeting": "مرحباً",
+        "notYou": "(لست {{username}}؟",
+        "logoutText": "تسجيل الخروج",
+        "closingParenthesis": ")",
+        "dashboardInfo": "من لوحة تحكم حسابك يمكنك عرض",
+        "recentOrders": "طلباتك الأخيرة",
+        "manageText": "، وإدارة",
+        "shippingAddresses": "عناوين الشحن والفواتير",
+        "andText": "، و",
+        "accountDetails": "تعديل كلمة المرور وتفاصيل الحساب",
+        "endingPeriod": ".",
+        "becomeVendor": "كن بائعاً"
+    },
+    "quickActions": {
+        "title": "الإجراءات السريعة",
+        "viewOrders": "عرض الطلبات",
+        "manageAddresses": "إدارة العناوين",
+        "editAccount": "تعديل تفاصيل الحساب",
+        "downloadInvoices": "تحميل الفواتير"
+    }
+}

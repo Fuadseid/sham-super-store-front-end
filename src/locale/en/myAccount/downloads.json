@@ -1,0 +1,27 @@
+{
+    "title": "Downloads",
+    "table": {
+        "headers": {
+            "product": "Product",
+            "downloadsRemaining": "Downloads remaining",
+            "expires": "Expires",
+            "download": "Download"
+        }
+    },
+    "emptyState": {
+        "message": "No downloads available yet.",
+        "title": "No Downloads Available",
+        "description": "You don't have any digital products to download. Purchase digital products to see your downloads here."
+    },
+    "actions": {
+        "browseProducts": "Browse products",
+        "download": "Download",
+        "expired": "Expired",
+        "unlimited": "Unlimited"
+    },
+    "status": {
+        "active": "Active",
+        "expired": "Expired",
+        "used": "Used"
+    }
+}

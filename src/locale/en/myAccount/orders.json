@@ -1,0 +1,32 @@
+{
+    "title": "Orders",
+    "table": {
+        "headers": {
+            "order": "Order",
+            "date": "Date",
+            "status": "Status",
+            "total": "Total",
+            "actions": "Actions"
+        }
+    },
+    "emptyState": {
+        "message": "No orders have been made yet.",
+        "title": "No Orders Found",
+        "description": "You haven't placed any orders yet. Start shopping to see your orders here."
+    },
+    "actions": {
+        "browseProducts": "Browse products",
+        "viewOrder": "View",
+        "downloadInvoice": "Download",
+        "cancelOrder": "Cancel",
+        "reorder": "Reorder"
+    },
+    "status": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "shipped": "Shipped",
+        "delivered": "Delivered"
+    }
+}

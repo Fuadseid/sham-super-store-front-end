@@ -1,0 +1,50 @@
+{
+    "header": {
+        "title": "Product Comparison",
+        "noProducts": "No products selected for comparison",
+        "compareCount": "Compare {{count}} product",
+        "compareCountPlural": "Compare {{count}} products"
+    },
+    "empty": {
+        "title": "Start Comparing Products",
+        "description": "Add products to compare their features, prices, and specifications side by side.",
+        "browseButton": "Browse Products"
+    },
+    "table": {
+        "labels": {
+            "product": "Product",
+            "rating": "Rating",
+            "price": "Price",
+            "availability": "Availability",
+            "sku": "SKU",
+            "condition": "Condition",
+            "colors": "Colors",
+            "sizes": "Sizes",
+            "addToCart": "Add to Cart"
+        }
+    },
+    "product": {
+        "saleBadge": "Sale",
+        "viewDetails": "View Details",
+        "removeTitle": "Remove from comparison"
+    },
+    "rating": {
+        "noRating": "No rating available",
+        "ratingText": "{{rating}}/5 ({{reviews}} reviews)"
+    },
+    "availability": {
+        "inStock": "✓ In Stock",
+        "outOfStock": "✗ Out of Stock"
+    },
+    "general": {
+        "notAvailable": "N/A"
+    },
+    "cart": {
+        "addToCart": "Add to Cart",
+        "outOfStock": "Out of Stock"
+    },
+    "actions": {
+        "continueShopping": "Continue Shopping",
+        "clearAll": "Clear All"
+    }
+}

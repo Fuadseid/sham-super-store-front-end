@@ -1,0 +1,290 @@
+@use '../../../assets/style/vars.scss' as *;
+
+.downloads-content {
+    .downloads-table {
+        margin: 20px 0;
+        overflow-x: auto;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid $gray-200;
+
+            thead {
+                background-color: $light-gray;
+
+                th {
+                    padding: 12px;
+                    text-align: left;
+                    border-bottom: 1px solid $gray-200;
+                    font-weight: 600;
+                    color: $text-dark;
+                }
+            }
+
+            tbody {
+                td {
+                    padding: 20px 12px;
+                    text-align: center;
+                    border-bottom: 1px solid $gray-200;
+                    color: $gray-600;
+                }
+            }
+        }
+    }
+
+    .browse-products {
+        display: inline-block;
+        background-color: $primary-color;
+        color: $white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: $radius-sm;
+        margin-top: 20px;
+        transition: $transition-all;
+
+        &:hover {
+            background-color: $primary-blue-hover;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: $light-gray;
+        border-radius: $radius-lg;
+        border: 1px dashed $gray-300;
+        margin: 20px 0;
+
+        h4 {
+            margin: 0 0 8px 0;
+            color: $text-dark;
+            font-size: 18px;
+            font-weight: 600;
+
+            // RTL text alignment
+            :global(.lang-ar) & {
+                text-align: center;
+            }
+        }
+
+        p {
+            color: $gray-600;
+            font-size: 14px;
+            line-height: 1.5;
+
+            :global(.lang-ar) & {
+                text-align: center;
+                direction: rtl;
+            }
+        }
+    }
+
+    .browse-products {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, $primary-color 0%, $primary-blue-hover 100%);
+        color: $white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: $radius-lg;
+        margin-top: 20px;
+        transition: $transition-all;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: $shadow-sm;
+
+        &:hover {
+            background: linear-gradient(135deg, $primary-blue-hover 0%, $dark-blue-color 100%);
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+        }
+
+        &:active {
+            transform: translateY(0);
+            box-shadow: $shadow-sm;
+        }
+
+        &:focus {
+            outline: 2px solid $primary-blue-light;
+            outline-offset: 2px;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            font-size: 16px;
+        }
+
+        :global(.lang-ar) & {
+            flex-direction: row-reverse;
+        }
+    }
+
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background-color: $primary-blue-light;
+        color: $primary-color;
+        border: none;
+        padding: 6px 12px;
+        border-radius: $radius-sm;
+        font-size: 12px;
+        cursor: pointer;
+        transition: $transition-all;
+        font-weight: 500;
+
+        &:hover {
+            background-color: $primary-color;
+            color: $white;
+            transform: translateY(-1px);
+            box-shadow: $shadow-sm;
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        .icon {
+            font-size: 14px;
+        }
+
+        :global(.lang-ar) & {
+            flex-direction: row-reverse;
+        }
+    }
+
+    .expired-status,
+    .used-status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: $radius-xl;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        :global(.lang-ar) & {
+            text-transform: none;
+            letter-spacing: normal;
+        }
+    }
+
+    .expired-status {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .used-status {
+        background-color: rgba(156, 163, 175, 0.1);
+        color: #6b7280;
+        border: 1px solid rgba(156, 163, 175, 0.3);
+    }
+
+    .downloads-table {
+        table {
+            tbody {
+                .product-name {
+                    text-align: left;
+                    font-weight: 500;
+                    color: $text-dark;
+
+                    :global(.lang-ar) & {
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .downloads-content {
+        .empty-state {
+            padding: 30px 15px;
+
+            .empty-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 48px;
+            }
+
+            h4 {
+                font-size: 16px;
+            }
+
+            p {
+                font-size: 13px;
+            }
+        }
+
+        .browse-products {
+            padding: 10px 20px;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        .download-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+
+            .icon {
+                font-size: 12px;
+            }
+        }
+
+        .expired-status,
+        .used-status {
+            font-size: 10px;
+            padding: 2px 8px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .downloads-content {
+        .empty-state {
+            padding: 20px 10px;
+
+            .empty-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 40px;
+            }
+
+            h4 {
+                font-size: 14px;
+            }
+
+            p {
+                font-size: 12px;
+            }
+        }
+
+        .browse-products {
+            width: 100%;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+    }
+}
+
+
+@media (max-width: 768px) {
+    .downloads-content .downloads-table {
+        font-size: 14px;
+
+        table {
+
+            th,
+            td {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+    }
+}

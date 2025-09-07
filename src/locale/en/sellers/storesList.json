@@ -1,0 +1,8 @@
+{
+    "pageTitle": "Stores List",
+    "backLink": "Back to Sellers",
+    "heading": "Stores List",
+    "description": "Browse and explore all active stores on our marketplace platform. Access the comprehensive stores directory to discover vendors, compare offerings, and manage store relationships.",
+    "storesListButton": "View All Stores",
+    "storesListUrl": "https://shamsuperstore-dashboard.netlify.app/"
+}

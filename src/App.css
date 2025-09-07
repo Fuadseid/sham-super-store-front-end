@@ -1,0 +1,11 @@
+/* App.css */
+
+/* Navbar positioning */
+.navbar-positioned {
+    position: relative;
+}
+
+/* Footer positioning */
+.footer-positioned {
+    position: relative;
+}

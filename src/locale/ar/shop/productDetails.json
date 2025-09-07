@@ -1,0 +1,80 @@
+{
+    "errors": {
+        "productNotFound": "المنتج غير موجود",
+        "productNotFoundDescription": "المنتج الذي تبحث عنه غير موجود أو تم حذفه.",
+        "backToShop": "العودة إلى المتجر"
+    },
+    "productInfo": {
+        "sku": "رمز المنتج:",
+        "reviews": "تقييمات",
+        "review": "تقييم",
+        "tags": "العلامات:",
+        "color": "اللون:",
+        "size": "المقاس:",
+        "quantity": "الكمية:",
+        "addToCart": "أضف إلى السلة",
+        "outOfStock": "غير متوفر",
+        "compare": "مقارنة",
+        "soldBy": "يُباع بواسطة:"
+    },
+    "tabs": {
+        "aboutItem": "عن هذا المنتج",
+        "shortDescription": "وصف مختصر",
+        "moreInformation": "معلومات إضافية",
+        "productRating": "تقييم المنتج",
+        "reviews": "التقييمات",
+        "shippingTime": "وقت الشحن",
+        "contactSeller": "التواصل مع البائع",
+        "otherSellers": "عروض البائعين الآخرين",
+        "marketplacePolicy": "سياسة المتجر",
+        "storePolicy": "سياسة المحل"
+    },
+    "reviews": {
+        "noReviews": "لا توجد تقييمات متاحة لهذا المنتج بعد.",
+        "basedOn": "بناءً على {{count}} تقييم من العملاء.",
+        "outstanding": "جودة وأداء متميز.",
+        "great": "جودة ممتازة وقيمة رائعة.",
+        "good": "جودة جيدة مع مجال للتحسين.",
+        "mixed": "تقييمات متنوعة، انظر في البدائل.",
+        "noRating": "لا يوجد تقييم متاح بعد. تحقق من التقييمات الفردية أدناه."
+    },
+    "shipping": {
+        "available": "متوفر",
+        "shippingTime": "وقت الشحن من يومين إلى ثلاثة أيام",
+        "outOfStock": "غير متوفر حالياً.",
+        "expectedRestock": "متوقع إعادة التوفر خلال 2-3 أسابيع."
+    },
+    "contact": {
+        "contactSeller": "التواصل مع البائع"
+    },
+    "policy": {
+        "securePayments": {
+            "title": "مدفوعات آمنة عبر الإنترنت",
+            "description": "نوفر نظام دفع آمن ومحمي لجميع المعاملات عبر الإنترنت مع حماية كاملة لبياناتك المالية والشخصية."
+        },
+        "freeShipping": {
+            "title": "شحن مجاني حول العالم",
+            "description": "نقدم خدمة الشحن المجاني لجميع أنحاء العالم مع ضمان وصول المنتجات بأمان وفي الوقت المحدد."
+        },
+        "customerSupport": {
+            "title": "دعم العملاء",
+            "description": "فريق دعم العملاء متاح على مدار الساعة لمساعدتك في أي استفسار أو مشكلة قد تواجهها."
+        },
+        "returnPeriod": {
+            "title": "فترة إرجاع 30 يوماً",
+            "description": "يمكنك إرجاع المنتج خلال 30 يوماً من تاريخ الشراء مع ضمان استرداد كامل للمبلغ المدفوع."
+        },
+        "noStorePolicy": "لا توجد معلومات سياسة المحل متاحة."
+    },
+    "accessibility": {
+        "viewStoreDetails": "اضغط لعرض تفاصيل المتجر",
+        "productThumbnail": "صورة مصغرة للمنتج {{productName}} رقم {{index}}",
+        "mainImage": "{{productName}}",
+        "navigationPrevious": "الصورة السابقة",
+        "navigationNext": "الصورة التالية",
+        "selectColor": "اختر اللون {{colorName}}",
+        "selectSize": "اختر المقاس {{sizeName}}",
+        "increaseQuantity": "زيادة الكمية",
+        "decreaseQuantity": "تقليل الكمية"
+    }
+}

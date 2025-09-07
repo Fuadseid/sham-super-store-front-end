@@ -1,0 +1,40 @@
+{
+    "title": "We'd Love Your Feedback!",
+    "subtitle": "Help us improve your shopping experience",
+    "platformQuestion": {
+        "title": "How would you rate our platform?",
+        "placeholder": "Share your thoughts about your shopping experience..."
+    },
+    "recommendQuestion": {
+        "title": "How likely are you to recommend us to others?",
+        "subtitle": "On a scale of 1-10",
+        "reasonLabel": "What is thew most important reason for your score?",
+        "reasonPlaceholder": "Type your reason here"
+    },
+    "buttons": {
+        "submit": "Submit Review",
+        "skip": "Skip for Now",
+        "submitting": "Submitting...",
+        "thankYou": "Thank You!"
+    },
+    "thankYouMessage": {
+        "title": "Thank You for Your Feedback!",
+        "message": "Your review helps us improve and serve you better.",
+        "close": "Close"
+    },
+    "validation": {
+        "platformRating": "Please rate our platform",
+        "recommendRating": "Please select a recommendation score",
+        "commentTooShort": "Please share more details (minimum 10 characters)"
+    },
+    "feelingQuestion": {
+        "title": "How would you feel if you could no longer use ShamSuperStore?",
+        "subtitle": "Select answer",
+        "options": {
+            "veryDisappointed": "Very Disappointed",
+            "somewhatDisappointed": "Somewhat Disappointed",
+            "notDisappointed": "Not Disappointed ( it isn't really that useful ) ",
+            "naNoLongerUse": "N/A - I no longer use it"
+        }
+    }
+}

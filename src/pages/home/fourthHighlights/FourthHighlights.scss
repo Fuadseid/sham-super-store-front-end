@@ -1,0 +1,232 @@
+@use '../../../assets/style/vars.scss' as *;
+
+.fourthHighlights-out-container {
+    width: 100%;
+    margin: 40px 0;
+
+    .fourthHighlights-container {
+        width: 100%;
+        display: flex;
+
+        .product-out-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.2);
+                transition: opacity 0.3s ease;
+                z-index: 1;
+            }
+
+            .content-overlay {
+                position: relative;
+                z-index: 2;
+                max-width: 1300px;
+                margin: 0 auto;
+                width: 100%;
+                padding: 0 40px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+
+                h2 {
+                    font-size: 48px;
+                    font-weight: 700;
+                    color: #fff;
+                    margin: 0 0 10px 0;
+                    line-height: 1.2;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                }
+
+                h3 {
+                    font-size: 24px;
+                    font-weight: 500;
+                    color: #fff;
+                    margin: 0 0 30px 0;
+                    line-height: 1.3;
+                    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                }
+
+                button {
+                    padding: 15px 30px;
+                    border-radius: 8px;
+                    border: none;
+                    background: $primary-color;
+                    color: white;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 16px;
+                    transition: all 0.3s ease;
+                    align-self: flex-start;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+                    &:hover {
+                        background: darken($primary-color, 10%);
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+                    }
+                }
+
+                &.right-content {
+                    align-items: flex-end;
+                    text-align: right;
+
+                    button {
+                        align-self: flex-end;
+                    }
+                }
+
+                &.left-content {
+                    align-items: flex-start;
+                    text-align: left;
+
+                    button {
+                        align-self: flex-start;
+                    }
+                }
+            }
+        }
+
+        .left-section {
+            background-image: url('../../../assets/images/home/fourthHighlights/left.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .right-section {
+            background-image: url('../../../assets/images/home/fourthHighlights/right.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    }
+
+    // RTL Support
+    &.rtl {
+        .fourthHighlights-container {
+            .product-out-container {
+                .content-overlay {
+
+                    h2,
+                    h3 {
+                        font-family: 'Arial', 'Tahoma', sans-serif;
+                    }
+
+                    &.right-content {
+                        align-items: flex-start;
+                        text-align: left;
+
+                        button {
+                            align-self: flex-start;
+                        }
+                    }
+
+                    &.left-content {
+                        align-items: flex-end;
+                        text-align: right;
+
+                        button {
+                            align-self: flex-end;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive design
+@media (max-width: 1024px) {
+    .fourthHighlights-out-container {
+        .fourthHighlights-container {
+            .product-out-container {
+                height: 250px;
+
+                .content-overlay {
+                    padding: 0 30px;
+
+                    h2 {
+                        font-size: 40px;
+                    }
+
+                    h3 {
+                        font-size: 20px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .fourthHighlights-out-container {
+        .fourthHighlights-container {
+            .product-out-container {
+                height: 200px;
+
+                .content-overlay {
+                    padding: 0 20px;
+
+                    h2 {
+                        font-size: 32px;
+                    }
+
+                    h3 {
+                        font-size: 18px;
+                        margin-bottom: 20px;
+                    }
+
+                    button {
+                        padding: 12px 24px;
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .fourthHighlights-out-container {
+        .fourthHighlights-container {
+            .product-out-container {
+                height: 180px;
+
+                .content-overlay {
+                    padding: 0 15px;
+
+                    h2 {
+                        font-size: 28px;
+                    }
+
+                    h3 {
+                        font-size: 16px;
+                        margin-bottom: 15px;
+                    }
+
+                    button {
+                        padding: 10px 20px;
+                        font-size: 13px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,64 @@
+{
+    "title": "تفاصيل الحساب",
+    "description": "قم بتحديث معلوماتك الشخصية وإدارة أمان حسابك.",
+    "sections": {
+        "personalInfo": "المعلومات الشخصية",
+        "passwordSecurity": "أمان كلمة المرور"
+    },
+    "form": {
+        "firstName": {
+            "label": "الاسم الأول *",
+            "placeholder": "أدخل اسمك الأول"
+        },
+        "lastName": {
+            "label": "اسم العائلة *",
+            "placeholder": "أدخل اسم عائلتك"
+        },
+        "displayName": {
+            "label": "الاسم المعروض *",
+            "placeholder": "أدخل اسمك المعروض",
+            "helper": "هذا هو الاسم الذي سيتم عرضه في قسم الحساب وفي التقييمات"
+        },
+        "email": {
+            "label": "عنوان البريد الإلكتروني *",
+            "placeholder": "أدخل عنوان بريدك الإلكتروني"
+        },
+        "currentPassword": {
+            "label": "كلمة المرور الحالية",
+            "placeholder": "أدخل كلمة المرور الحالية"
+        },
+        "newPassword": {
+            "label": "كلمة المرور الجديدة",
+            "placeholder": "أدخل كلمة المرور الجديدة",
+            "helper": "يجب أن تكون كلمة المرور 8 أحرف على الأقل"
+        },
+        "confirmPassword": {
+            "label": "تأكيد كلمة المرور الجديدة",
+            "placeholder": "تأكيد كلمة المرور الجديدة"
+        }
+    },
+    "passwordSection": {
+        "description": "اترك حقول كلمة المرور فارغة إذا كنت لا تريد تغيير كلمة المرور."
+    },
+    "actions": {
+        "saveChanges": "حفظ التغييرات",
+        "saving": "جاري حفظ التغييرات...",
+        "resetForm": "إعادة تعيين النموذج",
+        "showPassword": "إظهار كلمة المرور",
+        "hidePassword": "إخفاء كلمة المرور"
+    },
+    "validation": {
+        "firstNameRequired": "الاسم الأول مطلوب",
+        "lastNameRequired": "اسم العائلة مطلوب",
+        "displayNameRequired": "الاسم المعروض مطلوب",
+        "emailRequired": "عنوان البريد الإلكتروني مطلوب",
+        "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+        "currentPasswordRequired": "كلمة المرور الحالية مطلوبة لتغيير كلمة المرور",
+        "passwordMinLength": "يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل",
+        "passwordMismatch": "كلمات المرور غير متطابقة"
+    },
+    "messages": {
+        "updateSuccess": "تم تحديث تفاصيل الحساب بنجاح!",
+        "updateError": "فشل في تحديث تفاصيل الحساب. يرجى المحاولة مرة أخرى."
+    }
+}

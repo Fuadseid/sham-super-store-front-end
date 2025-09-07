@@ -1,0 +1,11 @@
+{
+    "title": "New Products",
+    "navigation": {
+        "previousSlide": "Previous products",
+        "nextSlide": "Next products"
+    },
+    "product": {
+        "addToCart": "Add to cart",
+        "viewProduct": "View product"
+    }
+}

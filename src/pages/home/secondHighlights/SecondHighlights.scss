@@ -1,0 +1,151 @@
+@use '../../../assets/style/vars.scss' as *;
+
+.secondHighlights-out-container {
+    background-color: #ECEBEA;
+    margin: 40px 0;
+    padding: 20px 5px;
+
+    .secondHighlights-container {
+        max-width: 1300px;
+        margin: auto;
+        padding: 0px 20px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+
+        .product-out-container {
+            background-color: #fff;
+            display: flex;
+            gap: 30px;
+            padding: 25px;
+            border-radius: 5px;
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            border: none !important;
+
+            .product-left-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 20px 0;
+
+                h5 {
+                    font-size: 16px;
+                    margin: 0;
+                    font-weight: 500;
+                    color: #666;
+                }
+
+                h3 {
+                    font-size: 24px;
+                    margin: 0;
+                    font-weight: 600;
+                    color: #333;
+                }
+
+                button {
+                    margin-top: 10px;
+                    padding: 10px 14px;
+                    width: 70px;
+                    border-radius: 5px;
+                    border: none;
+                    background: $primary-color;
+                    color: white;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: background-color 0.3s ease;
+
+                    &:hover {
+                        background: darken($primary-color, 10%);
+                    }
+                }
+            }
+
+            .product-right-container {
+                flex: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .product-right-image {
+                    width: 100%;
+                    height: 150px;
+                    object-fit: contain;
+                }
+            }
+        }
+    }
+}
+
+// RTL Support for Arabic
+.lang-ar {
+    .secondHighlights-out-container {
+        .secondHighlights-container {
+            .product-out-container {
+                direction: rtl;
+
+                .product-left-container {
+                    text-align: right;
+
+                    button {
+                        align-self: flex-start;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .secondHighlights-out-container {
+        .secondHighlights-container {
+            .product-out-container {
+                min-width: 280px;
+                max-width: 350px;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .secondHighlights-out-container {
+        .secondHighlights-container {
+            flex-direction: column;
+            align-items: center;
+
+            .product-out-container {
+                min-width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .secondHighlights-out-container {
+        padding: 20px 10px;
+
+        .secondHighlights-container {
+            padding: 0px 10px;
+
+            .product-out-container {
+                padding: 20px;
+
+                .product-left-container {
+                    h3 {
+                        font-size: 20px;
+                    }
+                }
+
+                .product-right-container {
+                    .product-right-image {
+                        height: 120px;
+                    }
+                }
+            }
+        }
+    }
+}

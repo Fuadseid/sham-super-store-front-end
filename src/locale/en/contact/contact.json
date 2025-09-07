@@ -1,0 +1,46 @@
+{
+    "pageTitle": "Contact Us",
+    "contactInfo": {
+        "phone": {
+            "number": "1-001-234-5678",
+            "hours": "Mon-Sat: 8:00 - 21:00"
+        },
+        "email": {
+            "address": "support@shamsuperstore.com",
+            "description": "24/7 Customer support"
+        },
+        "address": {
+            "location": "3 Rockaway St., New Rochelle, NY 10801",
+            "description": "Main office location"
+        }
+    },
+    "form": {
+        "title": "Questions?",
+        "description": "If you have any question, please don't hesitate to contact us",
+        "fields": {
+            "name": {
+                "label": "Name",
+                "placeholder": "name",
+                "required": true
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "Email",
+                "required": true
+            },
+            "message": {
+                "label": "Message",
+                "placeholder": "Message",
+                "required": false
+            }
+        },
+        "submitButton": "Send",
+        "requiredField": "*"
+    },
+    "socialMedia": {
+        "facebook": "Follow us on Facebook",
+        "instagram": "Follow us on Instagram",
+        "whatsapp": "Contact us on WhatsApp",
+        "phone": "Call us now"
+    }
+}

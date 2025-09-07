@@ -1,0 +1,27 @@
+{
+    "title": "التحميلات",
+    "table": {
+        "headers": {
+            "product": "المنتج",
+            "downloadsRemaining": "التحميلات المتبقية",
+            "expires": "ينتهي في",
+            "download": "تحميل"
+        }
+    },
+    "emptyState": {
+        "message": "لا توجد تحميلات متاحة بعد.",
+        "title": "لا توجد تحميلات متاحة",
+        "description": "ليس لديك أي منتجات رقمية للتحميل. اشترِ منتجات رقمية لرؤية تحميلاتك هنا."
+    },
+    "actions": {
+        "browseProducts": "تصفح المنتجات",
+        "download": "تحميل",
+        "expired": "منتهي الصلاحية",
+        "unlimited": "غير محدود"
+    },
+    "status": {
+        "active": "نشط",
+        "expired": "منتهي الصلاحية",
+        "used": "مستخدم"
+    }
+}

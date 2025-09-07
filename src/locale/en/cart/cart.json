@@ -1,0 +1,46 @@
+{
+    "title": "Shopping Cart",
+    "empty": {
+        "heading": "Your cart is empty",
+        "description": "Looks like you haven't added any items to your cart yet.",
+        "continueShoppingBtn": "Continue Shopping"
+    },
+    "table": {
+        "headers": {
+            "product": "Product",
+            "price": "Price",
+            "quantity": "Quantity",
+            "subtotal": "Subtotal"
+        }
+    },
+    "item": {
+        "saveForLater": "Save for later",
+        "removeItem": "Remove item",
+        "decreaseQuantity": "Decrease quantity",
+        "increaseQuantity": "Increase quantity",
+        "mobile": {
+            "pricePrefix": "Price: ",
+            "quantityPrefix": "Quantity: ",
+            "subtotalPrefix": "Subtotal: "
+        }
+    },
+    "actions": {
+        "couponPlaceholder": "Coupon code",
+        "applyCouponBtn": "Apply coupon",
+        "refreshCartBtn": "Refresh Cart"
+    },
+    "savedItems": {
+        "title": "Saved for Later",
+        "moveToCartBtn": "Move to Cart",
+        "removeFromSaved": "Remove from saved"
+    },
+    "totals": {
+        "title": "Cart totals",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "shippingMessage": "No shipping options were found for {{address}}.",
+        "changeAddressBtn": "Enter a different address",
+        "total": "Total",
+        "checkoutBtn": "Proceed to checkout"
+    }
+}

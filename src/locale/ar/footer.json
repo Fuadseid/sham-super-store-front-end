@@ -1,0 +1,44 @@
+{
+    "links": {
+        "accountDetails": "تفاصيل الحساب",
+        "shoppingCart": "سلة التسوق",
+        "checkout": "الدفع",
+        "orders": "الطلبات",
+        "orderTracking": "تتبع الطلب",
+        "saveForLater": "احفظ لاحقاً",
+        "wishlist": "قائمة الرغبات",
+        "downloads": "التحميلات",
+        "addresses": "العناوين",
+        "lostPassword": "كلمة مرور منسية",
+        "storeManager": "مدير المتجر",
+        "storesList": "قائمة المتاجر",
+        "vendorMembership": "عضوية البائع",
+        "inquiries": "الاستفسارات",
+        "vendorRegistration": "تسجيل بائع"
+    },
+    "quickLinks": {
+        "home": "الرئيسية",
+        "shop": "التسوق",
+        "about": "من نحن",
+        "contactUs": "اتصل بنا",
+        "inquiries": "الاستفسارات"
+    },
+    "newsletter": {
+        "title": "اشتراك النشرة الإخبارية",
+        "emailPlaceholder": "أدخل بريدك الإلكتروني...",
+        "signUp": "اشتراك",
+        "description": "احصل على العروض الترويجية والخصومات الخاصة"
+    },
+    "search": {
+        "title": "البحث",
+        "placeholder": "البحث..."
+    },
+    "copyright": {
+        "allRightsReserved": "جميع الحقوق محفوظة"
+    },
+    "legal": {
+        "privacyPolicy": "سياسة الخصوصية",
+        "termsConditions": "الشروط والأحكام",
+        "returnRefunds": "الإرجاع والاسترداد"
+    }
+}

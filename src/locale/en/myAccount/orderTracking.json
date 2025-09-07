@@ -1,0 +1,37 @@
+{
+    "title": "Order Tracking",
+    "loading": "Loading your orders...",
+    "noOrders": "You haven't placed any orders yet.",
+    "table": {
+        "orderNumber": "Order Number",
+        "orderDate": "Order Date",
+        "status": "Status",
+        "items": "Items",
+        "total": "Total",
+        "actions": "Actions",
+        "itemsCount": "items"
+    },
+    "status": {
+        "processing": "Processing",
+        "delivered": "Delivered",
+        "shipped": "Shipped",
+        "cancelled": "Cancelled"
+    },
+    "trackButton": "Track your order",
+    "completed": "Completed",
+    "inTransit": "In Transit",
+    "cancelled": "Cancelled",
+    "modal": {
+        "title": "Live Order Tracking",
+        "driverInfo": "Driver Information",
+        "driverName": "Driver Name",
+        "status": "Status",
+        "enRoute": "En Route to Your Location",
+        "estimatedTime": "Estimated Delivery Time",
+        "minutes": "minutes",
+        "deliveryAddress": "Delivery Address",
+        "loadingMap": "Loading map...",
+        "contactDriver": "Contact Driver",
+        "viewOrderDetails": "View Order Details"
+    }
+}

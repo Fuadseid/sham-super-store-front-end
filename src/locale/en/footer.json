@@ -1,0 +1,44 @@
+{
+    "links": {
+        "accountDetails": "Account details",
+        "shoppingCart": "Shopping Cart",
+        "checkout": "Checkout",
+        "orders": "Orders",
+        "orderTracking": "Order tracking",
+        "saveForLater": "Save for later",
+        "wishlist": "Wishlist",
+        "downloads": "Downloads",
+        "addresses": "Addresses",
+        "lostPassword": "Lost password",
+        "storeManager": "Store Manager",
+        "storesList": "Stores List",
+        "vendorMembership": "Vendor Membership",
+        "inquiries": "Inquiries",
+        "vendorRegistration": "Vendor Registration"
+    },
+    "quickLinks": {
+        "home": "Home",
+        "shop": "Shop",
+        "about": "About",
+        "contactUs": "Contact Us",
+        "inquiries": "Inquiries"
+    },
+    "newsletter": {
+        "title": "Newsletter signup",
+        "emailPlaceholder": "Enter your email...",
+        "signUp": "Sign up",
+        "description": "Get promotions, special offers and discounts"
+    },
+    "search": {
+        "title": "Search",
+        "placeholder": "Search..."
+    },
+    "copyright": {
+        "allRightsReserved": "All Rights Reserved"
+    },
+    "legal": {
+        "privacyPolicy": "Privacy Policy",
+        "termsConditions": "Terms & conditions",
+        "returnRefunds": "Return & Refunds"
+    }
+}

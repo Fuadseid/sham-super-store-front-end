@@ -1,0 +1,26 @@
+{
+    "title": "Categories",
+    "items": {
+        "computers": "Computers",
+        "electronics": "Electronics",
+        "smartHome": "Smart Home",
+        "furniture": "Furniture",
+        "clothes": "Clothes",
+        "shoes": "Shoes",
+        "homeGarden": "Home & Garden",
+        "sport": "Sport & Outdoor Activities",
+        "teen": "Teen Supplies",
+        "babies": "Babies & Kids Supply",
+        "beauty": "Beauty & Health",
+        "bags": "Bags & Luggage",
+        "entertainment": "Entertainment",
+        "handmade": "Handmade",
+        "school": "School & Office Supplies",
+        "pets": "Pets Supplies",
+        "cars": "Cars",
+        "books": "Books"
+    },
+    "accessibility": {
+        "categoryLink": "Browse {{categoryName}} category"
+    }
+}

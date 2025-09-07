@@ -1,0 +1,80 @@
+@use '../../assets/style/vars.scss' as *;
+
+.delivery-drivers-page {
+    background: linear-gradient(135deg, $orange-color 0%, $yellow-color 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+
+    .delivery-drivers-container {
+        max-width: 600px;
+        width: 100%;
+    }
+
+    .delivery-drivers-content {
+        background: $white;
+        border-radius: $radius-xl;
+        padding: 4rem 3rem;
+        text-align: center;
+        box-shadow: $shadow-2xl;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+
+        .drivers-icon {
+            margin-bottom: 2rem;
+
+            svg {
+                color: $orange-color;
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: $dark-blue-color;
+            margin-bottom: 2rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: $gray-600;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: $orange-color;
+            color: $white;
+            padding: 1rem 2rem;
+            border-radius: $radius-lg;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: $transition-all;
+            box-shadow: $shadow-md;
+
+            &:hover {
+                background: darken($orange-color, 10%);
+                transform: translateY(-2px);
+                box-shadow: $shadow-lg;
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .delivery-drivers-content {
+            padding: 3rem 2rem;
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+    }
+}

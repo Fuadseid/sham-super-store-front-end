@@ -1,0 +1,60 @@
+{
+    "title": "Support Tickets",
+    "actions": {
+        "createNewTicket": "Create New Ticket",
+        "viewTicket": "View",
+        "replyToTicket": "Reply",
+        "closeTicket": "Close",
+        "reopenTicket": "Reopen"
+    },
+    "table": {
+        "headers": {
+            "ticketId": "Ticket ID",
+            "subject": "Subject",
+            "status": "Status",
+            "priority": "Priority",
+            "lastUpdated": "Last Updated",
+            "actions": "Actions"
+        }
+    },
+    "status": {
+        "open": "Open",
+        "pending": "Pending",
+        "resolved": "Resolved",
+        "closed": "Closed",
+        "waiting": "Waiting for Response"
+    },
+    "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+    },
+    "emptyState": {
+        "message": "No support tickets found.",
+        "title": "No Support Tickets",
+        "description": "You haven't created any support tickets yet. Create a new ticket to get help with your questions or issues."
+    },
+    "form": {
+        "createTicket": {
+            "title": "Create New Support Ticket",
+            "subject": "Subject *",
+            "subjectPlaceholder": "Brief description of your issue",
+            "priority": "Priority *",
+            "category": "Category",
+            "description": "Description *",
+            "descriptionPlaceholder": "Describe your issue in detail...",
+            "attachments": "Attachments (optional)",
+            "submitButton": "Submit Ticket",
+            "cancelButton": "Cancel"
+        }
+    },
+    "categories": {
+        "technical": "Technical Support",
+        "billing": "Billing & Payment",
+        "account": "Account Issues",
+        "orders": "Order Support",
+        "general": "General Inquiry",
+        "feature": "Feature Request"
+    }
+}

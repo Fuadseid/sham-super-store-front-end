@@ -1,0 +1,41 @@
+{
+    "title": "Contacted Sellers",
+    "table": {
+        "headers": {
+            "seller": "Seller",
+            "subject": "Subject",
+            "date": "Date",
+            "actions": "Actions"
+        }
+    },
+    "actions": {
+        "viewConversation": "View",
+        "reply": "Reply",
+        "contactSeller": "Contact Seller",
+        "markAsRead": "Mark as Read",
+        "markAsUnread": "Mark as Unread",
+        "delete": "Delete"
+    },
+    "status": {
+        "read": "Read",
+        "unread": "Unread",
+        "replied": "Replied",
+        "pending": "Pending Response"
+    },
+    "emptyState": {
+        "message": "No Contacted Sellers found.",
+        "title": "No Seller Conversations",
+        "description": "You haven't contacted any sellers yet. When you send messages to sellers, your conversations will appear here."
+    },
+    "form": {
+        "contactSeller": {
+            "title": "Contact Seller",
+            "subject": "Subject *",
+            "subjectPlaceholder": "Enter your inquiry subject",
+            "message": "Message *",
+            "messagePlaceholder": "Write your message to the seller...",
+            "submitButton": "Send Message",
+            "cancelButton": "Cancel"
+        }
+    }
+}

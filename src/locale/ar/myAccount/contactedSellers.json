@@ -1,0 +1,41 @@
+{
+    "title": "البائعون المتصل بهم",
+    "table": {
+        "headers": {
+            "seller": "البائع",
+            "subject": "الموضوع",
+            "date": "التاريخ",
+            "actions": "الإجراءات"
+        }
+    },
+    "actions": {
+        "viewConversation": "عرض",
+        "reply": "رد",
+        "contactSeller": "التواصل مع البائع",
+        "markAsRead": "تمييز كمقروء",
+        "markAsUnread": "تمييز كغير مقروء",
+        "delete": "حذف"
+    },
+    "status": {
+        "read": "مقروء",
+        "unread": "غير مقروء",
+        "replied": "تم الرد",
+        "pending": "في انتظار الرد"
+    },
+    "emptyState": {
+        "message": "لم يتم العثور على بائعين متصل بهم.",
+        "title": "لا توجد محادثات مع البائعين",
+        "description": "لم تتواصل مع أي بائعين بعد. عندما ترسل رسائل للبائعين، ستظهر محادثاتك هنا."
+    },
+    "form": {
+        "contactSeller": {
+            "title": "التواصل مع البائع",
+            "subject": "الموضوع *",
+            "subjectPlaceholder": "أدخل موضوع استفسارك",
+            "message": "الرسالة *",
+            "messagePlaceholder": "اكتب رسالتك للبائع...",
+            "submitButton": "إرسال الرسالة",
+            "cancelButton": "إلغاء"
+        }
+    }
+}

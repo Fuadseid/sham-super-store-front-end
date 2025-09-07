@@ -1,0 +1,23 @@
+{
+    "welcome": {
+        "greeting": "Hello",
+        "notYou": "(not {{username}}?",
+        "logoutText": "Log out",
+        "closingParenthesis": ")",
+        "dashboardInfo": "From your account dashboard you can view your",
+        "recentOrders": "recent orders",
+        "manageText": ", manage your",
+        "shippingAddresses": "shipping and billing addresses",
+        "andText": ", and",
+        "accountDetails": "edit your password and account details",
+        "endingPeriod": ".",
+        "becomeVendor": "Become a Vendor"
+    },
+    "quickActions": {
+        "title": "Quick Actions",
+        "viewOrders": "View Orders",
+        "manageAddresses": "Manage Addresses",
+        "editAccount": "Edit Account Details",
+        "downloadInvoices": "Download Invoices"
+    }
+}

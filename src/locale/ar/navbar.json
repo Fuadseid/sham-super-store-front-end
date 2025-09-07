@@ -1,0 +1,194 @@
+{
+    "search": {
+        "placeholder": "البحث عن المنتجات...",
+        "button": "بحث"
+    },
+    "topActions": {
+        "support": "support@shamsuperstore.com",
+        "login": "تسجيل الدخول",
+        "becomeASeller": "كن بائعاً"
+    },
+    "navigation": {
+        "home": "الرئيسية",
+        "shop": "الفئات",
+        "myAccount": "حسابي",
+        "about": "من نحن",
+        "contactUs": "اتصل بنا",
+        "sellers": "البائعون",
+        "deliveryDrivers": "سائقو التوصيل",
+        "cart": "السلة"
+    },
+    "shop": {
+        "allCategories": "جميع الفئات",
+        "computer": "الحاسوب",
+        "electronics": "الإلكترونيات",
+        "smartHome": "المنزل الذكي",
+        "homeGarden": "المنزل والحديقة",
+        "furniture": "الأثاث",
+        "clothes": "الملابس",
+        "shoes": "الأحذية",
+        "babiesKidsChildren": "مستلزمات الأطفال والرضع",
+        "teenSupplies": "مستلزمات المراهقين",
+        "beautyHealth": "الجمال والصحة",
+        "sportsOutdoor": "الرياضة والأنشطة الخارجية",
+        "foodGrocery": "البقالة والطعام",
+        "petsSupplies": "مستلزمات الحيوانات الأليفة",
+        "entertainment": "الترفيه",
+        "handmade": "صناعة يدوية",
+        "schoolOffice": "مستلزمات المدرسة والمكتب",
+        "books": "الكتب",
+        "cars": "السيارات",
+        "industrialScientific": "المواد الصناعية والعلمية",
+        "bagsLuggage": "الحقائب والأمتعة"
+    },
+    "computer": {
+        "desktop": "حاسوب مكتبي",
+        "tablet": "جهاز لوحي",
+        "monitor": "شاشة الحاسوب",
+        "mouseKeyboard": "الفأرة ولوحة المفاتيح",
+        "software": "برامج الحاسوب",
+        "accessories": "إكسسوارات الحاسوب",
+        "components": "مكونات الحاسوب"
+    },
+    "electronics": {
+        "mobile": "الهواتف الذكية",
+        "wearable": "التكنولوجيا القابلة للارتداء",
+        "tvVideo": "التلفزيون والفيديو",
+        "speakers": "مكبرات الصوت",
+        "cameras": "الكاميرات والتصوير",
+        "moviesMusic": "الأفلام والموسيقى",
+        "musicalInstruments": "الآلات الموسيقية",
+        "officeEquipment": "معدات المكتب الإلكترونية"
+    },
+    "smartHome": {
+        "smartLock": "الأقفال الذكية",
+        "smartLighting": "الإضاءة الذكية",
+        "vacuumsMops": "المكانس والممسحات",
+        "plugsOutlets": "المقابس والمنافذ",
+        "wifiNetworking": "الواي فاي والشبكات",
+        "detectorsSensors": "أجهزة الكشف والاستشعار",
+        "securityCameras": "كاميرات الأمان والأنظمة"
+    },
+    "homeGarden": {
+        "homeAppliances": "الأجهزة المنزلية والأدوات الكهربائية",
+        "kitchen": "المطبخ",
+        "bath": "الحمام",
+        "laundry": "مستلزمات الغسيل",
+        "heatingCooling": "التدفئة والتبريد",
+        "lighting": "الإضاءة",
+        "homeAudioVideo": "أنظمة الصوت والفيديو المنزلية",
+        "storage": "التخزين والتنظيم",
+        "homeRepair": "أدوات إصلاح المنزل",
+        "lawnGarden": "العشب والحديقة",
+        "gardenSupplies": "مستلزمات الحديقة والأنشطة الخارجية"
+    },
+    "furniture": {
+        "chair": "كرسي",
+        "sofa": "أريكة",
+        "livingRoom": "غرفة المعيشة",
+        "guestRoom": "غرفة الضيوف",
+        "kidsRoom": "غرفة الأطفال",
+        "diningRoom": "غرفة الطعام",
+        "bedroom": "غرفة النوم",
+        "studyOffice": "المكتب والدراسة",
+        "outdoor": "الأثاث الخارجي",
+        "antiques": "التحف والفنون الجميلة"
+    },
+    "clothes": {
+        "womens": "ملابس نسائية",
+        "mens": "ملابس رجالية",
+        "girls": "ملابس البنات",
+        "boys": "ملابس الأولاد",
+        "childrens": "ملابس الأطفال",
+        "baby": "ملابس الرضع والأطفال الصغار"
+    },
+    "shoes": {
+        "womens": "أحذية نسائية",
+        "mens": "أحذية رجالية",
+        "girls": "أحذية البنات",
+        "boys": "أحذية الأولاد",
+        "childrens": "أحذية الأطفال"
+    },
+    "babiesKids": {
+        "babies": "مستلزمات الرضع",
+        "kids": "مستلزمات الأطفال",
+        "toys": "ألعاب الأطفال",
+        "diapers": "حفاضات الأطفال"
+    },
+    "beautyHealth": {
+        "cosmetics": "إكسسوارات التجميل",
+        "skinCare": "العناية المتخصصة بالبشرة",
+        "salonSpa": "منتجات الصالون والسبا",
+        "vitamins": "الفيتامينات والمكملات الغذائية",
+        "mensCosmetics": "مستحضرات التجميل الرجالية",
+        "jewelry": "المجوهرات",
+        "sunglasses": "النظارات الشمسية",
+        "watches": "الساعات"
+    },
+    "sportsOutdoor": {
+        "sportsEquipment": "المعدات الرياضية",
+        "exerciseFitness": "معدات التمرين واللياقة البدنية",
+        "gameRooms": "غرف الألعاب والألعاب الخارجية",
+        "outdoorEntertainment": "الترفيه والمعدات الخارجية",
+        "golf": "الجولف",
+        "hunting": "الصيد",
+        "cycling": "ركوب الدراجات",
+        "fishingBoating": "الصيد والقوارب"
+    },
+    "foodGrocery": {
+        "gourmet": "الطعام الفاخر"
+    },
+    "petsSupplies": {
+        "catFood": "طعام القطط",
+        "catSupplies": "مستلزمات القطط",
+        "dogFood": "طعام الكلاب",
+        "dogSupplies": "مستلزمات الكلاب",
+        "birdFood": "طعام الطيور",
+        "birdSupplies": "مستلزمات الطيور",
+        "fishSupplies": "مستلزمات الأسماك المائية",
+        "otherAnimals": "مستلزمات الحيوانات الأخرى"
+    },
+    "entertainment": {
+        "videoGames": "ألعاب الفيديو",
+        "homeEntertainment": "نظام الترفيه المنزلي",
+        "vr": "الواقع الافتراضي"
+    },
+    "handmade": {
+        "artsCrafts": "الفنون والحرف والخياطة"
+    },
+    "bagsLuggage": {
+        "handbags": "حقائب اليد",
+        "shoulderBags": "حقائب الكتف",
+        "luggage": "الأمتعة"
+    },
+    "myAccount": {
+        "dashboard": "لوحة التحكم",
+        "orders": "الطلبات",
+        "orderTracking": "تتبع الطلبات",
+        "downloads": "التحميلات",
+        "addresses": "العناوين",
+        "paymentMethods": "طرق الدفع",
+        "accountDetails": "تفاصيل الحساب",
+        "wishlist": "قائمة الأمنيات",
+        "following": "المتابعة",
+        "supportTickets": "تذاكر الدعم",
+        "contactedSellers": "البائعون المتصل بهم",
+        "lostPassword": "كلمة المرور المفقودة"
+    },
+    "sellers": {
+        "vendorRegistration": "تسجيل البائع",
+        "vendorMembership": "عضوية البائع",
+        "storeManager": "مدير المتجر",
+        "vendorsDriversManager": "مدير سائقي البائعين",
+        "storesList": "قائمة المتاجر"
+    },
+    "deliveryDrivers": {
+        "deliveryDrivers": "سائقو التوصيل",
+        "deliveryDriversManager": "مدير سائقي التوصيل",
+        "deliveryDriversApp": "موقع سائقي التوصيل"
+    },
+    "languages": {
+        "english": "English (الإنجليزية)",
+        "arabic": "العربية"
+    }
+}

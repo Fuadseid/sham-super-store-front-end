@@ -1,0 +1,40 @@
+{
+    "title": "نريد رأيك!",
+    "subtitle": "ساعدنا في تحسين تجربة التسوق الخاصة بك",
+    "platformQuestion": {
+        "title": "كيف تقيم منصتنا؟",
+        "placeholder": "شاركنا رأيك في تجربة التسوق..."
+    },
+    "recommendQuestion": {
+        "title": "ما مدى احتمالية أن توصي بنا للآخرين؟",
+        "subtitle": "على مقياس من 1-10",
+        "reasonLabel": "ما هو السبب الرئيسي لتقييمك هذا",
+        "reasonPlaceholder": "اكتب السبب الرئيسي هنا"
+    },
+    "buttons": {
+        "submit": "إرسال التقييم",
+        "skip": "تخطي الآن",
+        "submitting": "جاري الإرسال...",
+        "thankYou": "شكراً لك!"
+    },
+    "thankYouMessage": {
+        "title": "شكراً لك على ملاحظاتك!",
+        "message": "تقييمك يساعدنا في التحسين وخدمتك بشكل أفضل.",
+        "close": "إغلاق"
+    },
+    "validation": {
+        "platformRating": "يرجى تقييم منصتنا",
+        "recommendRating": "يرجى اختيار درجة التوصية",
+        "commentTooShort": "يرجى مشاركة المزيد من التفاصيل (10 أحرف على الأقل)"
+    },
+    "feelingQuestion": {
+        "title": "كيف ستشعر إذا لم يعد بإمكانك استخدام ShamSuperStore؟",
+        "subtitle": "اختر جوابا",
+        "options": {
+            "veryDisappointed": "محبط للغاية",
+            "somewhatDisappointed": "محبط قليلا",
+            "notDisappointed": "ليس بخيبة أمل",
+            "naNoLongerUse": "لم أعد أستخدمه"
+        }
+    }
+}

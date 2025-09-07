@@ -1,0 +1,61 @@
+{
+    "navigation": {
+        "backTo": "Back to {{categoryName}}"
+    },
+    "comparison": {
+        "status": "🔍 Comparing {{count}} product(s) - Add more products or",
+        "viewComparison": "view comparison"
+    },
+    "search": {
+        "placeholder": "Search products...",
+        "button": "Search"
+    },
+    "sorting": {
+        "default": "Default sorting",
+        "priceLowToHigh": "Price: Low to High",
+        "priceHighToLow": "Price: High to Low",
+        "ratingHighToLow": "Rating: High to Low"
+    },
+    "filters": {
+        "button": "Filter",
+        "title": "Advanced Filters",
+        "price": {
+            "label": "Price:",
+            "minPlaceholder": "Min",
+            "maxPlaceholder": "Max",
+            "separator": "to"
+        },
+        "size": {
+            "label": "Size:"
+        },
+        "color": {
+            "label": "Color:"
+        },
+        "condition": {
+            "label": "Condition:",
+            "allConditions": "All Conditions"
+        },
+        "rating": {
+            "label": "Minimum Rating:",
+            "andUp": "& up"
+        },
+        "stock": {
+            "label": "In Stock Only"
+        },
+        "clear": "Clear All Filters"
+    },
+    "results": {
+        "showing": "Showing {{filtered}} of {{total}} results",
+        "noProducts": "Coming Soon !!",
+        "comingSoon": "Coming Soon"
+    },
+    "product": {
+        "rating": "({{rating}})"
+    },
+    "conditions": {
+        "new": "New",
+        "used": "Used",
+        "openBox": "Open Box",
+        "refurbished": "Refurbished"
+    }
+}

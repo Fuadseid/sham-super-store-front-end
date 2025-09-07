@@ -1,0 +1,8 @@
+{
+    "pageTitle": "Delivery Drivers Manager",
+    "backLink": "Back to Delivery Drivers",
+    "heading": "Delivery Drivers Manager",
+    "description": "Manage delivery operations and coordinate driver teams efficiently. Access the manager dashboard to oversee deliveries, track performance, and ensure smooth operations.",
+    "managerButton": "Access Manager Dashboard",
+    "managerUrl": "https://shamsuperstore-dashboard.netlify.app/"
+}

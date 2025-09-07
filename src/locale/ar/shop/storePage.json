@@ -1,0 +1,26 @@
+{
+    "error": {
+        "storeNotFound": "المتجر غير موجود",
+        "storeNotFoundMessage": "المتجر الذي تبحث عنه غير موجود أو تم حذفه.",
+        "backToShop": "العودة للمتجر"
+    },
+    "tabs": {
+        "products": "المنتجات",
+        "storeReviews": "تقييمات المتجر"
+    },
+    "product": {
+        "saleBadge": "تخفيض",
+        "skuLabel": "رقم المنتج:",
+        "stockStatus": {
+            "inStock": "متوفر",
+            "outOfStock": "غير متوفر"
+        }
+    },
+    "reviews": {
+        "basedOnReviews": "بناءً على {{count}} تقييم",
+        "purchasedLabel": "تم شراء:"
+    },
+    "messages": {
+        "noProducts": "لا توجد منتجات متاحة من هذا المتجر."
+    }
+}

@@ -1,0 +1,171 @@
+@use '../../../assets/style/vars.scss' as *;
+
+.our-news-section {
+    background-color: #F9F9F9;
+    padding: 80px 20px;
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 50px;
+        font-size: 2.5rem;
+        color: $text-dark;
+        font-weight: 700;
+    }
+
+    .news-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        justify-items: center;
+    }
+
+    .news-card {
+        background: $white;
+        border: 1px solid $gray-900;
+        border-radius: $radius-md;
+        padding: 30px;
+        max-width: 400px;
+        width: 100%;
+        transition: $transition-all;
+
+        .card-image {
+            margin-bottom: 25px;
+            border-radius: $radius-md;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                transition: $transition-all;
+            }
+        }
+
+        .card-content {
+            .card-description {
+                color: $gray-600;
+                text-align: center;
+                line-height: 1.6;
+                font-size: 14px;
+            }
+        }
+    }
+
+    // RTL Support
+    &.rtl {
+        .section-title {
+            font-family: 'Arial', 'Tahoma', sans-serif;
+        }
+
+        .news-card {
+            .card-content {
+                .card-description {
+                    font-family: 'Arial', 'Tahoma', sans-serif;
+                    text-align: center; // Keep center alignment for descriptions
+                    direction: rtl;
+                }
+            }
+        }
+    }
+
+    // LTR Default (for clarity)
+    &.ltr {
+        .news-card {
+            .card-content {
+                .card-description {
+                    direction: ltr;
+                }
+            }
+        }
+    }
+}
+
+// Tablet/iPad specific styles - Force one row
+@media (min-width: 760px) and (max-width: 1200px) {
+    .our-news-section {
+        padding: 60px 15px;
+
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 40px;
+        }
+
+        .news-cards {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: nowrap; // Force one row
+        }
+
+        .news-card {
+            flex: 1;
+            max-width: 280px; // Smaller cards for tablets
+            padding: 20px;
+
+            .card-image {
+                margin-bottom: 20px;
+
+                img {
+                    height: 160px; // Smaller image height
+                }
+            }
+
+            .card-content {
+                .card-description {
+                    font-size: 13px;
+                    line-height: 1.5;
+                }
+            }
+        }
+    }
+}
+
+// Mobile devices - Column layout
+@media (max-width: 759px) {
+    .our-news-section {
+        padding: 60px 15px;
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 40px;
+        }
+
+        .news-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .news-card {
+            max-width: 400px;
+            width: 100%;
+            padding: 25px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .our-news-section {
+        padding: 40px 10px;
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .news-card {
+            padding: 20px;
+
+            .card-content {
+                .card-description {
+                    font-size: 13px;
+                }
+            }
+        }
+    }
+}

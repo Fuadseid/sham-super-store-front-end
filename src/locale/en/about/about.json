@@ -1,0 +1,32 @@
+{
+    "cards": {
+        "shoppers": {
+            "title": "For Shoppers",
+            "subtitle": "Discover More, Shop Smarter",
+            "description": "Welcome to your new favorite marketplace—where quality, variety, and trust come together. We connect you with unique products from independent sellers worldwide, all in one easy-to-use platform. Whether you're looking for something everyday or extraordinary, you'll find it here—secure, seamless, and always satisfying.",
+            "button": "Shop"
+        },
+        "sellers": {
+            "title": "For Sellers",
+            "subtitle": "Grow Your Brand, Reach More Customers",
+            "description": "Join a marketplace built for growth. Our multivendor platform empowers you to showcase your products to a diverse, engaged audience—with powerful tools to manage your store, marketing, and orders. From solo entrepreneurs to expanding brands, we're here to help you thrive and scale with confidence.",
+            "button": "Become a Seller"
+        },
+        "team": {
+            "title": "The People Behind the Platform",
+            "subtitle": "Our Team",
+            "description": "At the heart of everything we do is a team committed to excellence. From responsive support to consistent service quality, we work behind the scenes to ensure both vendors and shoppers have the best possible experience. Our approach is built on transparency, care, and a deep respect for every interaction. You can count on us to be professional, helpful, and always focused on getting it right.",
+            "button": "Contact Us"
+        },
+        "delivery": {
+            "title": "Delivery Team",
+            "subtitle": "Driven by Reliability, Powered by People",
+            "description": "Our delivery network plays a vital role in connecting sellers and shoppers every day. Behind every successful order is a team of dependable, hardworking individuals who ensure packages arrive safely and on time. Whether on the road or coordinating behind the scenes, our drivers and logistics staff are committed to professionalism, efficiency, and service that reflects our promise to customers and vendors alike.",
+            "button": "Join our delivery team"
+        }
+    },
+    "service": {
+        "title": "Excellent Service by Dedicated team",
+        "description": "Our team is always available to help you with any concern, if any questions, please don't hesitate to contact us"
+    }
+}

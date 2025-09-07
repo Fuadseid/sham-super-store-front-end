@@ -1,0 +1,39 @@
+{
+    "title": "Addresses",
+    "description": "The following addresses will be used on the checkout page by default.",
+    "types": {
+        "billing": "Billing Address",
+        "shipping": "Shipping Address"
+    },
+    "actions": {
+        "edit": "Edit",
+        "save": "Save Address",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "setDefault": "Set as Default"
+    },
+    "emptyState": {
+        "message": "You have not set up this type of address yet."
+    },
+    "form": {
+        "title": "Add New Address",
+        "firstName": "First Name *",
+        "lastName": "Last Name *",
+        "company": "Company (optional)",
+        "country": "Country *",
+        "street": "Street Address *",
+        "buildingNumber": "Building Number",
+        "floor": "Floor",
+        "city": "City *",
+        "state": "State/Province *",
+        "postalCode": "Postal Code *",
+        "phone": "Phone Number *",
+        "description": "Additional Description",
+        "setAsDefault": "Set as default address"
+    },
+    "validation": {
+        "required": "This field is required",
+        "invalidEmail": "Please enter a valid email address",
+        "invalidPhone": "Please enter a valid phone number"
+    }
+}

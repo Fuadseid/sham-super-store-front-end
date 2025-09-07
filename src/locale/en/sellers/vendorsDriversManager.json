@@ -1,0 +1,8 @@
+{
+    "pageTitle": "Vendors Drivers Manager",
+    "backLink": "Back to Sellers",
+    "heading": "Vendors Drivers Manager",
+    "description": "Coordinate and manage delivery drivers for your vendor operations. Access the drivers management portal to assign deliveries, track driver performance, and ensure timely order fulfillment.",
+    "driversManagerButton": "Manage Drivers",
+    "driversManagerUrl": "https://shamsuperstore-dashboard.netlify.app/"
+}

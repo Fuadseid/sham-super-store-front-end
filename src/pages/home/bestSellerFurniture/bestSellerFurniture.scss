@@ -1,0 +1,287 @@
+@use '../../../assets/style/vars.scss' as *;
+
+.best-sellers-section {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 40px 20px;
+
+    @media (max-width: 768px) {
+        padding: 30px 15px;
+    }
+
+    @media (max-width: 468px) {
+        padding: 30px 10px;
+    }
+
+    .section-title {
+        font-size: 32px;
+        font-weight: 600;
+        color: $text-dark;
+        margin-bottom: 30px;
+        text-align: left; // Default for LTR
+
+        @media (max-width: 768px) {
+            font-size: 20px;
+            margin: 0 30px;
+            margin-bottom: 20px;
+        }
+    }
+
+    // RTL title alignment
+    .rtl .section-title {
+        text-align: right;
+        font-family: 'Arial', 'Tahoma', sans-serif;
+    }
+
+    .products-swiper-container {
+        position: relative;
+        padding: 0 60px; // Increased padding to accommodate buttons
+
+        @media (max-width: 1024px) {
+            padding: 0 50px;
+        }
+
+        @media (max-width: 768px) {
+            padding: 0 35px;
+        }
+    }
+
+    // Navigation buttons positioned in the padding area
+    .custom-nav-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: $primary-color;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px; // Box-shaped like other components
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        @media (max-width: 768px) {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        &:hover {
+            background-color: $primary-blue-hover;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+
+            &:hover {
+                transform: translateY(-50%);
+                background-color: $primary-color;
+            }
+        }
+
+        svg {
+            width: 24px;
+            height: 24px;
+            fill: $white;
+
+            @media (max-width: 768px) {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        &.prev-button {
+            left: 10px;
+
+            @media (max-width: 768px) {
+                left: 5px;
+            }
+        }
+
+        &.next-button {
+            right: 10px;
+
+            @media (max-width: 768px) {
+                right: 5px;
+            }
+        }
+    }
+
+    .products-swiper {
+        position: relative;
+
+        // RTL layout handling through CSS
+        &.rtl-swiper {
+            direction: rtl;
+
+            .swiper-wrapper {
+                direction: ltr;
+            }
+
+            .swiper-slide {
+                direction: ltr; // Reset direction for slide content
+            }
+        }
+
+        .swiper-slide {
+            height: auto;
+        }
+
+        .product-item {
+            position: relative;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+
+            @media (max-width: 768px) {
+                padding: 5px;
+            }
+
+            .product-image-container {
+                position: relative;
+                width: 100%;
+                min-width: 150px;
+                height: 150px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 12px;
+                overflow: hidden;
+                border-radius: 8px;
+
+                @media (max-width: 768px) {
+                    min-width: 120px;
+                    height: 125px;
+                    max-height: 130px;
+                }
+
+                .product-image {
+                    width: 150px; // Fixed width
+                    height: 150px; // Fixed height
+                    object-fit: cover;
+
+                    @media (max-width: 768px) {
+                        width: 100%;
+                        max-width: 130px;
+                        max-height: 130px;
+                        height: 100%;
+                    }
+                }
+
+                // Flag-style sale banner (keeping original design)
+                .sale-banner {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: 2;
+
+                    span {
+                        display: inline-block;
+                        color: $white;
+                        font-size: 11px;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        position: relative;
+                    }
+                }
+
+                .store-icon-overlay {
+                    position: absolute;
+                    bottom: 8px;
+                    right: 8px;
+                    width: 32px;
+                    height: 32px;
+                    background-color: $primary-color;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transform: scale(0.8);
+                    transition: all 0.3s ease;
+
+                    .store-icon {
+                        width: 18px;
+                        height: 18px;
+                        fill: $white;
+                    }
+                }
+            }
+
+            .product-name {
+                font-size: 14px;
+                font-weight: 500;
+                color: $text-dark;
+                margin-bottom: 8px;
+                line-height: 1.3;
+                text-align: center;
+            }
+
+            .product-pricing {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+
+                .old-price {
+                    font-size: 12px;
+                    color: $text-light;
+                    text-decoration: line-through;
+                }
+
+                .current-price {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $text-dark;
+                }
+
+                .price-only {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $text-dark;
+                }
+            }
+        }
+
+        // Hover effect for store icon
+        .product-item:hover .store-icon-overlay {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+        }
+
+        // Hide default Swiper navigation buttons
+        .swiper-button-next,
+        .swiper-button-prev {
+            display: none;
+        }
+
+        // Hide pagination
+        .swiper-pagination {
+            display: none;
+        }
+    }
+
+    // RTL-specific adjustments for sale banner positioning
+    .rtl .products-swiper .product-item .product-image-container .sale-banner {
+        left: auto;
+        right: 0;
+
+        span {
+            &::after {
+                left: auto;
+                right: 0;
+                border-left: none;
+                border-right: 15px solid transparent;
+            }
+        }
+    }
+}

@@ -1,0 +1,80 @@
+{
+    "errors": {
+        "productNotFound": "Product not found",
+        "productNotFoundDescription": "The product you're looking for doesn't exist or has been removed.",
+        "backToShop": "Back to Shop"
+    },
+    "productInfo": {
+        "sku": "SKU:",
+        "reviews": "reviews",
+        "review": "review",
+        "tags": "Tags:",
+        "color": "Color:",
+        "size": "Size:",
+        "quantity": "Quantity:",
+        "addToCart": "Add to cart",
+        "outOfStock": "Out of Stock",
+        "compare": "Compare",
+        "soldBy": "Sold By:"
+    },
+    "tabs": {
+        "aboutItem": "About this item",
+        "shortDescription": "Short Description",
+        "moreInformation": "More information",
+        "productRating": "Product Rating",
+        "reviews": "Reviews",
+        "shippingTime": "Shipping time",
+        "contactSeller": "Contact Seller",
+        "otherSellers": "Other seller's offers",
+        "marketplacePolicy": "Marketplace Policy",
+        "storePolicy": "Store Policy"
+    },
+    "reviews": {
+        "noReviews": "No reviews available for this product yet.",
+        "basedOn": "Based on {{count}} customer reviews.",
+        "outstanding": "Outstanding quality and performance.",
+        "great": "Great quality and value.",
+        "good": "Good quality with room for improvement.",
+        "mixed": "Mixed reviews, consider alternatives.",
+        "noRating": "No rating available yet. Check individual reviews below."
+    },
+    "shipping": {
+        "available": "Available",
+        "shippingTime": "Shipping time is from 2 to 3 days",
+        "outOfStock": "Currently out of stock.",
+        "expectedRestock": "Expected restock in 2-3 weeks."
+    },
+    "contact": {
+        "contactSeller": "Contact Seller"
+    },
+    "policy": {
+        "securePayments": {
+            "title": "Secure online payments",
+            "description": "Scelerisque dignissim in leo at magna donec mi metus ipsum luctus nam elit sociis luctus et aliquam libero at mi metus ipsum luctus magna donec mi metus."
+        },
+        "freeShipping": {
+            "title": "Free worldwide shipping",
+            "description": "Cras mi metus ipsum luctus ultricies ligula sed magna dictum porta. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        },
+        "customerSupport": {
+            "title": "Customer support",
+            "description": "Scelerisque dignissim in leo at magna donec mi metus ipsum luctus nam elit sociis luctus et aliquam libero."
+        },
+        "returnPeriod": {
+            "title": "30 days return period",
+            "description": "Scelerisque dignissim in leo at magna donec mi metus ipsum luctus nam elit sociis luctus et aliquam libero. Cras ultricies ligula sed magna dictum porta."
+        },
+        "noStorePolicy": "No store policy information available."
+    },
+    "accessibility": {
+        "viewStoreDetails": "Click to view store details",
+        "productThumbnail": "{{productName}} thumbnail {{index}}",
+        "mainImage": "{{productName}}",
+        "navigationPrevious": "Previous image",
+        "navigationNext": "Next image",
+        "selectColor": "Select color {{colorName}}",
+        "selectSize": "Select size {{sizeName}}",
+        "increaseQuantity": "Increase quantity",
+        "decreaseQuantity": "Decrease quantity"
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "navigation": {
+        "backToCategories": "← Back to Categories",
+        "backToShop": "Back to Shop"
+    },
+    "comparison": {
+        "status": "🔍 Comparing {{count}} product(s) - Continue browsing to add more!"
+    },
+    "errors": {
+        "categoryNotFound": "Category not found"
+    },
+    "content": {
+        "comingSoon": "Coming Soon !!",
+        "viewProducts": "View Products"
+    }
+}

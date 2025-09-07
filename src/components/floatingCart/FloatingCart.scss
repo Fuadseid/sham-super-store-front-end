@@ -1,0 +1,99 @@
+@use '../../assets/style/vars.scss' as *;
+
+.floating-cart {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 998;
+  background: $white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: $shadow-xl;
+  cursor: pointer;
+  transition: $transition-all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-2xl;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .floating-cart-icon {
+    position: relative;
+    color: $text-dark;
+
+    .floating-cart-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: $orange-color;
+      color: $white;
+      border-radius: 50%;
+      min-width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1;
+      padding: 0 2px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-cart {
+    bottom: 15px;
+    right: 15px;
+    width: 55px;
+    height: 55px;
+
+    .floating-cart-icon {
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .floating-cart-badge {
+        min-width: 18px;
+        height: 18px;
+        font-size: 10px;
+        top: -6px;
+        right: -6px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-cart {
+    bottom: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+
+    .floating-cart-icon {
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .floating-cart-badge {
+        min-width: 16px;
+        height: 16px;
+        font-size: 9px;
+        top: -5px;
+        right: -5px;
+      }
+    }
+  }
+}

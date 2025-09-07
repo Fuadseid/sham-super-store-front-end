@@ -1,0 +1,60 @@
+{
+    "title": "تذاكر الدعم",
+    "actions": {
+        "createNewTicket": "إنشاء تذكرة جديدة",
+        "viewTicket": "عرض",
+        "replyToTicket": "رد",
+        "closeTicket": "إغلاق",
+        "reopenTicket": "إعادة فتح"
+    },
+    "table": {
+        "headers": {
+            "ticketId": "رقم التذكرة",
+            "subject": "الموضوع",
+            "status": "الحالة",
+            "priority": "الأولوية",
+            "lastUpdated": "آخر تحديث",
+            "actions": "الإجراءات"
+        }
+    },
+    "status": {
+        "open": "مفتوح",
+        "pending": "قيد الانتظار",
+        "resolved": "تم الحل",
+        "closed": "مغلق",
+        "waiting": "في انتظار الرد"
+    },
+    "priority": {
+        "low": "منخفض",
+        "medium": "متوسط",
+        "high": "عالي",
+        "urgent": "عاجل"
+    },
+    "emptyState": {
+        "message": "لم يتم العثور على تذاكر دعم.",
+        "title": "لا توجد تذاكر دعم",
+        "description": "لم تقم بإنشاء أي تذاكر دعم بعد. أنشئ تذكرة جديدة للحصول على المساعدة في أسئلتك أو مشاكلك."
+    },
+    "form": {
+        "createTicket": {
+            "title": "إنشاء تذكرة دعم جديدة",
+            "subject": "الموضوع *",
+            "subjectPlaceholder": "وصف مختصر للمشكلة",
+            "priority": "الأولوية *",
+            "category": "الفئة",
+            "description": "الوصف *",
+            "descriptionPlaceholder": "اوصف مشكلتك بالتفصيل...",
+            "attachments": "المرفقات (اختياري)",
+            "submitButton": "إرسال التذكرة",
+            "cancelButton": "إلغاء"
+        }
+    },
+    "categories": {
+        "technical": "الدعم التقني",
+        "billing": "الفواتير والدفع",
+        "account": "مشاكل الحساب",
+        "orders": "دعم الطلبات",
+        "general": "استفسار عام",
+        "feature": "طلب ميزة جديدة"
+    }
+}

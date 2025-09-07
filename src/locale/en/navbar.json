@@ -1,0 +1,194 @@
+{
+    "search": {
+        "placeholder": "Search products...",
+        "button": "Search"
+    },
+    "topActions": {
+        "support": "support@shamsuperstore.com",
+        "login": "Login",
+        "becomeASeller": "Become a seller"
+    },
+    "navigation": {
+        "home": "Home",
+        "shop": "Categories",
+        "myAccount": "My Account",
+        "about": "About",
+        "contactUs": "Contact Us",
+        "sellers": "Sellers",
+        "deliveryDrivers": "Delivery Drivers",
+        "cart": "Cart"
+    },
+    "shop": {
+        "allCategories": "All Categories",
+        "computer": "Computer",
+        "electronics": "Electronics",
+        "smartHome": "Smart Home",
+        "homeGarden": "Home - Garden",
+        "furniture": "Furniture",
+        "clothes": "Clothes",
+        "shoes": "Shoes",
+        "babiesKidsChildren": "Babies - Kids - Children Supplies",
+        "teenSupplies": "Teen Supplies",
+        "beautyHealth": "Beauty - Health",
+        "sportsOutdoor": "Sports - Outdoor Activities",
+        "foodGrocery": "Food Grocery",
+        "petsSupplies": "Pets Supplies",
+        "entertainment": "Entertainment",
+        "handmade": "Handmade",
+        "schoolOffice": "School - Office Supplies",
+        "books": "Books",
+        "cars": "Cars",
+        "industrialScientific": "Industrial Scientific Materials",
+        "bagsLuggage": "Bags - Luggage"
+    },
+    "computer": {
+        "desktop": "Desktop Computer",
+        "tablet": "Tablet PC",
+        "monitor": "Computer Monitor",
+        "mouseKeyboard": "Computer Mouse - Keyboard",
+        "software": "Computer Software",
+        "accessories": "Computer Accessories",
+        "components": "Computer Components"
+    },
+    "electronics": {
+        "mobile": "Mobile - Smart Phone",
+        "wearable": "Wearable Technology",
+        "tvVideo": "TV and Video",
+        "speakers": "Speakers",
+        "cameras": "Cameras - Pictures",
+        "moviesMusic": "Movies - Music",
+        "musicalInstruments": "Musical Instruments",
+        "officeEquipment": "Electronic Office Equipment"
+    },
+    "smartHome": {
+        "smartLock": "Smart Lock",
+        "smartLighting": "Smart Lighting",
+        "vacuumsMops": "Vacuums - Mops",
+        "plugsOutlets": "Plugs - Outlets",
+        "wifiNetworking": "WiFi - Networking",
+        "detectorsSensors": "Detectors - Sensors",
+        "securityCameras": "Security Cameras - Systems"
+    },
+    "homeGarden": {
+        "homeAppliances": "Home Appliances - Electrical Tools",
+        "kitchen": "Kitchen",
+        "bath": "Bath",
+        "laundry": "Laundry Supplies",
+        "heatingCooling": "Heating - Cooling",
+        "lighting": "Lighting",
+        "homeAudioVideo": "Home Audio - Video Systems",
+        "storage": "Storage - Organization Supplies",
+        "homeRepair": "Home Repair Tools",
+        "lawnGarden": "Lawn - Garden",
+        "gardenSupplies": "Garden Supplies - Outdoor Activities"
+    },
+    "furniture": {
+        "chair": "Chair",
+        "sofa": "Sofa",
+        "livingRoom": "Living Room",
+        "guestRoom": "Guest Room",
+        "kidsRoom": "Kids - Children Room",
+        "diningRoom": "Dining Room",
+        "bedroom": "Bedroom",
+        "studyOffice": "Study - Home Office",
+        "outdoor": "Outdoor Furniture",
+        "antiques": "Antiques - Fine Arts"
+    },
+    "clothes": {
+        "womens": "Women's Clothing",
+        "mens": "Men's Clothing",
+        "girls": "Girl's Clothing",
+        "boys": "Boy's Clothing",
+        "childrens": "Children's Clothing",
+        "baby": "Infant's - Baby's Clothing"
+    },
+    "shoes": {
+        "womens": "Women's Shoes",
+        "mens": "Men's Shoes",
+        "girls": "Girl's Shoes",
+        "boys": "Boy's Shoes",
+        "childrens": "Children's Shoes"
+    },
+    "babiesKids": {
+        "babies": "Babies Supplies",
+        "kids": "Kids - Children Supplies",
+        "toys": "Children Toys",
+        "diapers": "Baby Diapers"
+    },
+    "beautyHealth": {
+        "cosmetics": "Cosmetics Accessories",
+        "skinCare": "Specialized Skin Care",
+        "salonSpa": "Salon - Spa Products",
+        "vitamins": "Vitamins - Other Nutrients",
+        "mensCosmetics": "Men's Cosmetics Skin Care",
+        "jewelry": "Jewelry",
+        "sunglasses": "Sunglasses",
+        "watches": "Watches"
+    },
+    "sportsOutdoor": {
+        "sportsEquipment": "Sports Equipment",
+        "exerciseFitness": "Exercise - Fitness Equipment",
+        "gameRooms": "Game Rooms - Outdoor Games",
+        "outdoorEntertainment": "Outdoor Entertainment - Equipment",
+        "golf": "Golf",
+        "hunting": "Hunting",
+        "cycling": "Cycling",
+        "fishingBoating": "Fishing - Boating"
+    },
+    "foodGrocery": {
+        "gourmet": "Gourmet Food"
+    },
+    "petsSupplies": {
+        "catFood": "Cat Food",
+        "catSupplies": "Cat Supplies",
+        "dogFood": "Dog Food",
+        "dogSupplies": "Dog Supplies",
+        "birdFood": "Bird Food",
+        "birdSupplies": "Bird Supplies",
+        "fishSupplies": "Fish Aquatic Supplies",
+        "otherAnimals": "Other Animal Supplies"
+    },
+    "entertainment": {
+        "videoGames": "Video Games",
+        "homeEntertainment": "Home Entertainment System",
+        "vr": "VR - Virtual Reality"
+    },
+    "handmade": {
+        "artsCrafts": "Arts - Crafts - Sewing"
+    },
+    "bagsLuggage": {
+        "handbags": "Handbags",
+        "shoulderBags": "Shoulder Bags",
+        "luggage": "Luggage"
+    },
+    "myAccount": {
+        "dashboard": "Dashboard",
+        "orders": "Orders",
+        "orderTracking": "Order Tracking",
+        "downloads": "Downloads",
+        "addresses": "Addresses",
+        "paymentMethods": "Payment Methods",
+        "accountDetails": "Account Details",
+        "wishlist": "Wishlist",
+        "following": "Following",
+        "supportTickets": "Support Tickets",
+        "contactedSellers": "Contacted Sellers",
+        "lostPassword": "Lost Password"
+    },
+    "sellers": {
+        "vendorRegistration": "Vendor Registration",
+        "vendorMembership": "Vendor Membership",
+        "storeManager": "Store Manager",
+        "vendorsDriversManager": "Vendors Drivers Manager",
+        "storesList": "Stores List"
+    },
+    "deliveryDrivers": {
+        "deliveryDrivers": "Delivery Drivers",
+        "deliveryDriversManager": "Delivery Drivers Manager",
+        "deliveryDriversApp": "Delivery Drivers Website"
+    },
+    "languages": {
+        "english": "English",
+        "arabic": "العربية (Arabic)"
+    }
+}

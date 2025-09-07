@@ -1,0 +1,11 @@
+{
+    "title": "المنتجات الجديدة",
+    "navigation": {
+        "previousSlide": "المنتجات السابقة",
+        "nextSlide": "المنتجات التالية"
+    },
+    "product": {
+        "addToCart": "أضف إلى السلة",
+        "viewProduct": "عرض المنتج"
+    }
+}

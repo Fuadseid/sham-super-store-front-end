@@ -1,0 +1,20 @@
+/* Simple iPad Layout Shift Fix - Minimal Changes */
+
+body {
+  margin: 0;
+}
+
+/* Only fix the specific iPad layout shift issue */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* iPad Mini specific fix */
+@media screen and (width: 768px) and (height: 1024px),
+screen and (width: 1024px) and (height: 768px) {
+
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+}

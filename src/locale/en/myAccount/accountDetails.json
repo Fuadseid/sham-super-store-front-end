@@ -1,0 +1,64 @@
+{
+    "title": "Account Details",
+    "description": "Update your personal information and manage your account security.",
+    "sections": {
+        "personalInfo": "Personal Information",
+        "passwordSecurity": "Password Security"
+    },
+    "form": {
+        "firstName": {
+            "label": "First name *",
+            "placeholder": "Enter your first name"
+        },
+        "lastName": {
+            "label": "Last name *",
+            "placeholder": "Enter your last name"
+        },
+        "displayName": {
+            "label": "Display name *",
+            "placeholder": "Enter your display name",
+            "helper": "This will be how your name will be displayed in the account section and in reviews"
+        },
+        "email": {
+            "label": "Email address *",
+            "placeholder": "Enter your email address"
+        },
+        "currentPassword": {
+            "label": "Current password",
+            "placeholder": "Enter your current password"
+        },
+        "newPassword": {
+            "label": "New password",
+            "placeholder": "Enter your new password",
+            "helper": "Password must be at least 8 characters long"
+        },
+        "confirmPassword": {
+            "label": "Confirm new password",
+            "placeholder": "Confirm your new password"
+        }
+    },
+    "passwordSection": {
+        "description": "Leave password fields blank if you don't want to change your password."
+    },
+    "actions": {
+        "saveChanges": "Save Changes",
+        "saving": "Saving Changes...",
+        "resetForm": "Reset Form",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
+    },
+    "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "displayNameRequired": "Display name is required",
+        "emailRequired": "Email address is required",
+        "emailInvalid": "Please enter a valid email address",
+        "currentPasswordRequired": "Current password is required to change password",
+        "passwordMinLength": "New password must be at least 8 characters long",
+        "passwordMismatch": "Passwords do not match"
+    },
+    "messages": {
+        "updateSuccess": "Account details updated successfully!",
+        "updateError": "Failed to update account details. Please try again."
+    }
+}

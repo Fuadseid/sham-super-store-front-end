@@ -1,0 +1,21 @@
+{
+    "title": "سلة التسوق",
+    "closeCart": "إغلاق السلة",
+    "empty": "سلة التسوق فارغة",
+    "item": {
+        "decreaseQuantity": "تقليل الكمية",
+        "increaseQuantity": "زيادة الكمية",
+        "removeItem": "إزالة العنصر"
+    },
+    "summary": {
+        "subtotal": "المجموع الفرعي",
+        "shipping": "حساب الشحن",
+        "total": "الإجمالي",
+        "promoPlaceholder": "أدخل رمز الخصم",
+        "promoApply": "تطبيق"
+    },
+    "actions": {
+        "viewCart": "عرض السلة",
+        "checkout": "الدفع"
+    }
+}

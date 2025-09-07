@@ -1,0 +1,95 @@
+@use '../../../assets/style/vars.scss' as *;
+
+.vendors-drivers-manager-page {
+    background: $gray-50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+
+    .vendors-drivers-manager-container {
+        max-width: 600px;
+        width: 100%;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: $primary-color;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        transition: $transition-all;
+
+        &:hover {
+            color: $primary-blue-hover;
+        }
+    }
+
+    .vendors-drivers-manager-content {
+        background: $white;
+        border-radius: $radius-xl;
+        padding: 4rem 3rem;
+        text-align: center;
+        box-shadow: $shadow-xl;
+        border: 2px solid $primary-blue-light;
+
+        .vendors-drivers-manager-icon {
+            margin-bottom: 2rem;
+
+            svg {
+                color: $primary-color;
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: $dark-blue-color;
+            margin-bottom: 2rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: $gray-600;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        .vendors-drivers-manager-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: $primary-color;
+            color: $white;
+            padding: 1rem 2rem;
+            border-radius: $radius-lg;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: $transition-all;
+            box-shadow: $shadow-md;
+
+            &:hover {
+                background: $primary-blue-hover;
+                transform: translateY(-2px);
+                box-shadow: $shadow-lg;
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .vendors-drivers-manager-content {
+            padding: 3rem 2rem;
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+    }
+}

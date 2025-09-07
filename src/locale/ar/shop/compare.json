@@ -1,0 +1,50 @@
+{
+    "header": {
+        "title": "مقارنة المنتجات",
+        "noProducts": "لم يتم اختيار منتجات للمقارنة",
+        "compareCount": "مقارنة منتج واحد",
+        "compareCountPlural": "مقارنة {{count}} منتجات"
+    },
+    "empty": {
+        "title": "ابدأ مقارنة المنتجات",
+        "description": "أضف منتجات لمقارنة الميزات والأسعار والمواصفات جنباً إلى جنب.",
+        "browseButton": "تصفح المنتجات"
+    },
+    "table": {
+        "labels": {
+            "product": "المنتج",
+            "rating": "التقييم",
+            "price": "السعر",
+            "availability": "التوفر",
+            "sku": "رقم المنتج",
+            "condition": "الحالة",
+            "colors": "الألوان",
+            "sizes": "الأحجام",
+            "addToCart": "إضافة للسلة"
+        }
+    },
+    "product": {
+        "saleBadge": "تخفيض",
+        "viewDetails": "عرض التفاصيل",
+        "removeTitle": "إزالة من المقارنة"
+    },
+    "rating": {
+        "noRating": "لا يوجد تقييم متاح",
+        "ratingText": "{{rating}}/5 ({{reviews}} تقييم)"
+    },
+    "availability": {
+        "inStock": "✓ متوفر",
+        "outOfStock": "✗ غير متوفر"
+    },
+    "general": {
+        "notAvailable": "غير متاح"
+    },
+    "cart": {
+        "addToCart": "إضافة للسلة",
+        "outOfStock": "غير متوفر"
+    },
+    "actions": {
+        "continueShopping": "متابعة التسوق",
+        "clearAll": "مسح الكل"
+    }
+}

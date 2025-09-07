@@ -1,0 +1,46 @@
+{
+    "title": "سلة التسوق",
+    "empty": {
+        "heading": "سلة التسوق فارغة",
+        "description": "يبدو أنك لم تقم بإضافة أي عناصر إلى سلة التسوق بعد.",
+        "continueShoppingBtn": "متابعة التسوق"
+    },
+    "table": {
+        "headers": {
+            "product": "المنتج",
+            "price": "السعر",
+            "quantity": "الكمية",
+            "subtotal": "المجموع الفرعي"
+        }
+    },
+    "item": {
+        "saveForLater": "احفظ للاحقاً",
+        "removeItem": "إزالة العنصر",
+        "decreaseQuantity": "تقليل الكمية",
+        "increaseQuantity": "زيادة الكمية",
+        "mobile": {
+            "pricePrefix": "السعر: ",
+            "quantityPrefix": "الكمية: ",
+            "subtotalPrefix": "المجموع الفرعي: "
+        }
+    },
+    "actions": {
+        "couponPlaceholder": "رمز الكوبون",
+        "applyCouponBtn": "تطبيق الكوبون",
+        "refreshCartBtn": "تحديث السلة"
+    },
+    "savedItems": {
+        "title": "محفوظ للاحقاً",
+        "moveToCartBtn": "نقل إلى السلة",
+        "removeFromSaved": "إزالة من المحفوظات"
+    },
+    "totals": {
+        "title": "إجمالي السلة",
+        "subtotal": "المجموع الفرعي",
+        "shipping": "الشحن",
+        "shippingMessage": "لم يتم العثور على خيارات شحن لـ {{address}}.",
+        "changeAddressBtn": "أدخل عنوان مختلف",
+        "total": "الإجمالي",
+        "checkoutBtn": "المتابعة إلى الدفع"
+    }
+}

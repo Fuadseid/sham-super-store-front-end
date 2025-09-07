@@ -1,0 +1,270 @@
+@use '../../../assets/style/vars.scss' as *;
+
+.order-tracking-content {
+    h3 {
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid $primary-color;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+        }
+    }
+
+    .no-orders {
+        text-align: center;
+        padding: 60px 20px;
+
+        p {
+            color: #666;
+            font-size: 18px;
+            margin: 0;
+        }
+    }
+
+    .orders-table-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-top: 20px;
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+
+            thead {
+                background-color: #f8f9fa;
+
+                th {
+                    padding: 16px 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #333;
+                    border-bottom: 2px solid #e9ecef;
+                    font-size: 13px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+
+                    &:first-child {
+                        padding-left: 20px;
+                    }
+
+                    &:last-child {
+                        padding-right: 20px;
+                        text-align: center;
+                    }
+                }
+            }
+
+            tbody {
+                tr {
+                    transition: background-color 0.2s ease;
+                    border-bottom: 1px solid #e9ecef;
+
+                    &:hover {
+                        background-color: #f8f9fa;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    td {
+                        padding: 16px 12px;
+                        vertical-align: middle;
+
+                        &:first-child {
+                            padding-left: 20px;
+                        }
+
+                        &:last-child {
+                            padding-right: 20px;
+                            text-align: center;
+                        }
+
+                        &.order-id {
+                            font-weight: 600;
+                            color: $primary-color;
+                            font-family: 'Courier New', monospace;
+                        }
+
+                        &.total-amount {
+                            font-weight: 600;
+                            color: #333;
+                        }
+
+                        .status-badge {
+                            padding: 4px 12px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+
+                            &.status-processing {
+                                background-color: #fff3cd;
+                                color: #856404;
+                                border: 1px solid #ffeaa7;
+                            }
+
+                            &.status-delivered {
+                                background-color: #d4edda;
+                                color: #155724;
+                                border: 1px solid #c3e6cb;
+                            }
+
+                            &.status-shipped {
+                                background-color: #cce5ff;
+                                color: #004085;
+                                border: 1px solid #b3d7ff;
+                            }
+
+                            &.status-cancelled {
+                                background-color: #f8d7da;
+                                color: #721c24;
+                                border: 1px solid #f5c6cb;
+                            }
+                        }
+
+
+                    }
+
+                    .actions {
+                        .track-btn {
+                            background-color: $primary-color;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 12px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            transition: all 0.3s ease;
+
+                            &:hover {
+                                background-color: $primary-blue-hover;
+                                transform: translateY(-1px);
+                                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+                            }
+
+                            &:active {
+                                transform: translateY(0);
+                            }
+                        }
+
+                        .no-tracking {
+                            color: #666;
+                            font-size: 12px;
+                            font-style: italic;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    // Responsive design
+    @media (max-width: 768px) {
+        .orders-table-container {
+            overflow-x: auto;
+
+            .orders-table {
+                min-width: 600px;
+
+                thead th {
+                    padding: 12px 8px;
+                    font-size: 11px;
+                }
+
+                tbody td {
+                    padding: 12px 8px;
+                    font-size: 13px;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .orders-table-container {
+            margin-top: 16px;
+            border-radius: 6px;
+
+            .orders-table {
+                thead th {
+                    padding: 10px 6px;
+
+                    &:first-child {
+                        padding-left: 12px;
+                    }
+
+                    &:last-child {
+                        padding-right: 12px;
+                    }
+                }
+
+                tbody tr td {
+                    padding: 10px 6px;
+
+                    &:first-child {
+                        padding-left: 12px;
+                    }
+
+                    &:last-child {
+                        padding-right: 12px;
+                    }
+                }
+
+
+                tbody {
+                    tr {
+                        .actions {
+                            .track-btn {
+                                padding: 6px 12px;
+                                font-size: 11px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

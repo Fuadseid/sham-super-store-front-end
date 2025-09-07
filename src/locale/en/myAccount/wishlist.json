@@ -1,0 +1,18 @@
+{
+    "title": "Wishlist",
+    "emptyState": {
+        "message": "No products added to the wishlist",
+        "title": "Your Wishlist is Empty",
+        "description": "Save items you love by clicking the heart icon. You'll find them here."
+    },
+    "actions": {
+        "returnToShop": "Return To Shop",
+        "removeFromWishlist": "Remove from Wishlist",
+        "addToCart": "Add to Cart",
+        "viewProduct": "View Product"
+    },
+    "itemCount": {
+        "single": "{{count}} item in your wishlist",
+        "multiple": "{{count}} items in your wishlist"
+    }
+}

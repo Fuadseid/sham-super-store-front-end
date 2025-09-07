@@ -1,0 +1,21 @@
+{
+    "title": "Shopping Cart",
+    "closeCart": "Close cart",
+    "empty": "Your cart is empty",
+    "item": {
+        "decreaseQuantity": "Decrease quantity",
+        "increaseQuantity": "Increase quantity",
+        "removeItem": "Remove item"
+    },
+    "summary": {
+        "subtotal": "Sub Total",
+        "shipping": "Shipping Calculate",
+        "total": "Total",
+        "promoPlaceholder": "Enter your Promo Code",
+        "promoApply": "Apply"
+    },
+    "actions": {
+        "viewCart": "View cart",
+        "checkout": "Checkout"
+    }
+}

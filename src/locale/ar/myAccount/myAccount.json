@@ -1,0 +1,22 @@
+{
+    "navigation": {
+        "dashboard": "لوحة التحكم",
+        "orders": "الطلبات",
+        "orderTracking": "تتبع الطلبات",
+        "downloads": "التحميلات",
+        "addresses": "العناوين",
+        "paymentMethods": "طرق الدفع",
+        "accountDetails": "تفاصيل الحساب",
+        "wishlist": "قائمة الأمنيات",
+        "following": "المتابعة",
+        "supportTickets": "تذاكر الدعم",
+        "contactedSellers": "البائعون المتصل بهم",
+        "lostPassword": "كلمة المرور المفقودة"
+    },
+    "actions": {
+        "logout": "تسجيل الخروج"
+    },
+    "userInfo": {
+        "welcome": "مرحباً"
+    }
+}

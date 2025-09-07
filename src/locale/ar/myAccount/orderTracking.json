@@ -1,0 +1,37 @@
+{
+    "title": "تتبع الطلبات",
+    "loading": "جارٍ تحميل طلباتك...",
+    "noOrders": "لم تقم بأي طلبات حتى الآن.",
+    "table": {
+        "orderNumber": "رقم الطلب",
+        "orderDate": "تاريخ الطلب",
+        "status": "الحالة",
+        "items": "العناصر",
+        "total": "الإجمالي",
+        "actions": "الإجراءات",
+        "itemsCount": "عنصر"
+    },
+    "status": {
+        "processing": "قيد المعالجة",
+        "delivered": "تم التسليم",
+        "shipped": "تم الشحن",
+        "cancelled": "ملغي"
+    },
+    "trackButton": "تتبع طلبك",
+    "completed": "مكتمل",
+    "inTransit": "في الطريق",
+    "cancelled": "ملغي",
+    "modal": {
+        "title": "تتبع الطلب المباشر",
+        "driverInfo": "معلومات السائق",
+        "driverName": "اسم السائق",
+        "status": "الحالة",
+        "enRoute": "في الطريق إلى موقعك",
+        "estimatedTime": "وقت التسليم المتوقع",
+        "minutes": "دقيقة",
+        "deliveryAddress": "عنوان التسليم",
+        "loadingMap": "جارٍ تحميل الخريطة...",
+        "contactDriver": "تواصل مع السائق",
+        "viewOrderDetails": "عرض تفاصيل الطلب"
+    }
+}

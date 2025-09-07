@@ -1,0 +1,40 @@
+{
+    "title": "طرق الدفع",
+    "description": "لا يمكنك إضافة طريقة دفع جديدة لذلك لا يلزم عنوان فواتير.",
+    "currentMethods": {
+        "title": "طرق الدفع المتاحة",
+        "cash": {
+            "name": "الدفع نقداً",
+            "description": "ادفع نقداً عند التسليم",
+            "status": "متاح"
+        }
+    },
+    "comingSoon": {
+        "title": "قريباً",
+        "paySham": {
+            "name": "PaySham",
+            "description": "دفع بالمحفظة الرقمية",
+            "status": "قريباً"
+        },
+        "visaCard": {
+            "name": "بطاقات فيزا",
+            "description": "مدفوعات البطاقات الائتمانية والخصم",
+            "status": "قريباً"
+        },
+        "masterCard": {
+            "name": "ماستر كارد",
+            "description": "مدفوعات البطاقات الائتمانية والخصم",
+            "status": "قريباً"
+        }
+    },
+    "emptyState": {
+        "message": "لم يتم العثور على طرق دفع محفوظة.",
+        "addNew": "إضافة طريقة دفع"
+    },
+    "status": {
+        "available": "متاح",
+        "comingSoon": "قريباً",
+        "active": "نشط",
+        "disabled": "معطل"
+    }
+}
