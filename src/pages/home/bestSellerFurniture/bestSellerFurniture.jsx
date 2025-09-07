@@ -5,7 +5,7 @@ import { useState, useRef } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import './BestSellerFurniture.scss';
+import './bestSellerFurniture.scss';
 
 const BestSellerFurniture = () => {
     const { t, isRTL } = useLanguage();
