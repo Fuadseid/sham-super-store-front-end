@@ -28,7 +28,6 @@ export const Intro = () => {
     setIntro(banner);
     }
   },[banner])
-  console.log("Banner",intro)
 
   // This data will come from backend later - keeping as is
   const slides = [

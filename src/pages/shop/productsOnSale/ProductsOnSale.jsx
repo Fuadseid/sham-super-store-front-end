@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../context/LanguageContext';
 import './ProductsOnSale.scss';
+import { useGetOnsaleProductQuery } from '../../../stores/apiSlice';
+import { useSelector } from 'react-redux';
 
 export const ProductsOnSale = ({ compareProducts }) => {
     const { t, isRTL } = useLanguage();
     const navigate = useNavigate();
+    const {data:products,isLOading,isError} = useGetOnsaleProductQuery();
+    const Productdata = products?.data;
+    const [onsale,setOnsale] = useState([]);
+    const {media_url} = useSelector((state)=>state.auth);
+    console.log("On sale product",Productdata)
+    useEffect(()=>{
+        if(Productdata){
+            setOnsale(Productdata)
+        }
+    },[Productdata])
 
     // This data will come from backend later - keeping as is
     const saleProducts = [
@@ -56,10 +68,8 @@ export const ProductsOnSale = ({ compareProducts }) => {
     };
 
     const calculateSavings = (originalPrice, salePrice) => {
-        const original = parseFloat(originalPrice.replace('$', ''));
-        const sale = parseFloat(salePrice.replace('$', ''));
-        const savings = original - sale;
-        const percentage = Math.round((savings / original) * 100);
+        const savings = originalPrice - salePrice;
+        const percentage = Math.round((savings / originalPrice) * 100);
         return { amount: savings.toFixed(2), percentage };
     };
 
@@ -67,8 +77,8 @@ export const ProductsOnSale = ({ compareProducts }) => {
         <div className={`products-on-sale ${isRTL ? 'rtl' : 'ltr'}`}>
             <h3 className="section-title">{t('shop.productsOnSale.title')}</h3>
             <div className="products-list">
-                {saleProducts.map(product => {
-                    const savings = calculateSavings(product.originalPrice, product.salePrice);
+                {onsale.map(product => {
+                    const savings = calculateSavings(product.regular_price, product.on_sale_price);
 
                     return (
                         <div
@@ -77,14 +87,14 @@ export const ProductsOnSale = ({ compareProducts }) => {
                             onClick={() => handleProductClick(product.id)}
                         >
                             <div className="product-image">
-                                <img src={product.image} alt={product.name} />
+                                <img src={product.productgallers?media_url+product.productgallers[0]?.image_url:"placeholder.png"} alt={product.name} />
                                 <div className="sale-badge">-{savings.percentage}%</div>
                             </div>
                             <div className="product-info">
                                 <h4 className="product-name">{product.name}</h4>
                                 <div className="product-pricing">
-                                    <span className="original-price">{product.originalPrice}</span>
-                                    <span className="sale-price">{product.salePrice}</span>
+                                    <span className="original-price">{product.regular_price}</span>
+                                    <span className="sale-price">{product.on_sale_price}</span>
                                 </div>
                                 {/* <div className="savings-info">
                                     Save ${savings.amount}

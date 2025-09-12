@@ -1,12 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "./store";
 import { bannerendpoints } from "./endpoints/bannerendpoints";
+import { bestsellerEndpoints } from "./endpoints/bestsellerendpoints";
+import { catagoriesEndpoints } from "./endpoints/catagoriesendpoints";
+import { productEndpoints } from "./endpoints/productendpoints";
 
 export const apiSlice = createApi({
   reducerPath: "user",
   baseQuery: fetchBaseQuery({
-     baseUrl: "http://localhost:8000/api/",
-    //baseUrl: "https://ecom.addisanalytics.com/api/",
+    // baseUrl: "http://localhost:8000/api/",
+    baseUrl: "https://ecom.addisanalytics.com/api/",
 
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
@@ -24,12 +27,22 @@ export const apiSlice = createApi({
     },
   }),
   endpoints: (builder) => ({
-    ...bannerendpoints(builder)
+    ...bannerendpoints(builder),
+    ...bestsellerEndpoints(builder),
+    ...catagoriesEndpoints(builder),
+    ...productEndpoints(builder)
 
   }),
 });
 
 export const {
-  useGetMyintroBannerQuery
+  useGetMyintroBannerQuery,
+  useGetbestSellerQuery,
+  useGetCategoriesQuery,
+  useGetFirstbannerQuery,
+  useGetcategoryDetailQuery,
+  useGetOnsaleProductQuery,
+  useGetproductperCategoryQuery,
+  useGetNewProductQuery
 
 } = apiSlice;

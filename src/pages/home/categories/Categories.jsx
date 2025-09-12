@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../../context/LanguageContext';
 import './Categories.scss';
+import { useGetCategoriesQuery } from '../../../stores/apiSlice';
 
 const Categories = () => {
+    const {data:categories,isLoading:loadingcategoris,isError} = useGetCategoriesQuery();
+    const [category, setCategory] = useState([]);
+    const cate = categories?.data;
+    useEffect(()=>{
+        if(cate){
+            setCategory(cate)
+        }
+    },[cate])
+    console.log("catagory",categories)
     const { t, isRTL } = useLanguage();
 
-    const categories = [
+    const categoriess = [
         // Row 1
         { id: 1, icon: 'computer-icon', name: t('home.categories.items.computers') },
         { id: 2, icon: 'headphones-icon', name: t('home.categories.items.electronics') },
@@ -39,7 +49,7 @@ const Categories = () => {
             </div>
 
             <div className={`categories-grid ${isRTL ? 'rtl-grid' : ''}`}>
-                {categories.map((category) => (
+                {category.map((category) => (
                     <Link
                         key={category.id}
                         to={`/shop/category/${category.id}`}
