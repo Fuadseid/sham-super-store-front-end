@@ -75,7 +75,8 @@ export const {
   useGetUserDetailsQuery,
   useChangePasswordMutation,
   useUpdateUserDetailsMutation,
-  useGetMysupportticketQuery
+  useGetMysupportticketQuery,
+  useForgetpasswordMutation
   
 
 

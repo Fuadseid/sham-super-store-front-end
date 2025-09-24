@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import './LostPassword.scss';
+import { useForgetpasswordMutation } from '../../../stores/apiSlice';
 
 const LostPassword = ({ setShowLogin, onResetPassword }) => {
     const { t } = useLanguage();
+    const [forgetpassword, { isLoading }] = useForgetpasswordMutation();
     const [formData, setFormData] = useState({
-        usernameEmail: ''
+        email: '' // Changed from usernameEmail to email to match backend
     });
     const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [resetStatus, setResetStatus] = useState(null); // null, 'success', 'error'
+    const [resetStatus, setResetStatus] = useState(null);
     const [message, setMessage] = useState('');
 
     const handleInputChange = (e) => {
@@ -37,10 +38,10 @@ const LostPassword = ({ setShowLogin, onResetPassword }) => {
     const validateForm = () => {
         const newErrors = {};
 
-        if (!formData.usernameEmail.trim()) {
-            newErrors.usernameEmail = t('myAccount.lostPassword.messages.fieldRequired');
-        } else if (formData.usernameEmail.includes('@') && !/\S+@\S+\.\S+/.test(formData.usernameEmail)) {
-            newErrors.usernameEmail = t('myAccount.lostPassword.messages.invalidEmail');
+        if (!formData.email.trim()) {
+            newErrors.email = t('myAccount.lostPassword.messages.fieldRequired');
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = t('myAccount.lostPassword.messages.invalidEmail');
         }
 
         setErrors(newErrors);
@@ -54,34 +55,34 @@ const LostPassword = ({ setShowLogin, onResetPassword }) => {
             return;
         }
 
-        setIsLoading(true);
         setResetStatus(null);
         setMessage('');
 
         try {
-            if (onResetPassword) {
-                const result = await onResetPassword(formData.usernameEmail);
-                if (result.success) {
-                    setResetStatus('success');
-                    setMessage(t('myAccount.lostPassword.messages.successMessage'));
-                } else {
-                    setResetStatus('error');
-                    setMessage(result.message || t('myAccount.lostPassword.messages.errorMessage'));
-                }
-            } else {
-                // Simulate API call for demo
-                await new Promise(resolve => setTimeout(resolve, 2000));
+            // Call the API mutation
+            const result = await forgetpassword({ email: formData.email }).unwrap();
 
-                // Simulate success
+            if (result.success) {
                 setResetStatus('success');
-                setMessage(t('myAccount.lostPassword.messages.successMessage'));
+                setMessage(result.message || t('myAccount.lostPassword.messages.successMessage'));
+            } else {
+                setResetStatus('error');
+                setMessage(result.message || t('myAccount.lostPassword.messages.errorMessage'));
             }
         } catch (error) {
-            console.error('Error sending reset link:', error);
+            console.error('Error sending reset OTP:', error);
             setResetStatus('error');
-            setMessage(t('myAccount.lostPassword.messages.errorMessage'));
-        } finally {
-            setIsLoading(false);
+            
+            // Handle different error formats from API
+            if (error.data?.message) {
+                setMessage(error.data.message);
+            } else if (error.data?.errors) {
+                // Handle validation errors from backend
+                const errorMessages = Object.values(error.data.errors).flat();
+                setMessage(errorMessages.join(', '));
+            } else {
+                setMessage(t('myAccount.lostPassword.messages.errorMessage'));
+            }
         }
     };
 
@@ -93,7 +94,7 @@ const LostPassword = ({ setShowLogin, onResetPassword }) => {
     const handleTryAgain = () => {
         setResetStatus(null);
         setMessage('');
-        setFormData({ usernameEmail: '' });
+        setFormData({ email: '' });
         setErrors({});
     };
 
@@ -111,7 +112,7 @@ const LostPassword = ({ setShowLogin, onResetPassword }) => {
                     <div className="instructions">
                         <ol>
                             <li>{t('myAccount.lostPassword.instructions.checkEmail')}</li>
-                            <li>{t('myAccount.lostPassword.instructions.followLink')}</li>
+                            <li>{t('myAccount.lostPassword.instructions.enterOTP')}</li> {/* Updated for OTP flow */}
                         </ol>
                         <p className="spam-notice">{t('myAccount.lostPassword.instructions.checkSpam')}</p>
                     </div>
@@ -121,32 +122,36 @@ const LostPassword = ({ setShowLogin, onResetPassword }) => {
                             className="try-again-btn"
                             onClick={handleTryAgain}
                         >
-                            {t('myAccount.lostPassword.actions.resendLink')}
+                            {t('myAccount.lostPassword.actions.resendOTP')} {/* Updated for OTP flow */}
                         </button>
-                        {/* <a href="#" onClick={handleBackToLogin} className="back-login">
+                        <button
+                            type="button"
+                            className="back-login-btn"
+                            onClick={handleBackToLogin}
+                        >
                             {t('myAccount.lostPassword.actions.backToLogin')}
-                        </a> */}
+                        </button>
                     </div>
                 </div>
             ) : (
                 <>
                     <form className="lost-password-form" onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label htmlFor="username-email">
-                                {t('myAccount.lostPassword.form.usernameEmailLabel')}
+                            <label htmlFor="email">
+                                {t('myAccount.lostPassword.form.emailLabel')} {/* Updated label */}
                             </label>
                             <input
-                                type="text"
-                                id="username-email"
-                                name="usernameEmail"
-                                value={formData.usernameEmail}
+                                type="email" // Changed to email type for better validation
+                                id="email"
+                                name="email"
+                                value={formData.email}
                                 onChange={handleInputChange}
-                                placeholder={t('myAccount.lostPassword.form.usernameEmailPlaceholder')}
-                                className={errors.usernameEmail ? 'error' : ''}
+                                placeholder={t('myAccount.lostPassword.form.emailPlaceholder')}
+                                className={errors.email ? 'error' : ''}
                                 disabled={isLoading}
                             />
-                            {errors.usernameEmail && (
-                                <span className="error-message">{errors.usernameEmail}</span>
+                            {errors.email && (
+                                <span className="error-message">{errors.email}</span>
                             )}
                         </div>
 
@@ -174,14 +179,18 @@ const LostPassword = ({ setShowLogin, onResetPassword }) => {
                                     {t('myAccount.lostPassword.form.submitting')}
                                 </>
                             ) : (
-                                t('myAccount.lostPassword.form.resetPasswordButton')
+                                t('myAccount.lostPassword.form.sendOTPButton') 
                             )}
                         </button>
                     </form>
 
-                    {/* <a href="#" onClick={handleBackToLogin} className="back-login">
+                    <button
+                        type="button"
+                        className="back-login-btn"
+                        onClick={handleBackToLogin}
+                    >
                         {t('myAccount.lostPassword.actions.backToLogin')}
-                    </a> */}
+                    </button>
                 </>
             )}
         </div>

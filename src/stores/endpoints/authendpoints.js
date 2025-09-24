@@ -12,5 +12,12 @@ export const authEndpoints = (builder) => ({
             method: "POST",
             body: data 
         })
+    }),
+    forgetpassword:builder.mutation({
+        query:(data)=>({
+            url:"forget-password-otp",
+            method:"POST",
+            body:data,
+        })
     })
 });
