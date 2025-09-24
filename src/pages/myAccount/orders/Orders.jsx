@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Eye,
     RotateCcw,
@@ -11,8 +11,16 @@ import {
 } from 'lucide-react';
 import OrderDetailsModal from './OrderDetailsModal';
 import './Orders.scss';
+import { useFetchMyOrdersQuery } from '../../../stores/apiSlice';
 
 const Orders = ({ onBrowseProducts, onViewOrder, onCancelOrder, onRefundOrder }) => {
+   const {data:myorders} = useFetchMyOrdersQuery();
+   const [orederdata,setOrderdata] = useState([]);
+   console.log("my orders",myorders?.data.data);
+   useEffect(()=>{
+    if(myorders){
+        setOrderdata(myorders?.data.data);
+    }},[myorders])
 
     // Mock data for orders with comprehensive details
     const [orders] = useState([
@@ -420,23 +428,23 @@ const Orders = ({ onBrowseProducts, onViewOrder, onCancelOrder, onRefundOrder })
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.map((order) => (
+                            {orederdata.map((order) => (
                                 <tr key={order.id} className="order-row">
                                     <td>
                                         <div className="order-info">
                                             <span className="order-id">#{order.id}</span>
-                                            <span className="order-items">{getOrderItemsSummary(order.items)}</span>
+                                            <span className="order-items">{getOrderItemsSummary(order.orderitems)}</span>
                                         </div>
                                     </td>
                                     <td>
                                         <div className="date-info">
-                                            <span className="date-value">{formatDate(order.date)}</span>
+                                            <span className="date-value">{formatDate(order.created_at)}</span>
                                         </div>
                                     </td>
                                     <td>{getStatusBadge(order.status)}</td>
                                     <td>
                                         <div className="price-info">
-                                            <span className="price-value">{formatPrice(order.total)}</span>
+                                            <span className="price-value">{formatPrice(Number(order.order_value))}</span>
                                         </div>
                                     </td>
                                     <td>

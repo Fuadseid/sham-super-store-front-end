@@ -98,10 +98,10 @@ const [registerData, setRegisterData] = useState({
 
     try {
         const result = await register({ email: registerData.email }).unwrap();
-
+        console.log('Registration successful:', result);
         dispatch(authenticateUser({
-            ...result.user,
-            token: result.token
+            ...result.data.user,
+            token: result.data.token
         }));
 
         setRegisterData({ email: '' });

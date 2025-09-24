@@ -1,42 +1,31 @@
+import { useEffect, useState } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { useGetPaymentMethodsQuery } from '../../../stores/apiSlice';
 import './PaymentMethods.scss';
 
 const PaymentMethods = ({ savedPaymentMethods = [] }) => {
+    const { data: paymentMethods } = useGetPaymentMethodsQuery();
+    const [available, setAvailable] = useState([]);
+    const [comingSoon, setComingSoon] = useState([]);
     const { t } = useLanguage();
 
-    const availablePaymentMethods = [
-        {
-            id: 'cash',
-            name: t('myAccount.paymentMethods.currentMethods.cash.name'),
-            description: t('myAccount.paymentMethods.currentMethods.cash.description'),
-            status: 'available',
-            icon: '💵'
+    useEffect(() => {
+        if (paymentMethods?.data) {
+            const availableMethods = [];
+            const comingSoonMethods = [];
+            
+            paymentMethods.data.forEach(method => {
+                if (method.status === "active") {
+                    availableMethods.push(method);
+                } else if (method.status === "inactive") {
+                    comingSoonMethods.push(method);
+                }
+            });
+            
+            setAvailable(availableMethods);
+            setComingSoon(comingSoonMethods);
         }
-    ];
-
-    const comingSoonPaymentMethods = [
-        {
-            id: 'paysham',
-            name: t('myAccount.paymentMethods.comingSoon.paySham.name'),
-            description: t('myAccount.paymentMethods.comingSoon.paySham.description'),
-            status: 'comingSoon',
-            icon: '📱'
-        },
-        {
-            id: 'visa',
-            name: t('myAccount.paymentMethods.comingSoon.visaCard.name'),
-            description: t('myAccount.paymentMethods.comingSoon.visaCard.description'),
-            status: 'comingSoon',
-            icon: '💳'
-        },
-        {
-            id: 'mastercard',
-            name: t('myAccount.paymentMethods.comingSoon.masterCard.name'),
-            description: t('myAccount.paymentMethods.comingSoon.masterCard.description'),
-            status: 'comingSoon',
-            icon: '💳'
-        }
-    ];
+    }, [paymentMethods]);
 
     const PaymentMethodCard = ({ method }) => (
         <div className={`payment-method-card ${method.status}`}>
@@ -47,7 +36,7 @@ const PaymentMethods = ({ savedPaymentMethods = [] }) => {
                 <h4>{method.name}</h4>
                 <p>{method.description}</p>
                 <span className={`status-badge ${method.status}`}>
-                    {method.status === 'available'
+                    {method.status === 'active'
                         ? t('myAccount.paymentMethods.status.available')
                         : t('myAccount.paymentMethods.status.comingSoon')
                     }
@@ -62,29 +51,33 @@ const PaymentMethods = ({ savedPaymentMethods = [] }) => {
             <p>{t('myAccount.paymentMethods.description')}</p>
 
             {/* Available Payment Methods */}
-            <div className="payment-section">
-                <h4 className="section-title">{t('myAccount.paymentMethods.currentMethods.title')}</h4>
-                <div className="payment-methods-grid">
-                    {availablePaymentMethods.map((method) => (
-                        <PaymentMethodCard key={method.id} method={method} />
-                    ))}
+            {available.length > 0 && (
+                <div className="payment-section">
+                    <h4 className="section-title">{t('myAccount.paymentMethods.currentMethods.title')}</h4>
+                    <div className="payment-methods-grid">
+                        {available.map((method) => (
+                            <PaymentMethodCard key={method.id} method={method} />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Coming Soon Payment Methods */}
-            <div className="payment-section">
-                <h4 className="section-title">{t('myAccount.paymentMethods.comingSoon.title')}</h4>
-                <div className="payment-methods-grid">
-                    {comingSoonPaymentMethods.map((method) => (
-                        <PaymentMethodCard key={method.id} method={method} />
-                    ))}
+            {comingSoon.length > 0 && (
+                <div className="payment-section">
+                    <h4 className="section-title">{t('myAccount.paymentMethods.comingSoon.title')}</h4>
+                    <div className="payment-methods-grid">
+                        {comingSoon.map((method) => (
+                            <PaymentMethodCard key={method.id} method={method} />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Saved Payment Methods */}
             {savedPaymentMethods.length > 0 ? (
                 <div className="payment-section">
-                    <h4 className="section-title">Saved Payment Methods</h4>
+                    <h4 className="section-title">{t('myAccount.paymentMethods.savedMethods.title')}</h4>
                     <div className="saved-methods">
                         {savedPaymentMethods.map((method, index) => (
                             <div key={index} className="saved-method-card">

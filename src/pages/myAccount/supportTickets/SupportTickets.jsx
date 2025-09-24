@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import './SupportTickets.scss';
+import { useGetMysupportticketQuery } from '../../../stores/apiSlice';
 
 const SupportTickets = ({
     tickets = [],
@@ -11,6 +12,15 @@ const SupportTickets = ({
 }) => {
     const { t } = useLanguage();
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [ticket,setTicket] = useState([]);
+    const {data:myticket} = useGetMysupportticketQuery();
+
+    useEffect(()=>{
+        if(myticket){
+            setTicket(myticket?.data);
+        }
+    },[myticket])
+    console.log("My support ticket",ticket)
     const [formData, setFormData] = useState({
         subject: '',
         priority: 'medium',
@@ -185,7 +195,7 @@ const SupportTickets = ({
             )}
 
             <div className="tickets-table">
-                {tickets.length > 0 ? (
+                {ticket.length > 0 ? (
                     <table>
                         <thead>
                             <tr>
@@ -198,7 +208,7 @@ const SupportTickets = ({
                             </tr>
                         </thead>
                         <tbody>
-                            {tickets.map((ticket) => (
+                            {ticket.map((ticket) => (
                                 <tr key={ticket.id}>
                                     <td className="ticket-id">#{ticket.id}</td>
                                     <td className="ticket-subject">{ticket.subject}</td>
@@ -238,7 +248,7 @@ const SupportTickets = ({
                     </div>
                 )}
 
-                {tickets.length === 0 && (
+               {/*  {tickets.length === 0 && (
                     <table>
                         <thead>
                             <tr>
@@ -256,7 +266,7 @@ const SupportTickets = ({
                             </tr>
                         </tbody>
                     </table>
-                )}
+                )} */}
             </div>
         </div>
     );

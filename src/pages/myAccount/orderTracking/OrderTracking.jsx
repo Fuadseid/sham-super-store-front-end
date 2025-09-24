@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import './OrderTracking.scss';
 import OrderTrackingModal from './orderTrackingModal/OrderTrackingModal';
+import { useFetchMyOrdersQuery } from '../../../stores/apiSlice';
 
 const OrderTracking = () => {
     const { t } = useLanguage();
@@ -9,6 +10,13 @@ const OrderTracking = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+       const {data:myorders} = useFetchMyOrdersQuery();
+       const [orederdata,setOrderdata] = useState();
+       console.log("track orders",myorders?.data.data);
+       useEffect(()=>{
+        if(myorders){
+            setOrderdata(myorders?.data.data);
+        }},[myorders])
 
     // Mock order data - replace with actual API call later
     const mockOrders = [
@@ -155,7 +163,7 @@ const OrderTracking = () => {
         <div className="order-tracking-content">
             <h3>{t('myAccount.orderTracking.title')}</h3>
 
-            {orders.length === 0 ? (
+            {orederdata.length === 0 ? (
                 <div className="no-orders">
                     <p>{t('myAccount.orderTracking.noOrders')}</p>
                 </div>
@@ -173,15 +181,15 @@ const OrderTracking = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.map((order) => (
+                            {orederdata.map((order) => (
                                 <tr key={order.id}>
                                     <td className="order-id">{order.id}</td>
-                                    <td>{formatDate(order.orderDate)}</td>
-                                    <td>{getStatusBadge(order.status)}</td>
-                                    <td>{order.items} {t('myAccount.orderTracking.table.itemsCount')}</td>
-                                    <td className="total-amount">${order.totalAmount.toFixed(2)}</td>
+                                    <td>{formatDate(order.created_at)}</td>
+                                    <td>{getStatusBadge(order.delivery_status)}</td>
+                                    <td>{order.orderitems?.length} {t('myAccount.orderTracking.table.itemsCount')}</td>
+                                    <td className="total-amount">${Number(order.order_value).toFixed(2)}</td>
                                     <td className="actions">
-                                        {order.status === 'processing' ? (
+                                        {order.delivery_status === 'pending' ? (
                                             <button
                                                 className="track-btn"
                                                 onClick={() => handleTrackOrder(order)}
@@ -190,9 +198,9 @@ const OrderTracking = () => {
                                             </button>
                                         ) : (
                                             <span className="no-tracking">
-                                                {order.status === 'delivered' && t('myAccount.orderTracking.completed')}
-                                                {order.status === 'shipped' && t('myAccount.orderTracking.inTransit')}
-                                                {order.status === 'cancelled' && t('myAccount.orderTracking.cancelled')}
+                                                {order.delivery_status === 'delivered' && t('myAccount.orderTracking.completed')}
+                                                {order.delivery_status === 'processing' && t('myAccount.orderTracking.inTransit')}
+                                                {order.delivery_status === 'cancelled' && t('myAccount.orderTracking.cancelled')}
                                             </span>
                                         )}
                                     </td>

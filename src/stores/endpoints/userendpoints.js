@@ -1,0 +1,35 @@
+export const userEndpoints = (builder)=>({
+    getUserDetails:builder.query({
+        query:()=>({
+            url:'my-profile',
+            method:'GET'
+        })
+    }),
+    changePassword:builder.mutation({
+        query:(data)=>({
+            url:'change-password',
+            method:'POST',
+            body:data
+        })
+    }),
+    updateUserDetails:builder.mutation({
+        query:(data)=>({
+            url:'updateProfile',
+            method:'PUT',
+            body:data
+        })
+    }),
+    getMyfavorite:builder.query({
+        query:()=>({
+            url:'my-favorite',
+            method:"GET"
+        })
+    }),
+    getMysupportticket:builder.query({
+        query:()=>({
+            url:'my_support_ticket',
+            method:'GET',
+        })
+    })
+
+})

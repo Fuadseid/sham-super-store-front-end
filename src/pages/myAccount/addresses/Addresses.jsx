@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import './Addresses.scss';
+import { useGetCustomerAddressesQuery } from '../../../stores/apiSlice';
 
 const Addresses = ({
     billingAddress = null,
@@ -11,6 +12,12 @@ const Addresses = ({
     const { t } = useLanguage();
     const [showAddForm, setShowAddForm] = useState(false);
     const [addressType, setAddressType] = useState('billing');
+    const {data:myAddrss} = useGetCustomerAddressesQuery();
+    console.log("my address",myAddrss);
+     useEffect(()=>{
+        if(myAddrss){
+            console.log("my address",myAddrss);
+        }},[myAddrss])
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',

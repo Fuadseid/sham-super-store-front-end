@@ -1,23 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import './AccountDetails.scss';
+import { useChangePasswordMutation, useGetUserDetailsQuery, useUpdateUserDetailsMutation } from '../../../stores/apiSlice';
 
-const AccountDetails = ({
-    initialData = {
-        firstName: '',
-        lastName: '',
-        displayName: '',
-        email: ''
-    },
-    onSaveAccount
-}) => {
+const AccountDetails = () => {
     const { t } = useLanguage();
-
+    const { data: userData, refetch } = useGetUserDetailsQuery();
+    const [updateProfile] = useUpdateUserDetailsMutation();
+    const [changePassword] = useChangePasswordMutation();
+    
     const [formData, setFormData] = useState({
-        firstName: initialData.firstName || '',
-        lastName: initialData.lastName || '',
-        displayName: initialData.displayName || '',
-        email: initialData.email || '',
+        name: '',
+        email: '',
+        phone: '',
+        profile: '',
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
@@ -31,6 +27,22 @@ const AccountDetails = ({
 
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [activeSection, setActiveSection] = useState('profile'); // 'profile' or 'password'
+
+    // Initialize form data when user data is loaded
+    useEffect(() => {
+        if (userData?.data) {
+            const user = userData.data;
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                profile: user.profile || ''
+            }));
+        }
+    }, [userData]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -39,11 +51,17 @@ const AccountDetails = ({
             [name]: value
         }));
 
+        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
                 [name]: ''
             }));
+        }
+
+        // Clear success message when form changes
+        if (successMessage) {
+            setSuccessMessage('');
         }
     };
 
@@ -54,19 +72,12 @@ const AccountDetails = ({
         }));
     };
 
-    const validateForm = () => {
+    const validateProfileForm = () => {
         const newErrors = {};
 
-        if (!formData.firstName.trim()) {
-            newErrors.firstName = t('myAccount.accountDetails.validation.firstNameRequired');
-        }
-
-        if (!formData.lastName.trim()) {
-            newErrors.lastName = t('myAccount.accountDetails.validation.lastNameRequired');
-        }
-
-        if (!formData.displayName.trim()) {
-            newErrors.displayName = t('myAccount.accountDetails.validation.displayNameRequired');
+        // Basic validation for required fields
+        if (!formData.name.trim()) {
+            newErrors.name = t('myAccount.accountDetails.validation.nameRequired');
         }
 
         if (!formData.email.trim()) {
@@ -75,68 +86,202 @@ const AccountDetails = ({
             newErrors.email = t('myAccount.accountDetails.validation.emailInvalid');
         }
 
-        if (formData.newPassword || formData.confirmPassword) {
-            if (!formData.currentPassword) {
-                newErrors.currentPassword = t('myAccount.accountDetails.validation.currentPasswordRequired');
-            }
-
-            if (formData.newPassword.length < 8) {
-                newErrors.newPassword = t('myAccount.accountDetails.validation.passwordMinLength');
-            }
-
-            if (formData.newPassword !== formData.confirmPassword) {
-                newErrors.confirmPassword = t('myAccount.accountDetails.validation.passwordMismatch');
-            }
+        // Phone validation (optional but if provided, validate format)
+        if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+            newErrors.phone = t('myAccount.accountDetails.validation.phoneInvalid');
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const validatePasswordForm = () => {
+        const newErrors = {};
 
-        if (!validateForm()) {
-            return;
+        if (!formData.currentPassword) {
+            newErrors.currentPassword = t('myAccount.accountDetails.validation.currentPasswordRequired');
         }
 
-        setIsLoading(true);
+        if (!formData.newPassword) {
+            newErrors.newPassword = t('myAccount.accountDetails.validation.newPasswordRequired');
+        } else if (formData.newPassword.length < 6) {
+            newErrors.newPassword = t('myAccount.accountDetails.validation.passwordMinLength');
+        }
+
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = t('myAccount.accountDetails.validation.confirmPasswordRequired');
+        } else if (formData.newPassword !== formData.confirmPassword) {
+            newErrors.confirmPassword = t('myAccount.accountDetails.validation.passwordMismatch');
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleProfileUpdate = async () => {
+        if (!validateProfileForm()) {
+            return false;
+        }
 
         try {
-            if (onSaveAccount) {
-                await onSaveAccount(formData);
+            // Prepare data for API call
+            const updateData = {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                profile: formData.profile
+            };
+
+            // Remove empty fields to avoid sending null/empty values if not needed
+            Object.keys(updateData).forEach(key => {
+                if (updateData[key] === '' || updateData[key] === null) {
+                    delete updateData[key];
+                }
+            });
+
+            // Call the update mutation
+            const result = await updateProfile(updateData).unwrap();
+
+            if (result.success) {
+                setSuccessMessage(t('myAccount.accountDetails.messages.updateSuccess'));
+                await refetch();
+                return true;
             } else {
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                throw new Error(result.message || 'Update failed');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            
+            // Handle API validation errors
+            if (error.data && error.data.errors) {
+                const apiErrors = error.data.errors;
+                const formattedErrors = {};
+                
+                Object.keys(apiErrors).forEach(key => {
+                    formattedErrors[key] = apiErrors[key][0];
+                });
+                
+                setErrors(formattedErrors);
+            } else {
+                setErrors({ 
+                    submit: error.data?.message || t('myAccount.accountDetails.messages.updateError') 
+                });
+            }
+            return false;
+        }
+    };
+
+    const handlePasswordChange = async () => {
+        if (!validatePasswordForm()) {
+            return false;
+        }
+
+        try {
+            const passwordData = {
+                current_password: formData.currentPassword,
+                new_password: formData.newPassword
+            };
+
+            const result = await changePassword(passwordData).unwrap();
+
+            if (result.success) {
+                setSuccessMessage(t('myAccount.accountDetails.messages.passwordChangeSuccess'));
+                
+                // Reset password fields
+                setFormData(prev => ({
+                    ...prev,
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                }));
+                return true;
+            } else {
+                throw new Error(result.message || 'Password change failed');
+            }
+        } catch (error) {
+            console.error('Error changing password:', error);
+            
+            // Handle specific password errors
+            if (error.data?.message === 'Current password is incorrect') {
+                setErrors({ 
+                    currentPassword: t('myAccount.accountDetails.validation.incorrectCurrentPassword')
+                });
+            } else if (error.data && error.data.errors) {
+                const apiErrors = error.data.errors;
+                const formattedErrors = {};
+                
+                Object.keys(apiErrors).forEach(key => {
+                    if (key === 'current_password') {
+                        formattedErrors.currentPassword = apiErrors[key][0];
+                    } else if (key === 'new_password') {
+                        formattedErrors.newPassword = apiErrors[key][0];
+                    } else {
+                        formattedErrors[key] = apiErrors[key][0];
+                    }
+                });
+                
+                setErrors(formattedErrors);
+            } else {
+                setErrors({ 
+                    submit: error.data?.message || t('myAccount.accountDetails.messages.passwordChangeError') 
+                });
+            }
+            return false;
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setErrors({});
+
+        try {
+            let success = false;
+            
+            if (activeSection === 'profile') {
+                success = await handleProfileUpdate();
+            } else if (activeSection === 'password') {
+                success = await handlePasswordChange();
             }
 
-            alert(t('myAccount.accountDetails.messages.updateSuccess'));
-
-            setFormData(prev => ({
-                ...prev,
-                currentPassword: '',
-                newPassword: '',
-                confirmPassword: ''
-            }));
+            if (success) {
+                // Clear errors on success
+                setErrors({});
+            }
 
         } catch (error) {
-            console.error('Error updating account:', error);
-            alert(t('myAccount.accountDetails.messages.updateError'));
+            console.error('Error in form submission:', error);
+            setErrors({ 
+                submit: t('myAccount.accountDetails.messages.generalError') 
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleReset = () => {
-        setFormData({
-            firstName: initialData.firstName || '',
-            lastName: initialData.lastName || '',
-            displayName: initialData.displayName || '',
-            email: initialData.email || '',
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-        });
+        // Reset form to original user data
+        if (userData?.data) {
+            const user = userData.data;
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                profile: user.profile || '',
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            }));
+        }
         setErrors({});
+        setSuccessMessage('');
+    };
+
+    const handleSectionChange = (section) => {
+        setActiveSection(section);
+        setErrors({});
+        setSuccessMessage('');
     };
 
     return (
@@ -146,188 +291,221 @@ const AccountDetails = ({
                 <p>{t('myAccount.accountDetails.description')}</p>
             </div>
 
-            <form className="account-form" onSubmit={handleSubmit}>
-                <div className="form-section">
-                    <h4>{t('myAccount.accountDetails.sections.personalInfo')}</h4>
+            {/* Navigation Tabs */}
+            <div className="account-sections-tabs">
+                <button 
+                    className={`tab-button ${activeSection === 'profile' ? 'active' : ''}`}
+                    onClick={() => handleSectionChange('profile')}
+                >
+                    {t('myAccount.accountDetails.sections.profile')}
+                </button>
+                <button 
+                    className={`tab-button ${activeSection === 'password' ? 'active' : ''}`}
+                    onClick={() => handleSectionChange('password')}
+                >
+                    {t('myAccount.accountDetails.sections.password')}
+                </button>
+            </div>
 
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label htmlFor="first-name">
-                                {t('myAccount.accountDetails.form.firstName.label')}
-                            </label>
-                            <input
-                                type="text"
-                                id="first-name"
-                                name="firstName"
-                                value={formData.firstName}
-                                onChange={handleInputChange}
-                                className={errors.firstName ? 'error' : ''}
-                                placeholder={t('myAccount.accountDetails.form.firstName.placeholder')}
-                            />
-                            {errors.firstName && (
-                                <span className="error-message">{errors.firstName}</span>
-                            )}
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="last-name">
-                                {t('myAccount.accountDetails.form.lastName.label')}
-                            </label>
-                            <input
-                                type="text"
-                                id="last-name"
-                                name="lastName"
-                                value={formData.lastName}
-                                onChange={handleInputChange}
-                                className={errors.lastName ? 'error' : ''}
-                                placeholder={t('myAccount.accountDetails.form.lastName.placeholder')}
-                            />
-                            {errors.lastName && (
-                                <span className="error-message">{errors.lastName}</span>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="display-name">
-                            {t('myAccount.accountDetails.form.displayName.label')}
-                        </label>
-                        <input
-                            type="text"
-                            id="display-name"
-                            name="displayName"
-                            value={formData.displayName}
-                            onChange={handleInputChange}
-                            className={errors.displayName ? 'error' : ''}
-                            placeholder={t('myAccount.accountDetails.form.displayName.placeholder')}
-                        />
-                        <small>{t('myAccount.accountDetails.form.displayName.helper')}</small>
-                        {errors.displayName && (
-                            <span className="error-message">{errors.displayName}</span>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="account-email">
-                            {t('myAccount.accountDetails.form.email.label')}
-                        </label>
-                        <input
-                            type="email"
-                            id="account-email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            className={errors.email ? 'error' : ''}
-                            placeholder={t('myAccount.accountDetails.form.email.placeholder')}
-                        />
-                        {errors.email && (
-                            <span className="error-message">{errors.email}</span>
-                        )}
-                    </div>
+            {successMessage && (
+                <div className="success-message">
+                    {successMessage}
                 </div>
+            )}
 
-                <fieldset className="password-fieldset">
-                    <legend>{t('myAccount.accountDetails.sections.passwordSecurity')}</legend>
-                    <p className="fieldset-description">
-                        {t('myAccount.accountDetails.passwordSection.description')}
-                    </p>
+            {errors.submit && (
+                <div className="error-message submit-error">
+                    {errors.submit}
+                </div>
+            )}
 
-                    <div className="form-group">
-                        <label htmlFor="current-password">
-                            {t('myAccount.accountDetails.form.currentPassword.label')}
-                        </label>
-                        <div className="password-input-wrapper">
+            <form className="account-form" onSubmit={handleSubmit}>
+                {/* Profile Section */}
+                {activeSection === 'profile' && (
+                    <div className="form-section">
+                        <h4>{t('myAccount.accountDetails.sections.personalInfo')}</h4>
+
+                        <div className="form-group">
+                            <label htmlFor="name">
+                                {t('myAccount.accountDetails.form.name.label')}
+                            </label>
                             <input
-                                type={showPasswords.current ? "text" : "password"}
-                                id="current-password"
-                                name="currentPassword"
-                                value={formData.currentPassword}
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={formData.name}
                                 onChange={handleInputChange}
-                                className={errors.currentPassword ? 'error' : ''}
-                                placeholder={t('myAccount.accountDetails.form.currentPassword.placeholder')}
+                                className={errors.name ? 'error' : ''}
+                                placeholder={t('myAccount.accountDetails.form.name.placeholder')}
                             />
-                            <button
-                                type="button"
-                                className="password-toggle"
-                                onClick={() => togglePasswordVisibility('current')}
-                                aria-label={
-                                    showPasswords.current
-                                        ? t('myAccount.accountDetails.actions.hidePassword')
-                                        : t('myAccount.accountDetails.actions.showPassword')
-                                }
-                            >
-                                {showPasswords.current ? '👁️' : '👁️‍🗨️'}
-                            </button>
+                            {errors.name && (
+                                <span className="error-message">{errors.name}</span>
+                            )}
                         </div>
-                        {errors.currentPassword && (
-                            <span className="error-message">{errors.currentPassword}</span>
-                        )}
-                    </div>
 
-                    <div className="form-group">
-                        <label htmlFor="new-password">
-                            {t('myAccount.accountDetails.form.newPassword.label')}
-                        </label>
-                        <div className="password-input-wrapper">
+                        <div className="form-group">
+                            <label htmlFor="email">
+                                {t('myAccount.accountDetails.form.email.label')}
+                            </label>
                             <input
-                                type={showPasswords.new ? "text" : "password"}
-                                id="new-password"
-                                name="newPassword"
-                                value={formData.newPassword}
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
                                 onChange={handleInputChange}
-                                className={errors.newPassword ? 'error' : ''}
-                                placeholder={t('myAccount.accountDetails.form.newPassword.placeholder')}
+                                className={errors.email ? 'error' : ''}
+                                placeholder={t('myAccount.accountDetails.form.email.placeholder')}
                             />
-                            <button
-                                type="button"
-                                className="password-toggle"
-                                onClick={() => togglePasswordVisibility('new')}
-                                aria-label={
-                                    showPasswords.new
-                                        ? t('myAccount.accountDetails.actions.hidePassword')
-                                        : t('myAccount.accountDetails.actions.showPassword')
-                                }
-                            >
-                                {showPasswords.new ? '👁️' : '👁️‍🗨️'}
-                            </button>
+                            {errors.email && (
+                                <span className="error-message">{errors.email}</span>
+                            )}
                         </div>
-                        <small>{t('myAccount.accountDetails.form.newPassword.helper')}</small>
-                        {errors.newPassword && (
-                            <span className="error-message">{errors.newPassword}</span>
-                        )}
-                    </div>
 
-                    <div className="form-group">
-                        <label htmlFor="confirm-password">
-                            {t('myAccount.accountDetails.form.confirmPassword.label')}
-                        </label>
-                        <div className="password-input-wrapper">
+                        <div className="form-group">
+                            <label htmlFor="phone">
+                                {t('myAccount.accountDetails.form.phone.label')}
+                            </label>
                             <input
-                                type={showPasswords.confirm ? "text" : "password"}
-                                id="confirm-password"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                value={formData.phone}
                                 onChange={handleInputChange}
-                                className={errors.confirmPassword ? 'error' : ''}
-                                placeholder={t('myAccount.accountDetails.form.confirmPassword.placeholder')}
+                                className={errors.phone ? 'error' : ''}
+                                placeholder={t('myAccount.accountDetails.form.phone.placeholder')}
                             />
-                            <button
-                                type="button"
-                                className="password-toggle"
-                                onClick={() => togglePasswordVisibility('confirm')}
-                                aria-label={
-                                    showPasswords.confirm
-                                        ? t('myAccount.accountDetails.actions.hidePassword')
-                                        : t('myAccount.accountDetails.actions.showPassword')
-                                }
-                            >
-                                {showPasswords.confirm ? '👁️' : '👁️‍🗨️'}
-                            </button>
+                            {errors.phone && (
+                                <span className="error-message">{errors.phone}</span>
+                            )}
                         </div>
-                        {errors.confirmPassword && (
-                            <span className="error-message">{errors.confirmPassword}</span>
-                        )}
+
+                        <div className="form-group">
+                            <label htmlFor="profile">
+                                {t('myAccount.accountDetails.form.profile.label')}
+                            </label>
+                            <input
+                                type="text"
+                                id="profile"
+                                name="profile"
+                                value={formData.profile}
+                                onChange={handleInputChange}
+                                className={errors.profile ? 'error' : ''}
+                                placeholder={t('myAccount.accountDetails.form.profile.placeholder')}
+                            />
+                            <small>{t('myAccount.accountDetails.form.profile.helper')}</small>
+                            {errors.profile && (
+                                <span className="error-message">{errors.profile}</span>
+                            )}
+                        </div>
                     </div>
-                </fieldset>
+                )}
+
+                {/* Password Section */}
+                {activeSection === 'password' && (
+                    <fieldset className="password-fieldset">
+                        <legend>{t('myAccount.accountDetails.sections.passwordSecurity')}</legend>
+                        <p className="fieldset-description">
+                            {t('myAccount.accountDetails.passwordSection.description')}
+                        </p>
+
+                        <div className="form-group">
+                            <label htmlFor="current-password">
+                                {t('myAccount.accountDetails.form.currentPassword.label')}
+                            </label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPasswords.current ? "text" : "password"}
+                                    id="current-password"
+                                    name="currentPassword"
+                                    value={formData.currentPassword}
+                                    onChange={handleInputChange}
+                                    className={errors.currentPassword ? 'error' : ''}
+                                    placeholder={t('myAccount.accountDetails.form.currentPassword.placeholder')}
+                                />
+                                <button
+                                    type="button"
+                                    className="password-toggle"
+                                    onClick={() => togglePasswordVisibility('current')}
+                                    aria-label={
+                                        showPasswords.current
+                                            ? t('myAccount.accountDetails.actions.hidePassword')
+                                            : t('myAccount.accountDetails.actions.showPassword')
+                                    }
+                                >
+                                    {showPasswords.current ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
+                            {errors.currentPassword && (
+                                <span className="error-message">{errors.currentPassword}</span>
+                            )}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="new-password">
+                                {t('myAccount.accountDetails.form.newPassword.label')}
+                            </label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPasswords.new ? "text" : "password"}
+                                    id="new-password"
+                                    name="newPassword"
+                                    value={formData.newPassword}
+                                    onChange={handleInputChange}
+                                    className={errors.newPassword ? 'error' : ''}
+                                    placeholder={t('myAccount.accountDetails.form.newPassword.placeholder')}
+                                />
+                                <button
+                                    type="button"
+                                    className="password-toggle"
+                                    onClick={() => togglePasswordVisibility('new')}
+                                    aria-label={
+                                        showPasswords.new
+                                            ? t('myAccount.accountDetails.actions.hidePassword')
+                                            : t('myAccount.accountDetails.actions.showPassword')
+                                    }
+                                >
+                                    {showPasswords.new ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
+                            <small>{t('myAccount.accountDetails.form.newPassword.helper')}</small>
+                            {errors.newPassword && (
+                                <span className="error-message">{errors.newPassword}</span>
+                            )}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="confirm-password">
+                                {t('myAccount.accountDetails.form.confirmPassword.label')}
+                            </label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPasswords.confirm ? "text" : "password"}
+                                    id="confirm-password"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleInputChange}
+                                    className={errors.confirmPassword ? 'error' : ''}
+                                    placeholder={t('myAccount.accountDetails.form.confirmPassword.placeholder')}
+                                />
+                                <button
+                                    type="button"
+                                    className="password-toggle"
+                                    onClick={() => togglePasswordVisibility('confirm')}
+                                    aria-label={
+                                        showPasswords.confirm
+                                            ? t('myAccount.accountDetails.actions.hidePassword')
+                                            : t('myAccount.accountDetails.actions.showPassword')
+                                    }
+                                >
+                                    {showPasswords.confirm ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
+                            {errors.confirmPassword && (
+                                <span className="error-message">{errors.confirmPassword}</span>
+                            )}
+                        </div>
+                    </fieldset>
+                )}
 
                 <div className="form-actions">
                     <button
@@ -338,10 +516,15 @@ const AccountDetails = ({
                         {isLoading ? (
                             <>
                                 <span className="spinner"></span>
-                                {t('myAccount.accountDetails.actions.saving')}
+                                {activeSection === 'profile' 
+                                    ? t('myAccount.accountDetails.actions.saving')
+                                    : t('myAccount.accountDetails.actions.changingPassword')
+                                }
                             </>
                         ) : (
-                            t('myAccount.accountDetails.actions.saveChanges')
+                            activeSection === 'profile'
+                                ? t('myAccount.accountDetails.actions.saveChanges')
+                                : t('myAccount.accountDetails.actions.changePassword')
                         )}
                     </button>
                     <button

@@ -6,12 +6,16 @@ import { catagoriesEndpoints } from "./endpoints/catagoriesendpoints";
 import { productEndpoints } from "./endpoints/productendpoints";
 import { newsEndpoints } from "./endpoints/newsendpoints";
 import { authEndpoints } from "./endpoints/authendpoints";
+import { orderEndpoints } from "./endpoints/orderendpoints";
+import { customerAddressEndpoints } from "./endpoints/customeraddress";
+import { paymentMethodEndpoints } from "./endpoints/paymentmethodendpoints";
+import { userEndpoints } from "./endpoints/userendpoints";
 
 export const apiSlice = createApi({
   reducerPath: "user",
   baseQuery: fetchBaseQuery({
-    // baseUrl: "http://localhost:8000/api/",
-    baseUrl: "https://ecom.addisanalytics.com/api/",
+    baseUrl: "http://localhost:8000/api/",
+    //baseUrl: "https://ecom.addisanalytics.com/api/",
 
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
@@ -35,6 +39,10 @@ export const apiSlice = createApi({
     ...productEndpoints(builder),
     ...newsEndpoints(builder),
     ...authEndpoints(builder),
+    ...orderEndpoints(builder),
+    ...customerAddressEndpoints(builder),
+    ...paymentMethodEndpoints(builder),
+    ...userEndpoints(builder),
 
   }),
 });
@@ -59,6 +67,16 @@ export const {
   useGetProductbyreviewQuery,
   useGetCategoriesonNavbarQuery,
   useRegisterMutation,
-  useLoginMutation
+  useLoginMutation,
+  useFetchMyOrdersQuery,
+  useGetCustomerAddressesQuery,
+  useGetPaymentMethodsQuery,
+  useGetMyfavoriteQuery,
+  useGetUserDetailsQuery,
+  useChangePasswordMutation,
+  useUpdateUserDetailsMutation,
+  useGetMysupportticketQuery
+  
+
 
 } = apiSlice;
