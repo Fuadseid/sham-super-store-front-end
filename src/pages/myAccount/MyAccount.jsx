@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import './MyAccount.scss';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Import all components
 import AuthSection from './authSection/AuthSection';
@@ -15,19 +17,27 @@ import Wishlist from './wishlist/Wishlist';
 import Following from './following/Following';
 import LostPassword from './lostPassword/LostPassword';
 import SupportTickets from './supportTickets/SupportTickets';
-import Inquiries from './contactedSellers/ContactedSellers';
 import ContactedSellers from './contactedSellers/ContactedSellers';
+import { useRegisterMutation, useLoginMutation } from '../../stores/apiSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { authenticateUser, logoutUser } from '../../stores/authReducer';
 
 const MyAccount = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [showLogin, setShowLogin] = useState(true);
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         rememberMe: false
     });
+const [registerData, setRegisterData] = useState({
+    email: ''
+});    
+    const { isAuthenticated, user } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
     const { t } = useLanguage();
+    
+    const [register, { isLoading: isRegistering }] = useRegisterMutation();
+    const [login, { isLoading: isLoggingIn }] = useLoginMutation();
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -35,20 +45,74 @@ const MyAccount = () => {
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
+        if (name === 'email' && !type === 'checkbox') {
+            setEmail(value);
+        }
     };
 
-    const handleLogin = (e) => {
+    const handleRegisterInputChange = (e) => {
+    const { name, value } = e.target;
+    setRegisterData(prev => ({
+        ...prev,
+        [name]: value
+    }));
+};
+    const handleLogin = async (e) => {
         e.preventDefault();
-        setIsLoggedIn(true);
+        
+        if (!formData.email.trim() || !formData.password.trim()) {
+            toast.error('Email and password are required');
+            return;
+        }
+        
+        try {
+            const result = await login({
+                email: formData.email,
+                password: formData.password
+            }).unwrap();
+            
+            // Dispatch the authenticateUser action with the user data
+            dispatch(authenticateUser({
+                ...result.user,
+                token: result.token
+            }));
+            
+            // Clear form
+            setFormData({ email: '', password: '', rememberMe: false });
+            
+            toast.success('Login successful!');
+            
+        } catch (err) {
+            console.error('Login failed:', err);
+            toast.error(err.data?.message || 'Login failed. Please try again.');
+        }
     };
 
-    const handleRegister = (e) => {
-        e.preventDefault();
-        setIsLoggedIn(true);
-    };
+   const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (!registerData.email) {
+        toast.error('Email is required');
+        return;
+    }
+
+    try {
+        const result = await register({ email: registerData.email }).unwrap();
+
+        dispatch(authenticateUser({
+            ...result.user,
+            token: result.token
+        }));
+
+        setRegisterData({ email: '' });
+        toast.success('Registration successful! Check your email for the password.');
+    } catch (err) {
+        toast.error(err.data?.message || 'Registration failed.');
+    }
+};
 
     const handleLogout = () => {
-        setIsLoggedIn(false);
+        dispatch(logoutUser());
         setActiveTab('dashboard');
         setFormData({ email: '', password: '', rememberMe: false });
     };
@@ -71,26 +135,27 @@ const MyAccount = () => {
                 return <AccountDetails />;
             case 'wishlist':
                 return <Wishlist />;
-            // case 'following':
-            //     return <Following />;
             case 'support-tickets':
                 return <SupportTickets />;
             case 'inquiries':
                 return <ContactedSellers />;
             case 'lost-password':
-                return <LostPassword setShowLogin={setShowLogin} />;
+                return <LostPassword setShowLogin={() => setActiveTab('dashboard')} />;
             default:
                 return <Dashboard handleLogout={handleLogout} setActiveTab={setActiveTab} />;
         }
     };
 
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
         return (
             <AuthSection
                 formData={formData}
                 handleInputChange={handleInputChange}
+                handleInputChangeforreg={handleRegisterInputChange}
+                registerData = {registerData}
                 handleLogin={handleLogin}
                 handleRegister={handleRegister}
+                isLoading={isRegistering || isLoggingIn}
             />
         );
     }
@@ -100,7 +165,7 @@ const MyAccount = () => {
             <div className="account-container">
                 <div className="account-sidebar">
                     <div className="user-info">
-                        <h3>yamanajlouni</h3>
+                        <h3>{user?.username || user?.email || 'User'}</h3>
                         <button onClick={handleLogout} className="logout-btn">
                             {t('myAccount.actions.logout')}
                         </button>
@@ -147,11 +212,6 @@ const MyAccount = () => {
                                     {t('myAccount.navigation.wishlist')}
                                 </button>
                             </li>
-                            {/* <li className={activeTab === 'following' ? 'active' : ''}>
-                                <button onClick={() => setActiveTab('following')}>
-                                    {t('myAccount.navigation.following')}
-                                </button>
-                            </li> */}
                             <li className={activeTab === 'support-tickets' ? 'active' : ''}>
                                 <button onClick={() => setActiveTab('support-tickets')}>
                                     {t('myAccount.navigation.supportTickets')}

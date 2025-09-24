@@ -1,5 +1,7 @@
 /* Simple iPad Layout Shift Fix - Minimal Changes */
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 body {
   margin: 0;
 }

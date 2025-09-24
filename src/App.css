@@ -1,5 +1,7 @@
 /* App.css */
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 /* Navbar positioning */
 .navbar-positioned {
     position: relative;

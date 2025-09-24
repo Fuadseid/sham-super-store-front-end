@@ -4,6 +4,8 @@ import { bannerendpoints } from "./endpoints/bannerendpoints";
 import { bestsellerEndpoints } from "./endpoints/bestsellerendpoints";
 import { catagoriesEndpoints } from "./endpoints/catagoriesendpoints";
 import { productEndpoints } from "./endpoints/productendpoints";
+import { newsEndpoints } from "./endpoints/newsendpoints";
+import { authEndpoints } from "./endpoints/authendpoints";
 
 export const apiSlice = createApi({
   reducerPath: "user",
@@ -30,7 +32,9 @@ export const apiSlice = createApi({
     ...bannerendpoints(builder),
     ...bestsellerEndpoints(builder),
     ...catagoriesEndpoints(builder),
-    ...productEndpoints(builder)
+    ...productEndpoints(builder),
+    ...newsEndpoints(builder),
+    ...authEndpoints(builder),
 
   }),
 });
@@ -43,6 +47,18 @@ export const {
   useGetcategoryDetailQuery,
   useGetOnsaleProductQuery,
   useGetproductperCategoryQuery,
-  useGetNewProductQuery
+  useGetNewProductQuery,
+  useGetProductdetailQuery,
+  useGetSecondbannerQuery,
+  useGetThirdbannerQuery,
+  useGetForthbannerQuery,
+  useGetFifthbannerQuery,
+  useGetsixthbannerQuery,
+  useGetFeaturedProductQuery,
+  useGetNewsQuery,
+  useGetProductbyreviewQuery,
+  useGetCategoriesonNavbarQuery,
+  useRegisterMutation,
+  useLoginMutation
 
 } = apiSlice;

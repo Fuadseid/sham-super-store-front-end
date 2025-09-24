@@ -722,18 +722,16 @@ export const ProductsList = () => {
                         <div className="product-info">
                           <h3 className="product-name">{product.name}</h3>
 
-                          {product.rating && (
-                            <div className="product-rating">
-                              <div className="stars">
-                                {renderStars(4)}
-                              </div>
-                              <span className="rating-text">
-                                {t("shop.productsList.product.rating", {
-                                  rating: product.rating,
-                                })}
-                              </span>
+                          <div className="product-rating">
+                            <div className="stars">
+                              {renderStars(product.average_rating || 0)}
                             </div>
-                          )}
+                            {product.total_reviews > 0 && (
+                              <span className="rating-text">
+                                ({product.total_reviews})
+                              </span>
+                            )}
+                          </div>
 
                           <div className="product-price">
                             {product.is_on_sale ? (

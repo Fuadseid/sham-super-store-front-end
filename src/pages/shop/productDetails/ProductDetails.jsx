@@ -1,655 +1,207 @@
-import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
-import { useLanguage } from '../../../context/LanguageContext'; // Import the language context
-import './ProductDetails.scss';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useGetProductdetailQuery } from '../../../stores/apiSlice';
+// Styling handled by Tailwind CSS
+import { useSelector } from 'react-redux';
 
-export const ProductDetails = () => {
+const ProductDetails = () => {
+    const { t } = useLanguage();
     const { productId } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
     const [searchParams] = useSearchParams();
     const [quantity, setQuantity] = useState(1);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [activeTab, setActiveTab] = useState('about');
     const [selectedColor, setSelectedColor] = useState('');
     const [selectedSize, setSelectedSize] = useState('');
+    const { media_url } = useSelector((state) => state.auth);
 
-    // Language context
-    const { t } = useLanguage();
+    // Fetch product data
+    const { data: productDetail, isLoading: loadingProduct, error } = useGetProductdetailQuery(productId);
+    const [product, setProduct] = useState(null);
 
-    // Mock products database - in real app, this would be an API call
-    const productsDatabase = {
-        101: {
-            id: 101,
-            sku: "2021-590",
-            name: "Mechanical Gaming Keyboard RGB",
-            price: 89.99,
-            originalPrice: 129.99,
-            images: [
-                "https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1560472355-536de3962603?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&h=600&fit=crop"
-            ],
-            tags: ["gaming", "keyboard", "rgb"],
-            description: "High-quality mechanical keyboard with RGB lighting and Cherry MX switches. Perfect for gaming and productivity.",
-            inStock: true,
-            rating: 4.5,
-            reviews: 234,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" },
-                    { name: "White", value: "#FFFFFF" },
-                    { name: "Silver", value: "#C0C0C0" }
-                ],
-                sizes: ["Full Size", "Compact", "60%"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "GameMaster2023",
-                    rating: 5,
-                    date: "2024-01-15",
-                    comment: "Amazing keyboard! The RGB lighting is fantastic and the switches feel great."
-                },
-                {
-                    id: 2,
-                    user: "ProductivityPro",
-                    rating: 4,
-                    date: "2024-01-10",
-                    comment: "Great for both gaming and work. Build quality is excellent."
-                },
-                {
-                    id: 3,
-                    user: "TechReviewer",
-                    rating: 5,
-                    date: "2024-01-05",
-                    comment: "Best keyboard I've owned. Highly recommended!"
+    // Transform API data when it's loaded
+    useEffect(() => {
+        console.log('Product Detail API Response:', productDetail);
+        if (productDetail) {
+            const detail = productDetail.data || productDetail; // Handle both {data: ...} and direct response
+            
+            // Log the full detail object for debugging
+            console.log('Product detail object:', detail);
+            
+            // Process product images
+            const productImages = detail.productgallers?.length > 0 
+                ? detail.productgallers.map(img => img.image_url)
+                : ['https://via.placeholder.com/300'];
+            
+            // Process product variants
+            const variants = detail.productvariants || [];
+            const colors = [];
+            const sizes = [];
+            
+            variants.forEach(variant => {
+                if (variant.color && !colors.some(c => c.name === variant.color)) {
+                    colors.push({
+                        name: variant.color,
+                        value: variant.color.toLowerCase()
+                    });
                 }
-            ],
-            details: {
-                about: "This mechanical gaming keyboard features premium Cherry MX switches, customizable RGB lighting, and durable construction. Designed for both gaming enthusiasts and professionals who demand precision and reliability.",
-                shortDescription: "High-quality mechanical keyboard with RGB lighting and Cherry MX switches.",
-                moreInformation: "Switch Type: Cherry MX Blue, Backlight: RGB, Connection: USB-C, Compatibility: Windows/Mac/Linux, Warranty: 2 years",
-                productRating: "4.5/5 stars based on 234 customer reviews. Customers love the build quality and responsiveness.",
-                contactSeller: "Have questions about this product? Our technical specialists are here to help!",
-                otherSellers: "This product is also available from 3 other verified sellers with competitive pricing.",
-                storePolicy: "Free returns within 30 days, 2-year manufacturer warranty, and lifetime customer support."
+                if (variant.size && !sizes.includes(variant.size)) {
+                    sizes.push(variant.size);
+                }
+            });
+            
+            // Process product reviews
+            const reviews = (detail.productreviews || [])
+                .filter(review => review.status === 'approved' && review.stars > 0)
+                .map(review => ({
+                    id: review.id,
+                    user: review.customers?.name || 'Anonymous',
+                    rating: review.stars,
+                    date: review.created_at ? new Date(review.created_at).toLocaleDateString() : 'N/A',
+                    comment: review.comment || 'No review text provided'
+                }));
+            
+            // Calculate average rating
+            const averageRating = reviews.length > 0
+                ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+                : 0;
+            
+            const transformedProduct = {
+                id: detail.id || productId,
+                sku: detail.sku || t('shop.productDetails.productInfo.skuNotAvailable'),
+                name: detail.name || t('shop.productDetails.productInfo.noName'),
+                brand: detail.brand || t('shop.productDetails.productInfo.noBrand'),
+                price: parseFloat(detail.is_on_sale ? detail.on_sale_price : detail.regular_price || 0),
+                originalPrice: detail.is_on_sale ? parseFloat(detail.regular_price) : null,
+                images:productImages,
+                tags: detail.tags ? detail.tags.split(',').map(tag => tag.trim()) : [],
+                description: detail.long_description || detail.short_description || 
+                            t('shop.productDetails.productInfo.noDescription'),
+                inStock: detail.stock_quantity > 0,
+                rating: averageRating,
+                reviews: reviews.length,
+                condition: variants[0]?.condition || 'New',
+                stockQuantity: detail.stock_quantity || 0,
+                category: detail.productcategors?.name || '',
+                store: detail.stores ? {
+                    id: detail.stores.id,
+                    name: detail.stores.name,
+                    description: detail.stores.description,
+                    logo: detail.stores.logo,
+                    address: `${detail.stores.address}, ${detail.stores.city}, ${detail.stores.country}`,
+                    contact: {
+                        email: detail.stores.email,
+                        phone: detail.stores.phone,
+                        website: detail.stores.website
+                    }
+                } : null,
+                attributes: {
+                    colors,
+                    sizes,
+                    weight: variants[0]?.weight,
+                    dimensions: variants[0]?.dimensions,
+                    warranty: variants[0]?.customAttributes?.Warranty,
+                    batteryLife: variants[0]?.customAttributes?.battery_life,
+                    bluetoothVersion: variants[0]?.customAttributes?.bluetooth_version,
+                    otherFeatures: variants[0]?.customAttributes?.other_attributes
+                },
+                reviewsList: reviews,
+                details: {
+                    about: detail.long_description || detail.short_description || 'No description available',
+                    shortDescription: detail.short_description || '',
+                    moreInformation: (() => {
+                        const attrs = [];
+                        const variant = detail.productvariants?.[0];
+                        if (variant) {
+                            if (variant.weight) attrs.push(`Weight: ${variant.weight}`);
+                            if (variant.dimensions) {
+                                const { length, width, height } = variant.dimensions;
+                                attrs.push(`Dimensions: ${length} x ${width} x ${height} cm`);
+                            }
+                            if (variant.customAttributes) {
+                                // Only include non-Arabic attributes
+                                Object.entries(variant.customAttributes).forEach(([key, value]) => {
+                                    if (!key.endsWith('_arebic') && value) {
+                                        attrs.push(`${key}: ${value}`);
+                                    }
+                                });
+                            }
+                        }
+                        return attrs.join(' • ');
+                    })(),
+                    productRating: `${averageRating.toFixed(1)}/5 stars${reviews.length ? ` based on ${reviews.length} reviews` : ''}`,
+                    contactSeller: detail.stores ? `Contact ${detail.stores.name} at ${detail.stores.email || detail.stores.phone}` : 'Contact seller',
+                    otherSellers: 'Check availability from other sellers',
+                    storePolicy: detail.product_shipping?.[0]?.return_policy 
+                        ? `Return policy: ${detail.product_shipping[0].return_policy}` 
+                        : 'Standard return policy applies'
+                },
+                stores: detail.store ? [{
+                    id: detail.store.id,
+                    name: detail.store.name || 'Store',
+                    rating: detail.store.rating || 0,
+                    products: detail.store.product_count || 0,
+                    responseRate: 'N/A',
+                    shippingTime: 'Varies',
+                    logo: detail.store.logo || 'https://via.placeholder.com/50'
+                }] : []
+            };
+
+            setProduct(transformedProduct);
+            
+            // Set default selected color if available
+            if (transformedProduct.attributes.colors.length > 0) {
+                setSelectedColor(transformedProduct.attributes.colors[0].name);
             }
-        },
-        102: {
-            id: 102,
-            sku: "2021-591",
-            name: "Wireless Compact Keyboard",
-            price: 45.99,
-            originalPrice: null,
-            images: [
-                "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1595044426077-d36d9236d54a?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&h=600&fit=crop"
-            ],
-            tags: ["wireless", "compact", "productivity"],
-            description: "Compact wireless keyboard perfect for productivity and travel. Ultra-slim design with long battery life.",
-            inStock: true,
-            rating: 4.2,
-            reviews: 156,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Space Gray", value: "#8E8E93" },
-                    { name: "Silver", value: "#C0C0C0" }
-                ],
-                sizes: ["Compact"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "TravelWriter",
-                    rating: 4,
-                    date: "2024-01-12",
-                    comment: "Perfect for travel. Lightweight and responsive."
-                },
-                {
-                    id: 2,
-                    user: "OfficeWorker",
-                    rating: 4,
-                    date: "2024-01-08",
-                    comment: "Great for desk setup. Battery lasts forever."
-                }
-            ],
-            details: {
-                about: "Ultra-portable wireless keyboard designed for modern professionals. Features low-profile keys, excellent battery life, and seamless connectivity across multiple devices.",
-                shortDescription: "Compact wireless keyboard perfect for productivity and travel.",
-                moreInformation: "Connection: Bluetooth 5.0, Battery Life: 6 months, Weight: 300g, Dimensions: 28x12x1.5cm",
-                productRating: "4.2/5 stars based on 156 customer reviews. Great for travel and office use.",
-                contactSeller: "Questions about compatibility or bulk orders? Contact our sales team!",
-                otherSellers: "Available from 2 other sellers.",
-                storePolicy: "1-year warranty and free technical support."
-            }
-        },
-        103: {
-            id: 103,
-            sku: "2021-592",
-            name: "Ergonomic Split Keyboard",
-            price: 159.99,
-            originalPrice: 199.99,
-            images: [
-                "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1595044426077-d36d9236d54a?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1560472355-536de3962603?w=600&h=600&fit=crop"
-            ],
-            tags: ["ergonomic", "split", "health"],
-            description: "Ergonomic split design for comfortable typing during long sessions. Reduces wrist strain and improves posture.",
-            inStock: false,
-            rating: 4.7,
-            reviews: 89,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" },
-                    { name: "White", value: "#FFFFFF" }
-                ],
-                sizes: ["S", "M", "L", "XL"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "HealthConscious",
-                    rating: 5,
-                    date: "2024-01-13",
-                    comment: "Game changer for my wrist pain. Highly recommended!"
-                },
-                {
-                    id: 2,
-                    user: "Developer123",
-                    rating: 4,
-                    date: "2024-01-09",
-                    comment: "Takes time to get used to but worth it for long coding sessions."
-                }
-            ],
-            details: {
-                about: "Revolutionary split keyboard design that promotes natural hand positioning and reduces repetitive strain injuries. Perfect for professionals who spend long hours typing.",
-                shortDescription: "Ergonomic split design for comfortable typing during long sessions.",
-                moreInformation: "Layout: Split QWERTY, Connection: USB-A, Key Travel: 4mm, Wrist Rest: Included, Medical Certification: Yes",
-                productRating: "4.7/5 stars based on 89 reviews. Highly recommended by ergonomic specialists.",
-                contactSeller: "Any Questions? Please click to submit question about this product.",
-                otherSellers: "Limited availability from 1 other seller at higher price.",
-                storePolicy: "Extended 45-day return policy for ergonomic products."
-            }
-        },
-        201: {
-            id: 201,
-            sku: "2021-593",
-            name: "Gaming Mouse with LED",
-            price: 29.99,
-            originalPrice: 39.99,
-            images: [
-                "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1563297007-0686b7003af7?w=600&h=600&fit=crop"
-            ],
-            tags: ["gaming", "mouse", "led"],
-            description: "High-DPI gaming mouse with customizable LED lighting and ergonomic design.",
-            inStock: true,
-            rating: 4.3,
-            reviews: 445,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" },
-                    { name: "White", value: "#FFFFFF" },
-                    { name: "Red", value: "#FF0000" }
-                ],
-                sizes: ["Standard", "Large"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "ProGamer",
-                    rating: 5,
-                    date: "2024-01-14",
-                    comment: "Excellent precision for competitive gaming. LED customization is great!"
-                },
-                {
-                    id: 2,
-                    user: "CasualPlayer",
-                    rating: 4,
-                    date: "2024-01-11",
-                    comment: "Good value for money. Comfortable grip."
-                }
-            ],
-            details: {
-                about: "Professional gaming mouse with high-precision sensor, customizable LED lighting, and ergonomic design for extended gaming sessions.",
-                shortDescription: "High-DPI gaming mouse with customizable LED lighting.",
-                moreInformation: "DPI: 12000, Buttons: 6 programmable, Sensor: Optical, Cable: Braided USB",
-                productRating: "4.3/5 stars based on 445 reviews. Excellent for competitive gaming.",
-                contactSeller: "Need help with gaming setup recommendations? Our gaming specialists are here!",
-                otherSellers: "Compare prices from 4 other verified sellers.",
-                storePolicy: "2-year warranty and gaming gear specialist support."
-            }
-        },
-        202: {
-            id: 202,
-            sku: "2021-594",
-            name: "Wireless Office Mouse",
-            price: 19.99,
-            originalPrice: null,
-            images: [
-                "https://images.unsplash.com/photo-1563297007-0686b7003af7?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&h=600&fit=crop"
-            ],
-            tags: ["wireless", "office", "productivity"],
-            description: "Comfortable wireless mouse designed for office productivity and everyday use.",
-            inStock: true,
-            rating: null, // No rating - will not show rating section
-            reviews: 267,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" },
-                    { name: "Gray", value: "#6B7280" }
-                ],
-                sizes: ["Standard"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "OfficeWorker",
-                    rating: 4,
-                    date: "2024-01-12",
-                    comment: "Reliable and comfortable for daily use."
-                },
-                {
-                    id: 2,
-                    user: "Student123",
-                    rating: 4,
-                    date: "2024-01-08",
-                    comment: "Good value for money. Battery lasts long."
-                }
-            ],
-            details: {
-                about: "Reliable wireless office mouse with comfortable grip and precise tracking. Perfect for daily office work and general computer use.",
-                shortDescription: "Comfortable wireless mouse designed for office productivity.",
-                moreInformation: "DPI: 1200, Connection: 2.4GHz wireless, Battery: 2 AA batteries, Range: 10 meters",
-                productRating: "No rating available yet. Check individual reviews below.",
-                contactSeller: "Ask about bulk pricing for office environments.",
-                otherSellers: "Available from 3 other office supply retailers.",
-                storePolicy: "1-year manufacturer warranty with free replacement."
-            }
-        },
-        203: {
-            id: 203,
-            sku: "2021-595",
-            name: "Ergonomic Vertical Mouse",
-            price: 65.99,
-            originalPrice: 85.99,
-            images: [
-                "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1563297007-0686b7003af7?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&h=600&fit=crop"
-            ],
-            tags: ["ergonomic", "vertical", "health"],
-            description: "Vertical ergonomic design reduces wrist strain and promotes natural hand positioning.",
-            inStock: true,
-            rating: 4.6,
-            reviews: 178,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" },
-                    { name: "Blue", value: "#3B82F6" }
-                ],
-                sizes: ["Right-handed", "Left-handed"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "ErgonomicUser",
-                    rating: 5,
-                    date: "2024-01-15",
-                    comment: "Life-changing for my wrist pain. Highly recommended!"
-                },
-                {
-                    id: 2,
-                    user: "Developer456",
-                    rating: 4,
-                    date: "2024-01-10",
-                    comment: "Takes getting used to but great for long work sessions."
-                }
-            ],
-            details: {
-                about: "Innovative vertical mouse design that eliminates wrist twisting and reduces the risk of repetitive strain injuries. Recommended by occupational therapists.",
-                shortDescription: "Vertical ergonomic design reduces wrist strain.",
-                moreInformation: "DPI: 1600, Connection: Wireless 2.4GHz, Battery: Rechargeable Li-ion, Grip: Right-handed",
-                productRating: "4.6/5 stars based on 178 reviews. Life-changing for users with wrist pain.",
-                contactSeller: "Ask about our ergonomic workspace consultation service.",
-                otherSellers: "Available from 2 other health-focused retailers.",
-                storePolicy: "Health-focused return policy with ergonomic specialist support."
-            }
-        },
-        301: {
-            id: 301,
-            sku: "2021-596",
-            name: "Latest Pro Smartphone 128GB",
-            price: 899.99,
-            originalPrice: 999.99,
-            images: [
-                "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600&h=600&fit=crop"
-            ],
-            tags: ["smartphone", "pro", "camera"],
-            description: "Latest flagship smartphone with advanced camera system and premium features.",
-            inStock: true,
-            rating: 4.8,
-            reviews: 1205,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Midnight Black", value: "#1a1a1a" },
-                    { name: "Space Blue", value: "#1e3a8a" },
-                    { name: "Rose Gold", value: "#e11d48" },
-                    { name: "Silver", value: "#c0c0c0" }
-                ],
-                sizes: ["128GB", "256GB", "512GB"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "PhotoEnthusiast",
-                    rating: 5,
-                    date: "2024-01-16",
-                    comment: "Camera quality is outstanding! Best phone camera I've used."
-                },
-                {
-                    id: 2,
-                    user: "TechLover",
-                    rating: 5,
-                    date: "2024-01-13",
-                    comment: "Lightning fast performance. Battery lasts all day."
-                },
-                {
-                    id: 3,
-                    user: "BusinessUser",
-                    rating: 4,
-                    date: "2024-01-09",
-                    comment: "Great for productivity. Screen is gorgeous."
-                }
-            ],
-            details: {
-                about: "Flagship smartphone featuring the latest processor, professional-grade camera system, and premium build quality. Perfect for photography, gaming, and productivity.",
-                shortDescription: "Latest flagship smartphone with advanced camera system.",
-                moreInformation: "Display: 6.7\" OLED, Storage: 128GB, Camera: Triple 48MP, Battery: 4000mAh, 5G Ready",
-                productRating: "4.8/5 stars based on 1205 reviews. Outstanding camera and performance.",
-                contactSeller: "Questions about trade-in programs or need help choosing storage size?",
-                otherSellers: "Compare prices from authorized retailers.",
-                storePolicy: "30-day return policy with full manufacturer warranty."
-            }
-        },
-        302: {
-            id: 302,
-            sku: "2021-597",
-            name: "Budget Smartphone 64GB",
-            price: 199.99,
-            originalPrice: null,
-            images: [
-                "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600&h=600&fit=crop"
-            ],
-            tags: ["smartphone", "budget", "value"],
-            description: "Affordable smartphone with essential features, perfect for everyday communication and basic apps.",
-            inStock: true,
-            rating: 4.0,
-            reviews: 589,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" },
-                    { name: "Blue", value: "#3B82F6" },
-                    { name: "Red", value: "#EF4444" }
-                ],
-                sizes: ["64GB", "128GB"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "BudgetBuyer",
-                    rating: 4,
-                    date: "2024-01-14",
-                    comment: "Great value for money. Does everything I need."
-                },
-                {
-                    id: 2,
-                    user: "FirstTimeUser",
-                    rating: 4,
-                    date: "2024-01-11",
-                    comment: "Perfect for my first smartphone. Easy to use."
-                }
-            ],
-            details: {
-                about: "Budget-friendly smartphone that doesn't compromise on essential features. Great for first-time smartphone users or those looking for reliable backup device.",
-                shortDescription: "Affordable smartphone with essential features.",
-                moreInformation: "Display: 6.1\" LCD, Storage: 64GB, Camera: 13MP, Battery: 3000mAh, OS: Android 13",
-                productRating: "4.0/5 stars based on 589 reviews. Great value for money.",
-                contactSeller: "Ask about our prepaid plan bundles and accessories.",
-                otherSellers: "Available from 2 other mobile retailers.",
-                storePolicy: "1-year limited warranty and customer support."
-            }
-        },
-        401: {
-            id: 401,
-            sku: "2021-598",
-            name: "4K Gaming Monitor 27\"",
-            price: 449.99,
-            originalPrice: 599.99,
-            images: [
-                "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1593640495253-23196b27a87f?w=600&h=600&fit=crop"
-            ],
-            tags: ["monitor", "4K", "gaming"],
-            description: "Ultra HD 4K gaming monitor with HDR support and 144Hz refresh rate for immersive gaming experience.",
-            inStock: true,
-            rating: 4.8,
-            reviews: 342,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" }
-                ],
-                sizes: ["27\"", "32\""]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "GamerPro",
-                    rating: 5,
-                    date: "2024-01-15",
-                    comment: "Incredible display quality. Perfect for competitive gaming."
-                },
-                {
-                    id: 2,
-                    user: "ContentCreator",
-                    rating: 5,
-                    date: "2024-01-12",
-                    comment: "Colors are amazing. Great for video editing too."
-                }
-            ],
-            details: {
-                about: "Professional 4K gaming monitor with stunning visual clarity, HDR support, and ultra-fast refresh rate. Perfect for gaming, content creation, and professional work.",
-                shortDescription: "Ultra HD 4K gaming monitor with HDR support and 144Hz refresh rate.",
-                moreInformation: "Resolution: 3840x2160, Refresh Rate: 144Hz, HDR: HDR10, Inputs: HDMI 2.1, DisplayPort 1.4, USB-C",
-                productRating: "4.8/5 stars based on 342 reviews. Exceptional color accuracy and gaming performance.",
-                contactSeller: "Ask about our monitor calibration service and mounting solutions.",
-                otherSellers: "Available from 3 other electronics retailers.",
-                storePolicy: "3-year warranty with on-site replacement service."
-            }
-        },
-        501: {
-            id: 501,
-            sku: "2021-599",
-            name: "Gaming Laptop RTX 4070",
-            price: 1899.99,
-            originalPrice: 2199.99,
-            images: [
-                "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=600&h=600&fit=crop"
-            ],
-            tags: ["laptop", "gaming", "rtx"],
-            description: "High-performance gaming laptop with RTX 4070 graphics, 16GB RAM, and premium cooling system.",
-            inStock: true,
-            rating: 4.7,
-            reviews: 445,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Black", value: "#000000" },
-                    { name: "Silver", value: "#C0C0C0" }
-                ],
-                sizes: ["16GB RAM", "32GB RAM"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "HardcoreGamer",
-                    rating: 5,
-                    date: "2024-01-16",
-                    comment: "Beast of a machine! Runs everything at max settings."
-                },
-                {
-                    id: 2,
-                    user: "StreamerLife",
-                    rating: 5,
-                    date: "2024-01-13",
-                    comment: "Perfect for streaming and gaming simultaneously."
-                }
-            ],
-            details: {
-                about: "Ultimate gaming laptop powered by RTX 4070 graphics and latest generation processor. Features advanced cooling, high-refresh display, and premium build quality for serious gamers.",
-                shortDescription: "High-performance gaming laptop with RTX 4070 graphics and 16GB RAM.",
-                moreInformation: "CPU: Intel i7-13700H, GPU: RTX 4070 8GB, RAM: 16GB DDR5, Storage: 1TB NVMe SSD, Display: 15.6\" 165Hz",
-                productRating: "4.7/5 stars based on 445 reviews. Exceptional gaming performance and build quality.",
-                contactSeller: "Ask about our gaming setup consultation and accessories bundle.",
-                otherSellers: "Compare configurations from 2 other gaming specialists.",
-                storePolicy: "2-year premium warranty with gaming support hotline."
-            }
-        },
-        601: {
-            id: 601,
-            sku: "2021-600",
-            name: "Pro Tablet 12.9\" 256GB",
-            price: 1099.99,
-            originalPrice: 1299.99,
-            images: [
-                "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1561154464-82e9adf32764?w=600&h=600&fit=crop",
-                "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=600&fit=crop"
-            ],
-            tags: ["tablet", "pro", "creative"],
-            description: "Professional tablet with keyboard support and stylus compatibility, perfect for creative work and productivity.",
-            inStock: true,
-            rating: 4.8,
-            reviews: 567,
-            condition: "New",
-            attributes: {
-                colors: [
-                    { name: "Silver", value: "#C0C0C0" },
-                    { name: "Space Gray", value: "#4A5568" }
-                ],
-                sizes: ["256GB", "512GB", "1TB"]
-            },
-            reviewsList: [
-                {
-                    id: 1,
-                    user: "DigitalArtist",
-                    rating: 5,
-                    date: "2024-01-17",
-                    comment: "Perfect for digital art. Stylus is incredibly responsive."
-                },
-                {
-                    id: 2,
-                    user: "CreativePro",
-                    rating: 5,
-                    date: "2024-01-14",
-                    comment: "Replaced my laptop for most tasks. Screen is gorgeous."
-                }
-            ],
-            details: {
-                about: "Professional-grade tablet designed for creative professionals and power users. Features stunning display, powerful processor, and full compatibility with professional creative apps.",
-                shortDescription: "Professional tablet with keyboard support and Apple Pencil compatibility.",
-                moreInformation: "Display: 12.9\" Liquid Retina, Storage: 256GB, CPU: M2 chip, Camera: 12MP, Compatibility: Apple Pencil, Magic Keyboard",
-                productRating: "4.8/5 stars based on 567 reviews. Industry-leading performance for creative professionals.",
-                contactSeller: "Ask about our creative professional bundle deals and financing options.",
-                otherSellers: "Available from authorized retailers with same warranty.",
-                storePolicy: "AppleCare+ available with comprehensive coverage and priority support."
+            
+            // Set default selected size if available
+            if (transformedProduct.attributes.sizes.length > 0) {
+                setSelectedSize(transformedProduct.attributes.sizes[0]);
             }
         }
-    };
-
-    // Get product by ID from URL params
-    const product = productsDatabase[productId];
-
-    // Initialize selected attributes with first available option
-    useState(() => {
-        if (product?.attributes?.colors?.length > 0) {
-            setSelectedColor(product.attributes.colors[0].name);
-        }
-        if (product?.attributes?.sizes?.length > 0) {
-            setSelectedSize(product.attributes.sizes[0]);
-        }
-    }, [product]);
-
-    // Handle product not found
-    if (!product) {
-        return (
-            <div className="product-details">
-                <div className="error-message">
-                    <h2>{t('shop.productDetails.errors.productNotFound')}</h2>
-                    <p>{t('shop.productDetails.errors.productNotFoundDescription')}</p>
-                    <button onClick={() => navigate('/shop')}>
-                        {t('shop.productDetails.errors.backToShop')}
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    }, [productDetail]);
 
     const handleQuantityChange = (type) => {
-        if (type === 'increment') {
-            setQuantity(prev => prev + 1);
+        if (type === 'increment' && product?.inStock) {
+            setQuantity(prev => Math.min(prev + 1, 10)); // Max 10 items
         } else if (type === 'decrement' && quantity > 1) {
             setQuantity(prev => prev - 1);
         }
     };
 
-    const handleAddToCart = () => {
-        console.log(`Added ${quantity} items to cart`, {
-            productId,
-            sku: product.sku,
+   /*  const handleAddToCart = () => {
+        if (!product?.inStock) return;
+        
+        console.log('Added to cart:', {
+            productId: product.id,
+            name: product.name,
+            price: product.price,
+            quantity,
             color: selectedColor,
-            size: selectedSize,
-            quantity
+            size: selectedSize
         });
-        // Add your cart logic here
-    };
 
-    // FIXED: Properly handle comparison state
+        
+        // Here you would typically dispatch an action to update the cart
+        // For example: dispatch(addToCart({ product, quantity, selectedColor, selectedSize }));
+        
+        // Show success message or notification
+        alert(`${quantity} ${quantity > 1 ? 'items' : 'item'} added to cart!`);
+    } */
+
     const handleCompare = () => {
         let existingProductIds = [];
 
-        // Check for existing comparison products from multiple sources
-        const urlProducts = searchParams.get('products'); // Direct from compare page
-        const urlCompare = searchParams.get('compare'); // From shop page with compare state
+        // Check for existing comparison products from URL
+        const urlProducts = searchParams.get('products');
+        const urlCompare = searchParams.get('compare');
 
         if (urlProducts) {
-            existingProductIds = urlProducts.split(',').filter(id => id && productsDatabase[id]);
+            existingProductIds = urlProducts.split(',').filter(Boolean);
         } else if (urlCompare) {
-            existingProductIds = urlCompare.split(',').filter(id => id && productsDatabase[id]);
+            existingProductIds = urlCompare.split(',').filter(Boolean);
         }
 
         // Add current product if not already in the list
@@ -659,42 +211,24 @@ export const ProductDetails = () => {
 
         // Navigate to compare page with all products
         navigate(`/compare?products=${existingProductIds.join(',')}`);
-
-        console.log('Added to compare:', {
-            productId,
-            name: product.name,
-            sku: product.sku,
-            compareList: existingProductIds
-        });
     };
 
-    const handleInquiry = () => {
-        // Navigate to inquiry page with product details
-        navigate(`/inquiry/${productId}`, {
-            state: {
-                productName: product.name,
-                sku: product.sku
-            }
-        });
-    };
+  /*   const handleInquiry = () => {
+        // Implement inquiry logic here
+        console.log('Inquiry about product:', productId);
+    }; */
 
-    const handleStoreClick = () => {
-        // Navigate to store page - using store ID 2153 as default
-        // In a real app, this would be dynamic based on the product's seller
-        navigate('/shop/store/2153');
-    };
-
-    const renderStars = (rating) => {
+    const renderRatingStars = (rating) => {
         const stars = [];
         const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
+        const hasHalfStar = rating % 1 >= 0.5;
 
         for (let i = 0; i < fullStars; i++) {
-            stars.push(<span key={i} className="star filled">★</span>);
+            stars.push(<span key={`full-${i}`} className="star full">★</span>);
         }
 
         if (hasHalfStar) {
-            stars.push(<span key="half" className="star half">☆</span>);
+            stars.push(<span key="half" className="star half">★</span>);
         }
 
         const emptyStars = 5 - Math.ceil(rating);
@@ -705,12 +239,30 @@ export const ProductDetails = () => {
         return stars;
     };
 
-    // Helper function to get review count text with proper pluralization
     const getReviewCountText = (count) => {
-        if (count === 1) {
-            return `${count} ${t('shop.productDetails.productInfo.review')}`;
-        }
-        return `${count} ${t('shop.productDetails.productInfo.reviews')}`;
+        if (count === 0) return t('shop.productDetails.productInfo.noReviews');
+        if (count === 1) return t('shop.productDetails.productInfo.oneReview');
+        return t('shop.productDetails.productInfo.multipleReviews', { count });
+    };
+
+    const handleAddToCart = () => {
+        if (!product.inStock) return;
+        
+        // TODO: Implement add to cart functionality
+        console.log('Adding to cart:', {
+            productId: product.id,
+            quantity,
+            color: selectedColor,
+            size: selectedSize
+        });
+        
+        // Show success message
+        alert(t('shop.productDetails.addedToCart'));
+    };
+    
+    const handleInquiry = () => {
+        // TODO: Implement inquiry functionality
+        console.log('Initiating inquiry for product:', product.id);
     };
 
     const tabs = [
@@ -718,41 +270,36 @@ export const ProductDetails = () => {
         { id: 'shortDescription', label: t('shop.productDetails.tabs.shortDescription') },
         { id: 'moreInformation', label: t('shop.productDetails.tabs.moreInformation') },
         { id: 'productRating', label: t('shop.productDetails.tabs.productRating') },
-        { id: 'reviews', label: t('shop.productDetails.tabs.reviews') },
-        { id: 'shippingTime', label: t('shop.productDetails.tabs.shippingTime') },
         { id: 'contactSeller', label: t('shop.productDetails.tabs.contactSeller') },
         { id: 'otherSellers', label: t('shop.productDetails.tabs.otherSellers') },
-        { id: 'marketplacePolicy', label: t('shop.productDetails.tabs.marketplacePolicy') },
         { id: 'storePolicy', label: t('shop.productDetails.tabs.storePolicy') }
     ];
-
-    const hasSale = product.originalPrice && product.originalPrice > product.price;
 
     const renderTabContent = () => {
         if (activeTab === 'reviews') {
             return (
                 <div className="reviews-section">
-                    {product.reviewsList && product.reviewsList.length > 0 ? (
-                        <div className="reviews-list">
-                            {product.reviewsList.map((review) => (
-                                <div key={review.id} className="review-item">
-                                    <div className="review-header">
-                                        <span className="review-user">{review.user}</span>
-                                        <div className="review-rating">
-                                            {renderStars(review.rating)}
-                                        </div>
-                                        <span className="review-date">{review.date}</span>
+                    {product.reviewsList.length > 0 ? (
+                        product.reviewsList.map(review => (
+                            <div key={review.id} className="review-item">
+                                <div className="review-header">
+                                    <span className="reviewer">{review.user}</span>
+                                    <div className="review-rating">
+                                        {renderRatingStars(review.rating)}
                                     </div>
-                                    <p className="review-comment">{review.comment}</p>
+                                    <span className="review-date">{review.date}</span>
                                 </div>
-                            ))}
-                        </div>
+                                <p className="review-comment">{review.comment}</p>
+                            </div>
+                        ))
                     ) : (
-                        <p>{t('shop.productDetails.reviews.noReviews')}</p>
+                        <p>{t('shop.productDetails.productInfo.noReviews')}</p>
                     )}
                 </div>
             );
-        } else if (activeTab === 'contactSeller') {
+        }
+
+        if (activeTab === 'contactSeller' || activeTab === 'otherSellers' || activeTab === 'storePolicy') {
             return (
                 <div className="inquiry-section">
                     <p>{product.details[activeTab]}</p>
@@ -761,213 +308,235 @@ export const ProductDetails = () => {
                     </button>
                 </div>
             );
-        } else if (activeTab === 'shippingTime') {
-            return (
-                <div className="shipping-section">
-                    {product.inStock ? (
-                        <p>
-                            <strong>{t('shop.productDetails.shipping.available')}</strong> - {t('shop.productDetails.shipping.shippingTime')}
-                        </p>
-                    ) : (
-                        <p>
-                            <strong>{t('shop.productDetails.shipping.outOfStock')}</strong> {t('shop.productDetails.shipping.expectedRestock')}
-                        </p>
-                    )}
-                </div>
-            );
-        } else if (activeTab === 'marketplacePolicy') {
-            return (
-                <div className="marketplace-policy-section">
-                    <div className="policy-features">
-                        <div className="policy-feature">
-                            <div className="policy-icon">
-                                🛡️
-                            </div>
-                            <div className="policy-content">
-                                <h4>{t('shop.productDetails.policy.securePayments.title')}</h4>
-                                <p>{t('shop.productDetails.policy.securePayments.description')}</p>
-                            </div>
-                        </div>
+        }
 
-                        <div className="policy-feature">
-                            <div className="policy-icon">
-                                🚚
-                            </div>
-                            <div className="policy-content">
-                                <h4>{t('shop.productDetails.policy.freeShipping.title')}</h4>
-                                <p>{t('shop.productDetails.policy.freeShipping.description')}</p>
-                            </div>
-                        </div>
-
-                        <div className="policy-feature">
-                            <div className="policy-icon">
-                                🎧
-                            </div>
-                            <div className="policy-content">
-                                <h4>{t('shop.productDetails.policy.customerSupport.title')}</h4>
-                                <p>{t('shop.productDetails.policy.customerSupport.description')}</p>
-                            </div>
-                        </div>
-
-                        <div className="policy-feature">
-                            <div className="policy-icon">
-                                🔄
-                            </div>
-                            <div className="policy-content">
-                                <h4>{t('shop.productDetails.policy.returnPeriod.title')}</h4>
-                                <p>{t('shop.productDetails.policy.returnPeriod.description')}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        } else if (activeTab === 'storePolicy') {
-            return (
-                <div className="store-policy-section">
-                    {product.details[activeTab] && product.details[activeTab].trim() !== '' ? (
-                        <p>{product.details[activeTab]}</p>
-                    ) : (
-                        <p>{t('shop.productDetails.policy.noStorePolicy')}</p>
-                    )}
-                </div>
-            );
-        } else if (activeTab === 'productRating') {
+        if (activeTab === 'productRating') {
             return (
                 <div className="product-rating-section">
                     {product.rating ? (
                         <div className="rating-display">
                             <div className="rating-stars">
-                                {renderStars(product.rating)}
-                                <span className="rating-value">({product.rating})</span>
+                                {renderRatingStars(product.rating)}
                             </div>
-                            <p className="rating-text">
-                                {t('shop.productDetails.reviews.basedOn', { count: product.reviews })}
-                                {product.rating >= 4.5 ? ` ${t('shop.productDetails.reviews.outstanding')}` :
-                                    product.rating >= 4.0 ? ` ${t('shop.productDetails.reviews.great')}` :
-                                        product.rating >= 3.5 ? ` ${t('shop.productDetails.reviews.good')}` :
-                                            ` ${t('shop.productDetails.reviews.mixed')}`}
-                            </p>
+                            <div className="rating-text">
+                                {product.details.productRating}
+                            </div>
                         </div>
                     ) : (
-                        <p>{t('shop.productDetails.reviews.noRating')}</p>
+                        <p>{t('shop.productDetails.productInfo.noRatings')}</p>
                     )}
+                    <button 
+                        className="write-review-btn"
+                        onClick={() => setActiveTab('reviews')}
+                    >
+                        {t('shop.productDetails.actions.writeReview')}
+                    </button>
                 </div>
             );
-        } else {
-            return <p>{product.details[activeTab]}</p>;
         }
+
+        // Default tab content
+        return <p>{product.details[activeTab] || t('shop.productDetails.noInformation')}</p>;
     };
 
-    return (
-        <div className="product-details">
-            <div className="product-container">
-                {/* Product Images Section */}
-                <div className="product-images">
-                    <div className="main-image-container">
-                        <div className="image-wrapper">
-                            {hasSale && <div className="sale-badge">Sale</div>}
-                            <img
-                                src={product.images[selectedImageIndex]}
-                                alt={`${product.name}`}
-                                className="main-image"
-                            />
-                            {product.images.length > 1 && (
-                                <>
-                                    <button
-                                        className="nav-btn prev-btn"
-                                        onClick={() => setSelectedImageIndex(prev =>
-                                            prev === 0 ? product.images.length - 1 : prev - 1
-                                        )}
-                                    >
-                                        ❮
-                                    </button>
-                                    <button
-                                        className="nav-btn next-btn"
-                                        onClick={() => setSelectedImageIndex(prev =>
-                                            prev === product.images.length - 1 ? 0 : prev + 1
-                                        )}
-                                    >
-                                        ❯
-                                    </button>
-                                </>
-                            )}
-                        </div>
+    // Handle loading state
+    if (loadingProduct) {
+        return (
+            <div className="product-details loading">
+                <div className="skeleton-loader">
+                    <div className="skeleton-image"></div>
+                    <div className="skeleton-info">
+                        <div className="skeleton-title"></div>
+                        <div className="skeleton-rating"></div>
+                        <div className="skeleton-price"></div>
+                        <div className="skeleton-options"></div>
+                        <div className="skeleton-button"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-                        {/* Pagination dots */}
-                        {product.images.length > 1 && (
-                            <div className="pagination-dots">
-                                {product.images.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        className={`dot ${index === selectedImageIndex ? 'active' : ''}`}
-                                        onClick={() => setSelectedImageIndex(index)}
-                                    />
-                                ))}
+    // Handle error state
+    if (error) {
+        return (
+            <div className="product-details error">
+                <div className="error-content">
+                    <div className="error-icon">⚠️</div>
+                    <h2>{t('shop.productDetails.errors.loadingError')}</h2>
+                    <p>{error?.data?.message || t('shop.productDetails.errors.tryAgain')}</p>
+                    <div className="error-actions">
+                        <button 
+                            className="btn-retry" 
+                            onClick={() => window.location.reload()}
+                        >
+                            {t('common.retry')}
+                        </button>
+                        <button 
+                            className="btn-back"
+                            onClick={() => navigate('/shop')}
+                        >
+                            {t('common.backToShop')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Handle product not found or not loaded
+    if (!product) {
+        return (
+            <div className="product-details not-found">
+                <div className="not-found-content">
+                    <div className="not-found-icon">🔍</div>
+                    <h2>{t('shop.productDetails.errors.productNotFound')}</h2>
+                    <p>{t('shop.productDetails.errors.productNotFoundDesc')}</p>
+                    <div className="not-found-actions">
+                        <button 
+                            className="btn-back"
+                            onClick={() => navigate('/shop')}
+                        >
+                            {t('common.backToShop')}
+                        </button>
+                        <button 
+                            className="btn-contact"
+                            onClick={() => navigate('/contact')}
+                        >
+                            {t('common.contactSupport')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+            {/* Breadcrumb */}
+            <div className="flex items-center text-sm text-gray-600 mb-6">
+                <button 
+                    onClick={() => navigate(-1)} 
+                    className="text-blue-600 hover:text-blue-800 mr-2"
+                >
+                    &larr; {t('common.back')}
+                </button>
+                <span className="mx-2">/</span>
+                <span className="text-gray-500">{product.category}</span>
+                <span className="mx-2">/</span>
+                <span className="font-medium text-gray-900">{product.name}</span>
+            </div>
+
+            {/* Product Main */}
+            <div className="flex flex-col md:flex-row gap-8">
+                {/* Product Gallery */}
+                <div className="md:w-1/2">
+                    <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
+                        {product.images.length > 0 ? (
+                            <img
+                                src={media_url+product.images[selectedImageIndex]}
+                                alt={product.name}
+                                className="w-full h-auto object-cover aspect-square"
+                            />
+                        ) : (
+                            <div className="aspect-square flex items-center justify-center bg-gray-100 text-gray-400">
+                                {t('shop.productDetails.noImage')}
                             </div>
                         )}
                     </div>
-
-                    {/* Thumbnails */}
+                    
                     {product.images.length > 1 && (
-                        <div className="thumbnails-container">
-                            <div className="thumbnails-grid">
-                                {product.images.map((image, index) => (
-                                    <div
-                                        key={index}
-                                        className={`thumbnail ${index === selectedImageIndex ? 'active' : ''}`}
-                                        onClick={() => setSelectedImageIndex(index)}
-                                    >
-                                        <img src={image} alt={`${product.name} thumbnail ${index + 1}`} />
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="flex gap-2 overflow-x-auto py-2">
+                            {product.images.map((image, index) => (
+                                <button
+                                    key={index}
+                                    className={`flex-shrink-0 w-20 h-20 border-2 rounded overflow-hidden ${selectedImageIndex === index ? 'border-blue-500' : 'border-transparent'}`}
+                                    onClick={() => setSelectedImageIndex(index)}
+                                >
+                                    <img 
+                                        src={media_url + image} 
+                                        alt={`${product.name} thumbnail ${index + 1}`} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                </button>
+                            ))}
                         </div>
                     )}
                 </div>
 
-                {/* Product Info Section */}
-                <div className="product-info">
-                    <div className="sku-section">
-                        <span className="sku-label">{t('shop.productDetails.productInfo.sku')}</span>
-                        <span className="sku-value">{product.sku}</span>
-                    </div>
-
-                    <h1 className="product-name">{product.name}</h1>
-
-                    {/* Rating Section - only show if rating exists */}
-                    {product.rating && (
-                        <div className="rating-section">
-                            <div className="rating-stars">
-                                {renderStars(product.rating)}
-                                <span className="rating-value">({product.rating})</span>
-                            </div>
-                            <span className="review-count">{getReviewCountText(product.reviews)}</span>
-                        </div>
-                    )}
-
-                    <div className="price-container">
-                        <span className="current-price">${product.price.toFixed(2)}</span>
-                        {product.originalPrice && (
-                            <span className="original-price">${product.originalPrice.toFixed(2)}</span>
+                {/* Product Info */}
+                <div className="md:w-1/2">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+                    
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
+                        <span>SKU: {product.sku}</span>
+                        <span className={`font-medium ${product.inStock ? 'text-green-600' : 'text-red-600'}`}>
+                            {product.inStock 
+                                ? t('shop.productDetails.productInfo.inStock') 
+                                : t('shop.productDetails.productInfo.outOfStock')}
+                        </span>
+                        {product.condition && (
+                            <span>
+                                {t('shop.productDetails.productInfo.condition')}: {product.condition}
+                            </span>
                         )}
                     </div>
 
-                    {/* Attributes Section */}
-                    {product.attributes && (
-                        <div className="attributes-section">
-                            {/* Color Selection */}
-                            {product.attributes.colors && product.attributes.colors.length > 0 && (
-                                <div className="attribute-group">
-                                    <span className="attribute-label">
-                                        {t('shop.productDetails.productInfo.color')} <strong>{selectedColor}</strong>
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+                        {product.originalPrice && product.originalPrice > product.price && (
+                            <>
+                                <span className="text-lg text-gray-500 line-through">${product.originalPrice.toFixed(2)}</span>
+                                <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                    {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                                </span>
+                            </>
+                        )}
+                    </div>
+
+                    {product.rating > 0 && (
+                        <div className="flex items-center gap-2 mb-6">
+                            <div className="flex text-yellow-400">
+                                {[...Array(5)].map((_, i) => (
+                                    <span key={i} className={i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}>
+                                        ★
                                     </span>
-                                    <div className="color-options">
-                                        {product.attributes.colors.map((color) => (
+                                ))}
+                            </div>
+                            <span className="text-sm text-gray-500">
+                                ({product.reviews} {product.reviews === 1 ? 'review' : 'reviews'})
+                            </span>
+                            <button 
+                                className="text-sm text-blue-600 hover:underline"
+                                onClick={() => document.getElementById('review-form-modal')?.showModal()}
+                            >
+                                {t('shop.productDetails.writeAReview')}
+                            </button>
+                        </div>
+                    )}
+
+                    {product.description && (
+                        <div className="mb-6">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('shop.productDetails.productInfo.overview')}</h3>
+                            <p className="text-gray-600">{product.description}</p>
+                        </div>
+                    )}
+
+                    {(product.attributes?.colors?.length > 0 || product.attributes?.sizes?.length > 0) && (
+                        <div className="space-y-4 mb-6">
+                            {product.attributes.colors?.length > 0 && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('shop.productDetails.productInfo.color')}:
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {product.attributes.colors.map((color, index) => (
                                             <button
-                                                key={color.name}
-                                                className={`color-option ${selectedColor === color.name ? 'selected' : ''}`}
+                                                key={index}
+                                                className={`w-8 h-8 rounded-full border-2 ${selectedColor === color.value ? 'ring-2 ring-offset-2 ring-blue-500' : 'border-gray-200'} transition-all`}
                                                 style={{ backgroundColor: color.value }}
-                                                onClick={() => setSelectedColor(color.name)}
+                                                onClick={() => setSelectedColor(color.value)}
+                                                aria-label={color.name}
                                                 title={color.name}
                                             />
                                         ))}
@@ -975,15 +544,20 @@ export const ProductDetails = () => {
                                 </div>
                             )}
 
-                            {/* Size Selection */}
-                            {product.attributes.sizes && product.attributes.sizes.length > 0 && (
-                                <div className="attribute-group">
-                                    <span className="attribute-label">{t('shop.productDetails.productInfo.size')}</span>
-                                    <div className="size-options">
-                                        {product.attributes.sizes.map((size) => (
+                            {product.attributes.sizes?.length > 0 && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('shop.productDetails.productInfo.size')}:
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {product.attributes.sizes.map((size, index) => (
                                             <button
-                                                key={size}
-                                                className={`size-option ${selectedSize === size ? 'selected' : ''}`}
+                                                key={index}
+                                                className={`px-4 py-2 border rounded-md text-sm font-medium ${
+                                                    selectedSize === size 
+                                                        ? 'bg-blue-600 text-white border-blue-600' 
+                                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                }`}
                                                 onClick={() => setSelectedSize(size)}
                                             >
                                                 {size}
@@ -995,86 +569,426 @@ export const ProductDetails = () => {
                         </div>
                     )}
 
-                    <div className="tags-section">
-                        <span className="tags-label">{t('shop.productDetails.productInfo.tags')}</span>
-                        {product.tags.map((tag, index) => (
-                            <span key={index} className="tag">{tag}</span>
-                        ))}
-                    </div>
-
-                    <div className="description">
-                        <p>{product.description}</p>
-                    </div>
-
-                    <div className="purchase-section">
-                        <div className="quantity-selector">
-                            <button
-                                className="quantity-btn"
-                                onClick={() => handleQuantityChange('decrement')}
+                    <div className="flex items-center gap-4 mb-6">
+                        <label className="text-sm font-medium text-gray-700">
+                            {t('shop.productDetails.quantity')}:
+                        </label>
+                        <div className="flex items-center border border-gray-300 rounded-md">
+                            <button 
+                                className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                                 disabled={quantity <= 1}
                             >
                                 -
                             </button>
-                            <span className="quantity-display">{quantity}</span>
-                            <button
-                                className="quantity-btn"
-                                onClick={() => handleQuantityChange('increment')}
+                            <span className="w-12 text-center">{quantity}</span>
+                            <button 
+                                className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => setQuantity(prev => prev + 1)}
+                                disabled={quantity >= product.stockQuantity}
+                                aria-label="Increase quantity"
                             >
-                                +
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
                             </button>
                         </div>
 
                         <button
-                            className={`add-to-cart-btn ${!product.inStock ? 'disabled' : ''}`}
+                            type="button"
+                            className={`flex-1 px-6 py-3 rounded-md font-medium text-white transition-colors ${
+                                product.inStock
+                                    ? 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                                    : 'bg-gray-400 cursor-not-allowed'
+                            }`}
                             onClick={handleAddToCart}
                             disabled={!product.inStock}
                         >
-                            {product.inStock ?
-                                t('shop.productDetails.productInfo.addToCart') :
-                                t('shop.productDetails.productInfo.outOfStock')
-                            }
+                            <div className="flex items-center justify-center gap-2">
+                                <svg 
+                                    className="w-5 h-5" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path 
+                                        strokeLinecap="round" 
+                                        strokeLinejoin="round" 
+                                        strokeWidth={2} 
+                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" 
+                                    />
+                                </svg>
+                                {product.inStock 
+                                    ? t('shop.productDetails.actions.addToCart')
+                                    : t('shop.productDetails.actions.outOfStock')}
+                            </div>
+                        </button>
+
+                        <button 
+                            type="button"
+                            className="px-4 py-3 border border-gray-300 bg-white text-gray-700 rounded-md font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            onClick={handleCompare}
+                        >
+                            <div className="flex items-center justify-center gap-2">
+                                <svg 
+                                    className="w-5 h-5" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path 
+                                        strokeLinecap="round" 
+                                        strokeLinejoin="round" 
+                                        strokeWidth={2} 
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" 
+                                    />
+                                </svg>
+                                {t('shop.productDetails.actions.compare')}
+                            </div>
                         </button>
                     </div>
 
-                    <button className="compare-btn" onClick={handleCompare}>
-                        {t('shop.productDetails.productInfo.compare')}
-                    </button>
-
-                    <div className="sold-by">
-                        <span>{t('shop.productDetails.productInfo.soldBy')}</span>
-                        <div
-                            className="sold-by-details clickable"
-                            onClick={handleStoreClick}
-                            title={t('shop.productDetails.accessibility.viewStoreDetails')}
-                        >
-                            2153
+                    {product.store && (
+                        <div className="mt-8 border-t border-gray-200 pt-6">
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                {t('shop.productDetails.soldBy')}
+                            </h3>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                {product.store.logo && (
+                                    <div className="flex-shrink-0">
+                                        <img 
+                                            src={product.store.logo} 
+                                            alt={product.store.name} 
+                                            className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = 'https://via.placeholder.com/64';
+                                            }}
+                                        />
+                                    </div>
+                                )}
+                                <div className="flex-1">
+                                    <h4 className="text-base font-medium text-gray-900">{product.store.name}</h4>
+                                    {product.store.description && (
+                                        <p className="text-sm text-gray-600 mt-1">{product.store.description}</p>
+                                    )}
+                                    {product.store.address && (
+                                        <p className="text-sm text-gray-500 mt-1">{product.store.address}</p>
+                                    )}
+                                    
+                                    <div className="mt-3 flex flex-wrap gap-3">
+                                        {product.store.contact?.email && (
+                                            <a 
+                                                href={`mailto:${product.store.contact.email}`}
+                                                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                            >
+                                                <svg 
+                                                    className="w-4 h-4 mr-1" 
+                                                    fill="none" 
+                                                    stroke="currentColor" 
+                                                    viewBox="0 0 24 24" 
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path 
+                                                        strokeLinecap="round" 
+                                                        strokeLinejoin="round" 
+                                                        strokeWidth={2} 
+                                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
+                                                    />
+                                                </svg>
+                                                {product.store.contact.email}
+                                            </a>
+                                        )}
+                                        
+                                        {product.store.contact?.phone && (
+                                            <a 
+                                                href={`tel:${product.store.contact.phone.replace(/\D/g, '')}`}
+                                                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                            >
+                                                <svg 
+                                                    className="w-4 h-4 mr-1" 
+                                                    fill="none" 
+                                                    stroke="currentColor" 
+                                                    viewBox="0 0 24 24" 
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path 
+                                                        strokeLinecap="round" 
+                                                        strokeLinejoin="round" 
+                                                        strokeWidth={2} 
+                                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" 
+                                                    />
+                                                </svg>
+                                                {product.store.contact.phone}
+                                            </a>
+                                        )}
+                                        
+                                        {product.store.contact?.website && (
+                                            <a 
+                                                href={product.store.contact.website}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                            >
+                                                <svg 
+                                                    className="w-4 h-4 mr-1" 
+                                                    fill="none" 
+                                                    stroke="currentColor" 
+                                                    viewBox="0 0 24 24" 
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path 
+                                                        strokeLinecap="round" 
+                                                        strokeLinejoin="round" 
+                                                        strokeWidth={2} 
+                                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" 
+                                                    />
+                                                </svg>
+                                                {t('shop.productDetails.visitStore')}
+                                            </a>
+                                        )}
+                                    </div>
+                                    
+                                    <button 
+                                        className="mt-4 w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        onClick={() => {
+                                            // TODO: Navigate to store page
+                                            console.log('Visit store:', product.store.id);
+                                        }}
+                                    >
+                                        {t('shop.productDetails.actions.visitStore')}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
             {/* Product Details Tabs */}
-            <div className="product-tabs">
-                <div className="tabs-navigation">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                            onClick={() => setActiveTab(tab.id)}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
+            <div className="mt-12">
+                <div className="border-b border-gray-200">
+                    <nav className="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                                    activeTab === tab.id
+                                        ? 'border-blue-500 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                }`}
+                                aria-current={activeTab === tab.id ? 'page' : undefined}
+                            >
+                                {tab.label}
+                                {activeTab === tab.id && (
+                                    <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                        {tabs.findIndex((t) => t.id === tab.id) + 1}
+                                    </span>
+                                )}
+                            </button>
+                        ))}
+                    </nav>
                 </div>
-
-                <div className="tab-content">
-                    <div className="tab-panel">
-                        {renderTabContent()}
-                    </div>
+                <div className="mt-6">
+                    {renderTabContent()}
                 </div>
             </div>
+            
+            {/* Related Products Section */}
+            {product.relatedProducts && product.relatedProducts.length > 0 && (
+                <section className="mt-16">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                        {t('shop.productDetails.youMayAlsoLike')}
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        {product.relatedProducts.map(related => (
+                            <div 
+                                key={related.id} 
+                                className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                            >
+                                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg bg-gray-100">
+                                    <img 
+                                        src={related.image} 
+                                        alt={related.name}
+                                        className="h-full w-full object-cover object-center group-hover:opacity-90 transition-opacity duration-200 cursor-pointer"
+                                        onClick={() => navigate(`/product/${related.id}`)}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://via.placeholder.com/300';
+                                        }}
+                                    />
+                                </div>
+                                <div className="p-4">
+                                    <h3 
+                                        className="text-sm font-medium text-gray-900 line-clamp-2 h-10 overflow-hidden cursor-pointer hover:text-blue-600"
+                                        onClick={() => navigate(`/product/${related.id}`)}
+                                    >
+                                        {related.name}
+                                    </h3>
+                                    <div className="mt-2 flex items-center">
+                                        <p className="text-sm font-medium text-gray-900">
+                                            ${related.price.toFixed(2)}
+                                        </p>
+                                        {related.originalPrice > related.price && (
+                                            <p className="ml-2 text-sm text-gray-500 line-through">
+                                                ${related.originalPrice.toFixed(2)}
+                                            </p>
+                                        )}
+                                        {related.originalPrice > related.price && (
+                                            <span className="ml-2 text-xs font-medium text-red-600">
+                                                {Math.round((1 - related.price / related.originalPrice) * 100)}% OFF
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="mt-3">
+                                        <button 
+                                            className="w-full py-2 px-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // TODO: Add to cart functionality
+                                                console.log('Add to cart:', related.id);
+                                            }}
+                                        >
+                                            {t('shop.productDetails.addToCart')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+            
+            {/* Review Form Modal */}
+            <dialog id="review-form-modal" className="relative z-50">
+                <div className="fixed inset-0 bg-black/30" aria-hidden="true" onClick={() => document.getElementById('review-form-modal')?.close()} />
+                <div className="fixed inset-0 flex items-center justify-center p-4">
+                    <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl overflow-hidden">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-bold text-gray-900">
+                                    {t('shop.productDetails.writeAReview')}
+                                </h2>
+                                <button 
+                                    type="button"
+                                    className="text-gray-400 hover:text-gray-500"
+                                    onClick={() => document.getElementById('review-form-modal')?.close()}
+                                    aria-label="Close"
+                                >
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <form className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('shop.productDetails.yourRating')}
+                                    </label>
+                                    <div className="flex items-center space-x-1">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <React.Fragment key={star}>
+                                                <input 
+                                                    type="radio" 
+                                                    id={`star${star}`} 
+                                                    name="rating" 
+                                                    value={star} 
+                                                    className="sr-only"
+                                                />
+                                                <label 
+                                                    htmlFor={`star${star}`}
+                                                    className="text-2xl cursor-pointer text-gray-300 hover:text-yellow-400 peer-hover:text-yellow-400 peer-focus-visible:text-yellow-400"
+                                                    aria-label={`${star} ${star === 1 ? 'star' : 'stars'}`}
+                                                >
+                                                    ★
+                                                </label>
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label htmlFor="review-title" className="block text-sm font-medium text-gray-700 mb-1">
+                                        {t('shop.productDetails.reviewTitle')}
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="review-title" 
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        placeholder={t('shop.productDetails.reviewTitlePlaceholder')}
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label htmlFor="review-text" className="block text-sm font-medium text-gray-700 mb-1">
+                                        {t('shop.productDetails.yourReview')}
+                                    </label>
+                                    <textarea 
+                                        id="review-text" 
+                                        rows={5} 
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        placeholder={t('shop.productDetails.reviewPlaceholder')}
+                                        required
+                                    ></textarea>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('shop.productDetails.uploadPhotos')}
+                                    </label>
+                                    <div className="mt-1 flex items-center">
+                                        <label className="group relative cursor-pointer rounded-md bg-white font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                                            <span className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                <svg className="-ml-1 mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fillRule="evenodd" d="M5.5 17a4.5 4.5 0 01-1.44-8.765 4.5 4.5 0 018.302-3.046 3.5 3.5 0 014.504 4.272A4 4 0 0115 17H5.5zm5.25-9.25a.75.75 0 00-1.5 0v4.59l-1.95-2.1a.75.75 0 10-1.1 1.02l3.25 3.5a.75.75 0 001.1 0l3.25-3.5a.75.75 0 10-1.1-1.02l-1.95 2.1V7.75z" clipRule="evenodd" />
+                                                </svg>
+                                                {t('shop.productDetails.chooseFiles')}
+                                            </span>
+                                            <input 
+                                                type="file" 
+                                                multiple 
+                                                accept="image/*" 
+                                                className="sr-only"
+                                                onChange={(e) => {
+                                                    // TODO: Handle file uploads
+                                                    console.log('Files selected:', e.target.files);
+                                                }}
+                                            />
+                                        </label>
+                                        <p className="ml-4 text-sm text-gray-500">
+                                            {t('shop.productDetails.uploadLimit')}
+                                        </p>
+                                    </div>
+                                    <div id="file-names" className="mt-2 text-sm text-gray-600"></div>
+                                </div>
+                                
+                                <div className="flex justify-end space-x-3 pt-4">
+                                    <button 
+                                        type="button" 
+                                        className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        onClick={() => document.getElementById('review-form-modal')?.close()}
+                                    >
+                                        {t('common.cancel')}
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    >
+                                        {t('shop.productDetails.submitReview')}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </dialog>
         </div>
     );
-};
+}
 
 export default ProductDetails;

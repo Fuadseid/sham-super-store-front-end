@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { useState, useRef } from 'react';
@@ -6,15 +6,28 @@ import { useLanguage } from '../../../context/LanguageContext';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import './NewProducts.scss';
+import { useGetNewProductQuery } from '../../../stores/apiSlice';
+import { useSelector } from 'react-redux';
 
 const NewProducts = () => {
     const { t, isRTL } = useLanguage();
     const swiperRef = useRef(null);
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
+    const {media_url} = useSelector((state)=>state.auth);
+    const [newproductsdata,setNewProductsData] = useState([]);
+    const {data:newproduct,isLoading:loadingnewproduct, isError:errornewproduct} = useGetNewProductQuery();
+    const newProducts = newproduct?.data;
+
+    useEffect(()=>{
+        if(newProducts){
+            setNewProductsData(newProducts);
+        }
+    },[newProducts]);
+
 
     // This data will come from backend later - keeping as is
-    const products = [
+/*     const products = [
         {
             id: 1,
             name: 'Sunt explicabo',
@@ -73,7 +86,7 @@ const NewProducts = () => {
             image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=150&h=150&fit=crop',
             currentPrice: 250.00
         }
-    ];
+    ]; */
 
     const StoreIcon = () => (
         <svg className="store-icon" viewBox="0 0 24 24">
@@ -173,12 +186,12 @@ const NewProducts = () => {
                     watchOverflow={true}
                     className={`products-swiper ${isRTL ? 'rtl-swiper' : ''}`}
                 >
-                    {products.map((product) => (
+                    {newproductsdata.map((product) => (
                         <SwiperSlide key={product.id}>
                             <div className="product-item">
                                 <div className="product-image-container">
                                     <img
-                                        src={product.image}
+                                        src={media_url+product.productgallers[0]?.image_url}
                                         alt={product.name}
                                         className="product-image"
                                     />
@@ -190,18 +203,18 @@ const NewProducts = () => {
                                 <div className="product-name">{product.name}</div>
 
                                 <div className="product-pricing">
-                                    {product.oldPrice ? (
+                                    {product.is_on_sale ? (
                                         <>
                                             <span className="old-price">
-                                                {formatPrice(product.oldPrice)}
+                                                {formatPrice(Number(product.regular_price))}
                                             </span>
                                             <span className="current-price">
-                                                {formatPrice(product.currentPrice)}
+                                                {formatPrice(Number(product.on_sale_price))}
                                             </span>
                                         </>
                                     ) : (
                                         <span className="price-only">
-                                            {formatPrice(product.currentPrice)}
+                                            {formatPrice(Number(product.regular_price))}
                                         </span>
                                     )}
                                 </div>

@@ -17,4 +17,11 @@ export const catagoriesEndpoints = (builder) => ({
         method:"GET",
     }),
   }),
+  getCategoriesonNavbar:builder.query
+  ({
+    query:()=>({
+        url:'public/all-catagoris-nav', 
+        method:'GET'
+    })
+  })
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, FreeMode } from 'swiper/modules';
 import { useState, useRef } from 'react';
@@ -7,12 +7,24 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
 import './TopRatedProducts.scss';
+import { useGetProductbyreviewQuery } from '../../../stores/apiSlice';
+import { useSelector } from 'react-redux';
 
 const TopRatedProducts = () => {
     const { t, isRTL } = useLanguage();
     const swiperRef = useRef(null);
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
+    const { media_url } = useSelector((state) => state.auth);
+
+    const [topRatedProductsData, setTopRatedProductsData] = useState([]);
+    const { data: topRatedProducts } = useGetProductbyreviewQuery();
+    useEffect(() => {
+        if (topRatedProducts) {
+            setTopRatedProductsData(topRatedProducts?.data);
+        }
+    }, [topRatedProducts]);
+    console.log('top rated', topRatedProductsData);
 
     // This data will come from backend later - keeping as is
     const products = [
@@ -146,17 +158,17 @@ const TopRatedProducts = () => {
                     watchOverflow={true}
                     className={`products-swiper ${isRTL ? 'rtl-swiper' : ''}`}
                 >
-                    {products.map((product) => (
+                    {topRatedProductsData.map((product) => (
                         <SwiperSlide key={product.id}>
                             <div className="product-item">
                                 <div className="product-image-container">
                                     <img
-                                        src={product.image}
+                                        src={media_url+product.image}
                                         alt={product.name}
                                         className="product-image"
                                     />
 
-                                    {product.isOnSale && (
+                                    {product.is_on_sale && (
                                         <div className="sale-banner">
                                             <span>{t('home.topRatedProducts.sale')}</span>
                                         </div>
@@ -170,18 +182,18 @@ const TopRatedProducts = () => {
                                 <div className="product-name">{product.name}</div>
 
                                 <div className="product-pricing">
-                                    {product.oldPrice ? (
+                                    {product.is_on_sale ? (
                                         <>
                                             <span className="old-price">
-                                                {formatPrice(product.oldPrice)}
+                                                {formatPrice(Number(product.oldPrice))}
                                             </span>
                                             <span className="current-price">
-                                                {formatPrice(product.currentPrice)}
+                                                {formatPrice(Number(product.current_price))}
                                             </span>
                                         </>
                                     ) : (
                                         <span className="price-only">
-                                            {formatPrice(product.currentPrice)}
+                                            {formatPrice(Number(product.oldPrice))}
                                         </span>
                                     )}
                                 </div>

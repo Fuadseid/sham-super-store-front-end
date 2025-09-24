@@ -10,5 +10,23 @@ export const productEndpoints = (builder)=>({
             url:"public/new-products",
             method:"GET"
         })
+    }),
+    getProductdetail:builder.query({
+        query:(id)=>({
+            url:`public/product/${id}`,
+            method:"GET"
+        })
+    }),
+   getFeaturedProduct:builder.query({
+        query:()=>({
+            url:"public/featured-products",
+            method:"GET"
+        })
+    }),
+    getProductbyreview:builder.query({
+        query:()=>({
+       url:'public/product-by-review',
+       method:"GET"
+    })
     })
 })

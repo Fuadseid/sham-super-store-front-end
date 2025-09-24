@@ -1,7 +1,7 @@
 import { useLanguage } from '../../../context/LanguageContext';
 import './AuthSection.scss';
 
-const AuthSection = ({ formData, handleInputChange, handleLogin, handleRegister }) => {
+const AuthSection = ({ formData,registerData,handleInputChangeforreg, handleInputChange, handleLogin, handleRegister, isLoading = false }) => {
     const { t } = useLanguage();
 
     return (
@@ -67,7 +67,11 @@ const AuthSection = ({ formData, handleInputChange, handleLogin, handleRegister 
                                     type="email"
                                     id="reg-email"
                                     name="email"
+                                    value={registerData.email}
+                                    onChange={handleInputChangeforreg}
+                                    placeholder={t('myAccount.auth.register.emailPlaceholder')}
                                     required
+                                    disabled={isLoading}
                                 />
                             </div>
                             <p className="register-info">
@@ -76,8 +80,19 @@ const AuthSection = ({ formData, handleInputChange, handleLogin, handleRegister 
                             <p className="privacy-info">
                                 {t('myAccount.auth.register.privacyText')} <a href="#" className="privacy-link">{t('myAccount.auth.register.privacyLink')}</a>.
                             </p>
-                            <button type="submit" className="register-btn">
-                                {t('myAccount.auth.register.registerButton')}
+                            <button 
+                                type="submit" 
+                                className={`register-btn ${isLoading ? 'loading' : ''}`}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <span className="spinner"></span>
+                                        {t('myAccount.auth.register.registering') || 'Registering...'}
+                                    </>
+                                ) : (
+                                    t('myAccount.auth.register.registerButton')
+                                )}
                             </button>
                         </form>
                         <div className="vendor-link">

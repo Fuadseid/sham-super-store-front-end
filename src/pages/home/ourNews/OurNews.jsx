@@ -1,29 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import './OurNews.scss';
 import laptop from '../../../assets/images/home/ourNews/laptop.jpg';
 import room from '../../../assets/images/home/ourNews/room.jpg';
 import man from '../../../assets/images/home/ourNews/man.jpg';
+import { useSelector } from 'react-redux';
+import { useGetNewsQuery } from '../../../stores/apiSlice';
 
 const OurNews = () => {
     const { t, isRTL } = useLanguage();
-
+    const {media_url} = useSelector((state) => state.auth);
+    const {data:news,isLoading:loadingnews,isError:errorfetching} = useGetNewsQuery();
+    const [newsDatas,setNewsData] = useState([]);
+    useEffect(()=>{
+        if(news?.data){
+            setNewsData(news?.data);
+        }
+    },[news?.data])
+   console.log("News",newsDatas);
     // This data will come from backend later - keeping as is
     const newsData = [
         {
-            id: 1,
-            image: laptop,
-            description: "We're proud to bring you a wide variety of products from trusted vendors—new sellers join us daily, so there's always something fresh to discover!"
+            id: newsDatas[0]?.id,
+            image: `${media_url}${newsDatas[0]?.image}`,
+            description: newsDatas[0]?.description
         },
         {
-            id: 2,
-            image: room,
-            description: "To our valued vendors: our mission is to become a one-stop shop for shoppers everywhere, giving your products maximum exposure to a growing customer base."
+            id: newsDatas[1]?.id,
+            image: `${media_url}${newsDatas[1]?.image}`,
+            description: newsDatas[1]?.description
         },
         {
-            id: 3,
-            image: man,
-            description: "To our dedicated delivery drivers: join a thriving team and enjoy great opportunities as part of our growing family."
+            id: newsDatas[2]?.id,
+            image: `${media_url}${newsDatas[2]?.image}`,
+            description: newsDatas[2]?.description
         }
     ];
 

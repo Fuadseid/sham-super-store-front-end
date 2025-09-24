@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { useState, useRef } from 'react';
@@ -6,15 +6,25 @@ import { useLanguage } from '../../../context/LanguageContext';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import './BestSellerKitchen.scss';
+import { useGetbestSellerQuery } from '../../../stores/apiSlice';
+import { useSelector } from 'react-redux';
 
 const BestSellerKitchen = () => {
     const { t, isRTL } = useLanguage();
     const swiperRef = useRef(null);
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
-
+   const {media_url} = useSelector((state)=>state.auth);
+    const [bestsellerdata,setBestSellerData] = useState([]);
+    const {data:bestselling,isLoading:loadbestselling,isError} = useGetbestSellerQuery();
+    const bestSeller = bestselling?.data.config[3]?.products;
+    
+   useEffect(()=>{
+        if(bestSeller){
+            setBestSellerData(bestSeller);
+        }  },[bestSeller]);
     // This data will come from backend later - keeping as is
-    const products = [
+ /*    const products = [
         {
             id: 1,
             name: 'Designer Leather Handbag',
@@ -83,7 +93,7 @@ const BestSellerKitchen = () => {
             currentPrice: 145.00,
             isOnSale: false
         }
-    ];
+    ]; */
 
     const StoreIcon = () => (
         <svg className="store-icon" viewBox="0 0 24 24">
@@ -180,17 +190,17 @@ const BestSellerKitchen = () => {
                     watchOverflow={true}
                     className={`products-swiper ${isRTL ? 'rtl-swiper' : ''}`}
                 >
-                    {products.map((product) => (
+                    {bestsellerdata.map((product) => (
                         <SwiperSlide key={product.id}>
                             <div className="product-item">
                                 <div className="product-image-container">
                                     <img
-                                        src={product.image}
+                                        src={media_url+product.image_url}
                                         alt={product.name}
                                         className="product-image"
                                     />
 
-                                    {product.isOnSale && (
+                                    {product.is_on_sale && (
                                         <div className="sale-banner">
                                             <span>{t('home.bestSellerKitchen.sale')}</span>
                                         </div>
@@ -204,18 +214,18 @@ const BestSellerKitchen = () => {
                                 <div className="product-name">{product.name}</div>
 
                                 <div className="product-pricing">
-                                    {product.oldPrice ? (
+                                    {product.is_on_sale ? (
                                         <>
                                             <span className="old-price">
-                                                {formatPrice(product.oldPrice)}
+                                                {formatPrice(Number(product.regular_price))}
                                             </span>
                                             <span className="current-price">
-                                                {formatPrice(product.currentPrice)}
+                                                {formatPrice(Number(product.on_sale_price))}
                                             </span>
                                         </>
                                     ) : (
                                         <span className="price-only">
-                                            {formatPrice(product.currentPrice)}
+                                            {formatPrice(Number(product.regular_price))}
                                         </span>
                                     )}
                                 </div>
