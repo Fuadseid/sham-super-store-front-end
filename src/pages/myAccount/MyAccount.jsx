@@ -73,9 +73,9 @@ const [registerData, setRegisterData] = useState({
             
             // Dispatch the authenticateUser action with the user data
             dispatch(authenticateUser({
-                ...result.user,
-                token: result.token
-            }));
+            ...result.data.user,
+            token: result.data.token
+        }));
             
             // Clear form
             setFormData({ email: '', password: '', rememberMe: false });
