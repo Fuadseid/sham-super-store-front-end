@@ -28,7 +28,10 @@ import DeliveryDriversApp from '../pages/deliveryDrivers/deliveryDriversApp/Deli
 import PrivacyPolicy from '../components/privacyPolicy/PrivacyPolicy'
 import TermsConditions from '../components/termsConditions/TermsConditions'
 import ReturnPolicy from '../components/returnPolicy/ReturnPolicy'
-
+import LocationMap from '../pages/home/Map/LocationMap'
+import TrackOrder from '../pages/home/Map/TrackOrder'
+/* import Map from '../pages/home/Map/Map'
+ */
 export const AppRoutes = () => {
   return (
     <Routes>
@@ -36,6 +39,9 @@ export const AppRoutes = () => {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-conditions" element={<TermsConditions />} />
       <Route path="/return-and-refunds-policy" element={<ReturnPolicy />} />
+      <Route path="/location/:id" element={<LocationMap />} />
+       <Route path="/track/:orderId" element={<TrackOrder />} />
+
 
       {/* Shop Pages and Sections */}
       <Route path="/shop" element={<Shop />} />
@@ -50,7 +56,8 @@ export const AppRoutes = () => {
       {/* Cart and Checkout Pages */}
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
-
+{/*       <Route path="/my-location" element ={<Map/>}/>
+ */}
       {/* Sellers Section Pages */}
       <Route path="/sellers" element={<Sellers />} />
       <Route path="/vendor-registration" element={<VendorRegistration />} />

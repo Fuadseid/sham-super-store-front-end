@@ -6,4 +6,10 @@ export const orderEndpoints = (builder) => ({
             body: data
         }),
     }),
+    fetchlocation:builder.query({
+        query:(id)=>({
+            url:`/public/locations/${id}`,
+            method:"GET",
+        })
+    })
 })
