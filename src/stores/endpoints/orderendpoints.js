@@ -11,5 +11,25 @@ export const orderEndpoints = (builder) => ({
             url:`/public/locations/${id}`,
             method:"GET",
         })
+    }),
+    addTocart:builder.mutation({
+        query:(data)=>({
+            url:"/carts",
+            method:"POST",
+            body:data,
+        })
+    }),
+    getCart:builder.query({
+        query:()=>({
+            url:"/checkout/calculate-delivery-fee",
+            method:"GET"
+        })
+    }),
+    checkout:builder.mutation({
+        query:({data})=>({
+            url:"/checkout/session",
+            method:"POST",
+            body:data
+        })
     })
 })

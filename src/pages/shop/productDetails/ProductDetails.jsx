@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
-import { useGetProductdetailQuery } from '../../../stores/apiSlice';
+import { useAddTocartMutation, useGetProductdetailQuery } from '../../../stores/apiSlice';
 // Styling handled by Tailwind CSS
 import { useSelector } from 'react-redux';
 
@@ -16,10 +16,12 @@ const ProductDetails = () => {
     const [selectedColor, setSelectedColor] = useState('');
     const [selectedSize, setSelectedSize] = useState('');
     const { media_url } = useSelector((state) => state.auth);
+    const [addtocart,{isLoading,refeching,isError}] = useAddTocartMutation();
 
     // Fetch product data
     const { data: productDetail, isLoading: loadingProduct, error } = useGetProductdetailQuery(productId);
     const [product, setProduct] = useState(null);
+    const [variantId,setVariantId] = useState();
 
     // Transform API data when it's loaded
     useEffect(() => {
@@ -29,7 +31,9 @@ const ProductDetails = () => {
             
             // Log the full detail object for debugging
             console.log('Product detail object:', detail);
-            
+
+            setVariantId(detail?.productvariants[0].id);
+                        
             // Process product images
             const productImages = detail.productgallers?.length > 0 
                 ? detail.productgallers.map(img => img.image_url)
@@ -162,6 +166,7 @@ const ProductDetails = () => {
             }
         }
     }, [productDetail]);
+    console.log("Variant Id",variantId)
 
     const handleQuantityChange = (type) => {
         if (type === 'increment' && product?.inStock) {
@@ -170,6 +175,8 @@ const ProductDetails = () => {
             setQuantity(prev => prev - 1);
         }
     };
+  
+
 
    /*  const handleAddToCart = () => {
         if (!product?.inStock) return;
@@ -245,16 +252,16 @@ const ProductDetails = () => {
         return t('shop.productDetails.productInfo.multipleReviews', { count });
     };
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!product.inStock) return;
-        
+
+        const response = await addtocart({
+            variant_id: variantId,
+            quantity:quantity,
+        })
+
         // TODO: Implement add to cart functionality
-        console.log('Adding to cart:', {
-            productId: product.id,
-            quantity,
-            color: selectedColor,
-            size: selectedSize
-        });
+        console.log('Adding to cart:',response);
         
         // Show success message
         alert(t('shop.productDetails.addedToCart'));
@@ -413,6 +420,8 @@ const ProductDetails = () => {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {loadingProduct?<div>Loading...</div>:(<div>
+            
             {/* Breadcrumb */}
             <div className="flex items-center text-sm text-gray-600 mb-6">
                 <button 
@@ -987,6 +996,10 @@ const ProductDetails = () => {
                     </div>
                 </div>
             </dialog>
+        
+        </div>)}
+
+
         </div>
     );
 }

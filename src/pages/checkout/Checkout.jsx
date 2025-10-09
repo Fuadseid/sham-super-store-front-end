@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, CreditCard, Truck, Check } from 'lucide-react';
 import './Checkout.scss';
 import { useCart } from '../../context/CartReducer';
 import { useLanguage } from '../../context/LanguageContext';
 import ReviewPopup from '../../components/reviewPopup/ReviewPopup';
+import { useGetCartQuery } from '../../stores/apiSlice';
 
 const Checkout = () => {
     const { items, getTotalPrice, clearCart } = useCart();
@@ -48,7 +49,14 @@ const Checkout = () => {
     const [shippingToBilling, setShippingToBilling] = useState(true);
     const [shippingMethod, setShippingMethod] = useState('free');
     const [paymentMethod, setPaymentMethod] = useState('');
+    const { data: carts, isLoading, isError } = useGetCartQuery(); 
+    const [cartData,setCartData] = useState();
     const [errors, setErrors] = useState({});
+      useEffect(() => {
+        if (carts) {
+          setCartData(carts);
+        }
+      }, [carts]);
 
     const shippingOptions = {
         free: { price: 0, label: t('checkout.order.freeShipping') || 'Free Shipping' },
@@ -348,12 +356,12 @@ const Checkout = () => {
                                         <input
                                             type="radio"
                                             value="paypal"
-                                            checked={paymentMethod === 'paypal'}
+                                            checked={paymentMethod === 'stripe'}
                                             onChange={(e) => setPaymentMethod(e.target.value)}
                                         />
                                         <div className="option-content">
-                                            <span className="option-title">{t('checkout.order.paypal') || 'PayPal'}</span>
-                                            <p className="option-desc">{t('checkout.order.paypalDesc') || 'Pay via PayPal; you can pay with your credit card if you don\'t have a PayPal account.'}</p>
+                                            <span className="option-title">{'Stripe'}</span>
+                                            <p className="option-desc">{'Pay via Stripe; you can pay with your credit card if you don\'t have a Stripe account.'}</p>
                                         </div>
                                     </label>
                                 </div>

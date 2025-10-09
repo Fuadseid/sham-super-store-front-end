@@ -49,6 +49,66 @@
     }
   }
 }
+.floating-cart {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  
+  &:hover {
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+}
+
+.cart-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  animation: slideDown 0.2s ease-out;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Scrollbar styling for cart dropdown
+.cart-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cart-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.cart-dropdown::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.cart-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
 
 @media (max-width: 768px) {
   .floating-cart {

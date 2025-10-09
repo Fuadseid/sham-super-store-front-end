@@ -8,10 +8,12 @@ import 'swiper/css/navigation';
 import './NewProducts.scss';
 import { useGetNewProductQuery } from '../../../stores/apiSlice';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const NewProducts = () => {
     const { t, isRTL } = useLanguage();
     const swiperRef = useRef(null);
+    const navigate = useNavigate();
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
     const {media_url} = useSelector((state)=>state.auth);
@@ -187,7 +189,9 @@ const NewProducts = () => {
                     className={`products-swiper ${isRTL ? 'rtl-swiper' : ''}`}
                 >
                     {newproductsdata.map((product) => (
-                        <SwiperSlide key={product.id}>
+                        <SwiperSlide 
+                        onClick={()=>navigate(`/shop/product/${product.id}`)}
+                        key={product.id}>
                             <div className="product-item">
                                 <div className="product-image-container">
                                     <img
