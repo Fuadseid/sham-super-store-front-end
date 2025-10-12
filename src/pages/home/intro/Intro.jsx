@@ -7,6 +7,7 @@ import intro3 from '../../../assets/images/home/intro/intro3.png';
 import intro4 from '../../../assets/images/home/intro/intro4.png';
 import { useGetMyintroBannerQuery } from '../../../stores/apiSlice';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 export const Intro = () => {
   const { t } = useLanguage();
@@ -16,6 +17,7 @@ export const Intro = () => {
   const containerRef = useRef(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const navigate = useNavigate();
   const autoplayRef = useRef(null);
   const {data:getBannerintro,isLoading:introLoading} = useGetMyintroBannerQuery();
   const {media_url} = useSelector((state)=>state.auth)
@@ -210,7 +212,9 @@ export const Intro = () => {
               <div className="slide-text">
                 <div className="collection-label">{slide.short_description}</div>
                 <h1 className="main-title">{slide.title}</h1>
-                <button className="shop-button">
+                <button
+                onClick={()=>navigate(`/shop`)}
+                className="shop-button">
                   {t('home.intro.buttons.shopAccessories')}
                 </button>
               </div>

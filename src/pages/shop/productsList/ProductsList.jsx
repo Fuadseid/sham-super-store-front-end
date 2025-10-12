@@ -4,7 +4,6 @@ import { Search, Filter, ChevronLeft, Star } from "lucide-react";
 import ProductsOnSale from "../productsOnSale/ProductsOnSale";
 import FeaturedProducts from "../featuredProducts/FeaturedProducts";
 import { useLanguage } from "../../../context/LanguageContext";
-import "./ProductsList.scss";
 import {
   useGetcategoryDetailQuery,
   useGetproductperCategoryQuery,
@@ -15,271 +14,106 @@ export const ProductsList = () => {
   const { categoryId, subcategoryId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  
+  // State declarations
   const [sortBy, setSortBy] = useState("name");
   const [filterInStock, setFilterInStock] = useState(false);
-  const { media_url } = useSelector((state) => state.auth);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedCondition, setSelectedCondition] = useState("");
+  const [minRating, setMinRating] = useState(0);
+  
+  const { media_url } = useSelector((state) => state.auth);
+  const { t } = useLanguage();
+
+  // API Queries
   const {
     data: productpercategory,
     isLoading,
     isError,
   } = useGetproductperCategoryQuery(subcategoryId);
-  const [product, setProduct] = useState([]);
-  const productsData = productpercategory?.data.data;
-  useEffect(() => {
-    if (productsData) {
-      setProduct(productsData);
-    }
-  }, [productsData]);
-  console.log("Product Data", productsData);
-  // Language context
-  const { t } = useLanguage();
+  
   const {
     data: categoryDetail,
     isLoading: categoryload,
     isError: categoryError,
   } = useGetcategoryDetailQuery(categoryId);
+
+  // Local state management
+  const [product, setProduct] = useState([]);
   const [detail, setDetail] = useState([]);
-  const [catagory, setCatagory] = useState([]);
-  const subcatdetail = categoryDetail?.data.children;
-  const cate = categoryDetail?.data.category_products;
-  console.log("category Detail", subcatdetail);
+  const [category, setCategory] = useState(null);
+
+  const productsData = productpercategory?.data?.data || [];
+  const subcatdetail = categoryDetail?.data?.children || [];
+  const categoryData = categoryDetail?.data;
+  const compareProducts = searchParams.get("compare");
+  const currentSubcategory = detail.find(sub => sub.id == subcategoryId);
+
+  // Effects for data updates
+  useEffect(() => {
+    if (productsData) {
+      setProduct(productsData);
+    }
+  }, [productsData]);
+
   useEffect(() => {
     if (subcatdetail) {
       setDetail(subcatdetail);
     }
   }, [subcatdetail]);
-  useEffect(
-    (cate) => {
-      if (cate) {
-        setCatagory(cate);
-      }
-    },
-    [cate]
-  );
 
-  // New filter states
-  const [selectedSizes, setSelectedSizes] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
-  const [selectedCondition, setSelectedCondition] = useState("");
-  const [minRating, setMinRating] = useState(0);
+  useEffect(() => {
+    if (categoryData) {
+      setCategory(categoryData);
+    }
+  }, [categoryData]);
 
-  // Get comparison state from URL
-  const compareProducts = searchParams.get("compare");
-
-  // Categories data
-  const categories = {
-    1: { name: "Computer" },
-    2: { name: "Electronics" },
-    6: { name: "Clothes" },
-  };
-
-  // Subcategories data
-  const subcategories = {
-    11: { name: "Keyboards", categoryId: 1 },
-    12: { name: "Mice", categoryId: 1 },
-    13: { name: "Monitors", categoryId: 1 },
-    14: { name: "Laptops", categoryId: 1 },
-    15: { name: "Desktops", categoryId: 1 },
-    21: { name: "Smartphones", categoryId: 2 },
-    22: { name: "Tablets", categoryId: 2 },
-    61: { name: "Men's Clothing", categoryId: 6 },
-  };
-
-  const productsDataa = {
-    11: [
-      {
-        id: 101,
-        name: "Mechanical Gaming Keyboard RGB",
-        price: 89.99,
-        originalPrice: 129.99,
-        image:
-          "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["Full Size", "Compact"],
-        colors: ["Black", "White", "RGB"],
-        condition: "new",
-        rating: 4.5,
-      },
-      {
-        id: 102,
-        name: "Wireless Compact Keyboard",
-        price: 45.99,
-        originalPrice: null,
-        image:
-          "https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["Compact"],
-        colors: ["Black", "Silver"],
-        condition: "new",
-        rating: 4.2,
-      },
-      {
-        id: 103,
-        name: "Ergonomic Split Keyboard",
-        price: 159.99,
-        originalPrice: 199.99,
-        image:
-          "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&h=400&fit=crop&crop=center",
-        inStock: false,
-        sizes: ["Full Size"],
-        colors: ["Black", "White"],
-        condition: "openBox",
-        rating: 4.8,
-      },
-      {
-        id: 104,
-        name: "Membrane Office Keyboard",
-        price: 24.99,
-        originalPrice: null,
-        image:
-          "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["Full Size"],
-        colors: ["Black"],
-        condition: "used",
-        rating: 3.9,
-      },
-    ],
-    12: [
-      {
-        id: 201,
-        name: "Gaming Mouse with LED",
-        price: 29.99,
-        originalPrice: 39.99,
-        image:
-          "https://images.unsplash.com/photo-1527814050087-3793815479db?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["Standard"],
-        colors: ["Black", "Red", "Blue"],
-        condition: "new",
-        rating: 4.3,
-      },
-      {
-        id: 202,
-        name: "Wireless Office Mouse",
-        price: 19.99,
-        originalPrice: null,
-        image:
-          "https://images.unsplash.com/photo-1563297007-0686b7003af7?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["Standard"],
-        colors: ["Black", "Silver", "White"],
-        condition: "new",
-        rating: 4.0,
-      },
-      {
-        id: 203,
-        name: "Ergonomic Vertical Mouse",
-        price: 65.99,
-        originalPrice: 85.99,
-        image:
-          "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["Large"],
-        colors: ["Black", "Gray"],
-        condition: "openBox",
-        rating: 4.6,
-      },
-    ],
-    61: [
-      {
-        id: 701,
-        name: "Premium Cotton Dress Shirt",
-        price: 89.99,
-        originalPrice: 129.99,
-        image:
-          "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["S", "M", "L", "XL", "XXL"],
-        colors: ["White", "Blue", "Black"],
-        condition: "new",
-        rating: 4.7,
-      },
-      {
-        id: 702,
-        name: "Casual Denim Jeans",
-        price: 69.99,
-        originalPrice: null,
-        image:
-          "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["28", "30", "32", "34", "36", "38"],
-        colors: ["Blue", "Black", "Gray"],
-        condition: "new",
-        rating: 4.4,
-      },
-      {
-        id: 703,
-        name: "Wool Blend Suit Jacket",
-        price: 299.99,
-        originalPrice: 399.99,
-        image:
-          "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["S", "M", "L", "XL"],
-        colors: ["Navy", "Charcoal", "Black"],
-        condition: "used",
-        rating: 4.8,
-      },
-      {
-        id: 704,
-        name: "Casual Polo Shirt",
-        price: 39.99,
-        originalPrice: null,
-        image:
-          "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=400&fit=crop&crop=center",
-        inStock: true,
-        sizes: ["S", "M", "L", "XL"],
-        colors: ["White", "Navy", "Red", "Green"],
-        condition: "new",
-        rating: 4.1,
-      },
-    ],
-  };
-
-  const category = catagory;
-  const subcategory = detail;
-  const products = product || [];
-
-  // Get unique filter options from products
+  // Filter options
   const filterOptions = useMemo(() => {
-    const sizes = [...new Set(products.flatMap((p) => p.sizes || []))];
-    const colors = [...new Set(products.flatMap((p) => p.colors || []))];
+    const sizes = [...new Set(product.flatMap((p) => p.sizes || []))];
+    const colors = [...new Set(product.flatMap((p) => p.colors || []))];
     const conditions = [
-      ...new Set(products.map((p) => p.condition).filter(Boolean)),
+      ...new Set(product.map((p) => p.condition).filter(Boolean)),
     ];
 
     return { sizes, colors, conditions };
-  }, [products]);
+  }, [product]);
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
-    let filtered = [...products];
+    let filtered = [...product];
 
     // Filter by search term
     if (searchTerm.trim()) {
       filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by stock
     if (filterInStock) {
-      filtered = filtered.filter((product) => product.inStock);
+      filtered = filtered.filter((product) => product.in_stock);
+    }
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((product) => product.status === statusFilter);
     }
 
     // Filter by price range
     if (priceRange.min !== "") {
       filtered = filtered.filter(
-        (product) => product.price >= parseFloat(priceRange.min)
+        (product) => Number(product.regular_price) >= parseFloat(priceRange.min)
       );
     }
     if (priceRange.max !== "") {
       filtered = filtered.filter(
-        (product) => product.price <= parseFloat(priceRange.max)
+        (product) => Number(product.regular_price) <= parseFloat(priceRange.max)
       );
     }
 
@@ -311,7 +145,7 @@ export const ProductsList = () => {
     // Filter by rating
     if (minRating > 0) {
       filtered = filtered.filter(
-        (product) => (product.rating || 0) >= minRating
+        (product) => (product.average_rating || 0) >= minRating
       );
     }
 
@@ -319,22 +153,23 @@ export const ProductsList = () => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "price-low":
-          return a.price - b.price;
+          return Number(a.regular_price) - Number(b.regular_price);
         case "price-high":
-          return b.price - a.price;
+          return Number(b.regular_price) - Number(a.regular_price);
         case "rating":
-          return (b.rating || 0) - (a.rating || 0);
+          return (b.average_rating || 0) - (a.average_rating || 0);
         case "name":
         default:
-          return a.name.localeCompare(b.name);
+          return a.name?.localeCompare(b.name);
       }
     });
 
     return filtered;
   }, [
-    products,
+    product,
     sortBy,
     filterInStock,
+    statusFilter,
     searchTerm,
     priceRange,
     selectedSizes,
@@ -343,6 +178,7 @@ export const ProductsList = () => {
     minRating,
   ]);
 
+  // Event handlers
   const handleBackToSubcategories = () => {
     if (compareProducts) {
       navigate(`/shop/category/${categoryId}?compare=${compareProducts}`);
@@ -366,6 +202,7 @@ export const ProductsList = () => {
   const clearFilters = () => {
     setPriceRange({ min: "", max: "" });
     setFilterInStock(false);
+    setStatusFilter("all");
     setSearchTerm("");
     setSelectedSizes([]);
     setSelectedColors([]);
@@ -411,21 +248,91 @@ export const ProductsList = () => {
     }
   };
 
-  if (!subcategory && productpercategory) {
+  // Loading state
+  if (isLoading || categoryload) {
     return (
-      <div className="shop-page">
-        <div className="sidebar">
-          <ProductsOnSale compareProducts={compareProducts} />
-          <FeaturedProducts compareProducts={compareProducts} />
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex gap-8">
+            {/* Sidebar */}
+            <div className="w-1/4">
+              <ProductsOnSale compareProducts={compareProducts} />
+              <FeaturedProducts compareProducts={compareProducts} />
+            </div>
+            
+            {/* Main Content */}
+            <div className="flex-1">
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading products...</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="main-content">
-          <div className="error-message">
-            <h2>{t("shop.productsList.results.comingSoon")}</h2>
-            <button onClick={handleBackToSubcategories}>
-              {t("shop.productsList.navigation.backTo", {
-                categoryName: "Categories",
-              })}
-            </button>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError || categoryError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex gap-8">
+            {/* Sidebar */}
+            <div className="w-1/4">
+              <ProductsOnSale compareProducts={compareProducts} />
+              <FeaturedProducts compareProducts={compareProducts} />
+            </div>
+            
+            {/* Main Content */}
+            <div className="flex-1">
+              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Error loading products</h2>
+                <p className="text-gray-600 mb-6">Failed to load products. Please try again.</p>
+                <button 
+                  onClick={handleBackToSubcategories}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Back to Categories
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // No subcategory found
+  if (!currentSubcategory && product.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex gap-8">
+            {/* Sidebar */}
+            <div className="w-1/4">
+              <ProductsOnSale compareProducts={compareProducts} />
+              <FeaturedProducts compareProducts={compareProducts} />
+            </div>
+            
+            {/* Main Content */}
+            <div className="flex-1">
+              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <div className="text-yellow-500 text-6xl mb-4">📁</div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Category Not Found</h2>
+                <p className="text-gray-600 mb-6">This category doesn't exist or has no products.</p>
+                <button 
+                  onClick={handleBackToSubcategories}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Back to Categories
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -433,334 +340,167 @@ export const ProductsList = () => {
   }
 
   return (
-    <div className="shop-page">
-      <div className="sidebar">
-        <ProductsOnSale compareProducts={compareProducts} />
-        <FeaturedProducts compareProducts={compareProducts} />
-      </div>
-      <div className="main-content">
-        <div className="shop-products-section">
-          <button className="back-button" onClick={handleBackToSubcategories}>
-            <ChevronLeft size={16} />
-            {t("shop.productsList.navigation.backTo", {
-              categoryName: category?.name,
-            })}
-          </button>
-
-          <h2 className="section-title">{subcategory.name}</h2>
-
-          {/* Show comparison status if active */}
-          {compareProducts && (
-            <div className="comparison-status">
-              <p>
-                {t("shop.productsList.comparison.status", {
-                  count: compareProducts.split(",").length,
-                })}{" "}
-                <button
-                  onClick={() =>
-                    navigate(`/compare?products=${compareProducts}`)
-                  }
-                  style={{
-                    color: "#FEF3C7",
-                    textDecoration: "underline",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                  }}
-                >
-                  {t("shop.productsList.comparison.viewComparison")}
-                </button>
-              </p>
-            </div>
-          )}
-
-          {/* Filter Bar */}
-          <div className="filter-bar">
-            <div className="search-container">
-              <input
-                type="text"
-                placeholder={t("shop.productsList.search.placeholder")}
-                className="search-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button className="search-button" onClick={handleSearch}>
-                <Search size={16} />
-              </button>
-            </div>
-
-            <div className="filter-controls">
-              <div className="sort-dropdown">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-select"
-                >
-                  <option value="name">
-                    {t("shop.productsList.sorting.default")}
-                  </option>
-                  <option value="price-low">
-                    {t("shop.productsList.sorting.priceLowToHigh")}
-                  </option>
-                  <option value="price-high">
-                    {t("shop.productsList.sorting.priceHighToLow")}
-                  </option>
-                  <option value="rating">
-                    {t("shop.productsList.sorting.ratingHighToLow")}
-                  </option>
-                </select>
-              </div>
-              <button
-                className="filter-button"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter size={16} />
-                {t("shop.productsList.filters.button")}
-              </button>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex gap-8">
+          {/* Sidebar */}
+          <div className="w-1/4 space-y-6">
+            <ProductsOnSale compareProducts={compareProducts} />
+            <FeaturedProducts compareProducts={compareProducts} />
           </div>
+          
+          {/* Main Content */}
+          <div className="flex-1">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              {/* Back button */}
+              <button 
+                onClick={handleBackToSubcategories}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 transition-colors"
+              >
+                <ChevronLeft size={20} />
+                Back to {category?.name || "Categories"}
+              </button>
 
-          {/* Advanced Filters Panel */}
-          {showFilters && (
-            <div className="advanced-filters">
-              <h3 className="filters-title">
-                {t("shop.productsList.filters.title")}
-              </h3>
+              {/* Section title */}
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {currentSubcategory?.name || "Products"}
+              </h1>
 
-              <div className="filter-grid">
-                {/* Price Range */}
-                <div className="filter-group">
-                  <label className="filter-label">
-                    {t("shop.productsList.filters.price.label")}
-                  </label>
-                  <div className="price-range">
-                    <input
-                      type="number"
-                      placeholder={t(
-                        "shop.productsList.filters.price.minPlaceholder"
-                      )}
-                      className="price-input"
-                      value={priceRange.min}
-                      onChange={(e) =>
-                        setPriceRange({ ...priceRange, min: e.target.value })
-                      }
-                    />
-                    <span className="price-separator">
-                      {t("shop.productsList.filters.price.separator")}
-                    </span>
-                    <input
-                      type="number"
-                      placeholder={t(
-                        "shop.productsList.filters.price.maxPlaceholder"
-                      )}
-                      className="price-input"
-                      value={priceRange.max}
-                      onChange={(e) =>
-                        setPriceRange({ ...priceRange, max: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* Size Filter */}
-                {filterOptions.sizes.length > 0 && (
-                  <div className="filter-group">
-                    <label className="filter-label">
-                      {t("shop.productsList.filters.size.label")}
-                    </label>
-                    <div className="size-options">
-                      {filterOptions.sizes.map((size) => (
-                        <button
-                          key={size}
-                          className={`size-option ${
-                            selectedSizes.includes(size) ? "selected" : ""
-                          }`}
-                          onClick={() => handleSizeToggle(size)}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Color Filter */}
-                {filterOptions.colors.length > 0 && (
-                  <div className="filter-group">
-                    <label className="filter-label">
-                      {t("shop.productsList.filters.color.label")}
-                    </label>
-                    <div className="color-options">
-                      {filterOptions.colors.map((color) => (
-                        <button
-                          key={color}
-                          className={`color-option ${
-                            selectedColors.includes(color) ? "selected" : ""
-                          }`}
-                          onClick={() => handleColorToggle(color)}
-                        >
-                          <span
-                            className={`color-swatch color-${color.toLowerCase()}`}
-                          ></span>
-                          {color}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Condition Filter */}
-                {filterOptions.conditions.length > 0 && (
-                  <div className="filter-group">
-                    <label className="filter-label">
-                      {t("shop.productsList.filters.condition.label")}
-                    </label>
-                    <select
-                      value={selectedCondition}
-                      onChange={(e) => setSelectedCondition(e.target.value)}
-                      className="condition-select"
+              {/* Comparison status */}
+              {compareProducts && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <p className="text-blue-800">
+                    Comparing {compareProducts.split(",").length} products -{" "}
+                    <button
+                      onClick={() => navigate(`/compare?products=${compareProducts}`)}
+                      className="text-blue-600 hover:text-blue-800 underline font-semibold"
                     >
-                      <option value="">
-                        {t("shop.productsList.filters.condition.allConditions")}
-                      </option>
-                      {filterOptions.conditions.map((condition) => (
-                        <option key={condition} value={condition}>
-                          {getConditionTranslation(condition)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                      View Comparison
+                    </button>
+                  </p>
+                </div>
+              )}
 
-                {/* Rating Filter */}
-                <div className="filter-group">
-                  <label className="filter-label">
-                    {t("shop.productsList.filters.rating.label")}
-                  </label>
-                  <div className="rating-options">
-                    {[4, 3, 2, 1].map((rating) => (
-                      <button
-                        key={rating}
-                        className={`rating-option ${
-                          minRating === rating ? "selected" : ""
-                        }`}
-                        onClick={() =>
-                          setMinRating(minRating === rating ? 0 : rating)
-                        }
+              {/*  */}
+
+              {/* Advanced filters panel */}
+              
+
+              {/* No products found - Tailwind CSS Styled */}
+              {filteredAndSortedProducts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-4">
+                  <div className="text-8xl mb-6 text-gray-400">📦</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                    No Products Found
+                  </h3>
+                  <p className="text-gray-600 text-center max-w-md mb-8">
+                    We couldn't find any products matching your criteria. Try adjusting your filters or search terms.
+                  </p>
+                  
+                  {(searchTerm || statusFilter !== 'all' || selectedSizes.length > 0 || selectedColors.length > 0 || selectedCondition || minRating > 0 || priceRange.min || priceRange.max || filterInStock) ? (
+                    <div className="bg-gray-50 rounded-lg p-6 max-w-md w-full">
+                      <p className="font-medium text-gray-900 mb-3 text-center">Suggestions:</p>
+                      <ul className="text-sm text-gray-600 space-y-1 mb-6">
+                        {searchTerm && <li className="flex items-center justify-center">• Try different search terms</li>}
+                        {statusFilter !== 'all' && <li className="flex items-center justify-center">• Clear status filter</li>}
+                        {(selectedSizes.length > 0 || selectedColors.length > 0 || selectedCondition || minRating > 0) && <li className="flex items-center justify-center">• Clear advanced filters</li>}
+                        {(priceRange.min || priceRange.max) && <li className="flex items-center justify-center">• Adjust price range</li>}
+                        {filterInStock && <li className="flex items-center justify-center">• Include out-of-stock items</li>}
+                      </ul>
+                      <button 
+                        onClick={clearFilters}
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                       >
-                        <div className="stars">{renderStars(4)}</div>
-                        <span>
-                          {t("shop.productsList.filters.rating.andUp")}
-                        </span>
+                        Clear All Filters
                       </button>
-                    ))}
+                    </div>
+                  ) : product.length === 0 ? (
+                    <div className="bg-gray-50 rounded-lg p-6 max-w-md w-full text-center">
+                      <p className="text-gray-600 mb-4">This category currently has no products available.</p>
+                      <button 
+                        onClick={handleBackToSubcategories}
+                        className="w-full bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                      >
+                        Back to Categories
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <>
+                  {/* Results info */}
+                  <div className="mb-6">
+                    <p className="text-gray-600">
+                      Showing {filteredAndSortedProducts.length} of {product.length} products
+                    </p>
                   </div>
-                </div>
 
-                {/* Stock Filter */}
-                <div className="filter-group">
-                  <div className="stock-filter">
-                    <input
-                      type="checkbox"
-                      id="inStock"
-                      className="stock-checkbox"
-                      checked={filterInStock}
-                      onChange={(e) => setFilterInStock(e.target.checked)}
-                    />
-                    <label htmlFor="inStock" className="stock-label">
-                      {t("shop.productsList.filters.stock.label")}
-                    </label>
-                  </div>
-                </div>
-
-                {/* Clear Filters */}
-                <div className="filter-group">
-                  <button className="clear-filters-btn" onClick={clearFilters}>
-                    {t("shop.productsList.filters.clear")}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {products.length === 0 && productsData ? (
-            <div className="no-products">
-              <p>{t("shop.productsList.results.noProducts")}</p>
-            </div>
-          ) : (
-            <>
-              <div className="results-info">
-                <span>
-                  {t("shop.productsList.results.showing", {
-                    filtered: filteredAndSortedProducts.length,
-                    total: products.length,
-                  })}
-                </span>
-              </div>
-
-              <div className="products-grid">
-                {isLoading
-                  ? "Loading..."
-                  : filteredAndSortedProducts.map((product) => (
+                  {/* Products grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredAndSortedProducts.map((product) => (
                       <div
                         key={product.id}
-                        className="product-card"
+                        className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                         onClick={() => handleProductClick(product.id)}
                       >
-                        <div className="product-image">
+                        <div className="aspect-square bg-gray-100 overflow-hidden">
                           <img
                             src={
-                              product.productgallers
-                                ? media_url +
-                                  product.productgallers[0]?.image_url
-                                : "placeholder.png"
+                              product.productgallers && product.productgallers[0]?.image_url
+                                ? media_url + product.productgallers[0].image_url
+                                : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzBDMTEwLjQ4MSA3MCAxMTkgNjEuNDgxNCAxMTkgNTFDMTE5IDQwLjUxODYgMTEwLjQ4MSAzMiAxMDAgMzJDODkuNTE4NiAzMiA4MSA0MC41MTg2IDgxIDUxQzgxIDYxLjQ4MTQgODkuNTE4NiA3MCAxMDAgNzBaTTEwMCA4MEM4MC4xMTcgODAgNjQgODcuNDgwNSA2NCA5N0g1M0M1MyA4My44MjU0IDc0LjQyMiA3MyAxMDAgNzNIMTI1QzE1MC41NzggNzMgMTcyIDgzLjgyNTQgMTcyIDk3SDEzNkMxMzYgODcuNDgwNSAxMTkuODgzIDgwIDEwMCA4MFoiIGZpbGw9IiM4QTlBQUEiLz4KPC9zdmc+Cg=="
                             }
                             alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzBDMTEwLjQ4MSA3MCAxMTkgNjEuNDgxNCAxMTkgNTFDMTE5IDQwLjUxODYgMTEwLjQ4MSAzMiAxMDAgMzJDODkuNTE4NiAzMiA4MSA0MC41MTg2IDgxIDUxQzgxIDYxLjQ4MTQgODkuNTE4NiA3MCAxMDAgNzBaTTEwMCA4MEM4MC4xMTcgODAgNjQgODcuNDgwNSA2NCA5N0g1M0M1MyA4My44MjU0IDc0LjQyMiA3MyAxMDAgNzNIMTI1QzE1MC41NzggNzMgMTcyIDgzLjgyNTQgMTcyIDk3SDEzNkMxMzYgODcuNDgwNSAxMTkuODgzIDgwIDEwMCA4MFoiIGZpbGw9IiM4QTlBQUEiLz4KPC9zdmc+Cg==";
+                            }}
                           />
                         </div>
-                        <div className="product-info">
-                          <h3 className="product-name">{product.name}</h3>
+                        <div className="p-4">
+                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
 
-                          <div className="product-rating">
-                            <div className="stars">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="flex text-yellow-400">
                               {renderStars(product.average_rating || 0)}
                             </div>
                             {product.total_reviews > 0 && (
-                              <span className="rating-text">
+                              <span className="text-sm text-gray-500">
                                 ({product.total_reviews})
                               </span>
                             )}
                           </div>
 
-                          <div className="product-price">
+                          <div className="flex items-center gap-2 mb-2">
                             {product.is_on_sale ? (
                               <>
-                                <span className="original-price">
-                                  ${product.regular_price}
+                                <span className="text-lg font-bold text-gray-900">
+                                  ${Number(product.on_sale_price).toFixed(2)}
                                 </span>
-                                <span className="current-price">
-                                  ${product.on_sale_price}
+                                <span className="text-sm text-gray-500 line-through">
+                                  ${Number(product.regular_price).toFixed(2)}
                                 </span>
                               </>
                             ) : (
-                              <span className="current-price">
-                                ${product.regular_price}
+                              <span className="text-lg font-bold text-gray-900">
+                                ${Number(product.regular_price).toFixed(2)}
                               </span>
                             )}
                           </div>
 
                           {product.condition && product.condition !== "new" && (
-                            <div className="product-condition">
+                            <div className="text-sm text-gray-500">
                               {getConditionTranslation(product.condition)}
                             </div>
                           )}
                         </div>
                       </div>
                     ))}
-              </div>
-            </>
-          )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

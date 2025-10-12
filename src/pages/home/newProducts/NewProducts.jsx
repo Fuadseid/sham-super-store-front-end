@@ -20,7 +20,7 @@ const NewProducts = () => {
     const [newproductsdata,setNewProductsData] = useState([]);
     const {data:newproduct,isLoading:loadingnewproduct, isError:errornewproduct} = useGetNewProductQuery();
     const newProducts = newproduct?.data;
-
+    
     useEffect(()=>{
         if(newProducts){
             setNewProductsData(newProducts);
