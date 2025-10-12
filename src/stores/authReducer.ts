@@ -58,14 +58,14 @@ export const authSlice = createSlice({
     notifications: [] as string[],
     csrf_token: "",
 
-    upload_url: "http://localhost:8000/api/uploadFile",
-    app_url: "http://localhost:8000/",
-    media_url: "http://localhost:8000/storage/uploads/",
+    //upload_url: "http://localhost:8000/api/uploadFile",
+    //app_url: "http://localhost:8000/",
+    //media_url: "http://localhost:8000/storage/uploads/",
 
 
-    //upload_url: "https://ecom.addisanalytics.com/api/uploadFile",
-    //app_url: "https://ecom.addisanalytics.com",
-    //media_url: "https://ecom.addisanalytics.com/storage/uploads/",
+    upload_url: "https://ecom.addisanalytics.com/api/uploadFile",
+    app_url: "https://ecom.addisanalytics.com",
+    media_url: "https://ecom.addisanalytics.com/storage/uploads/",
 
     lang: "en",
     tenant: "test",

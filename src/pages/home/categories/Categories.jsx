@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../../context/LanguageContext';
 import './Categories.scss';
 import { useGetCategoriesQuery } from '../../../stores/apiSlice';
+import { useSelector } from 'react-redux';
 
 const Categories = () => {
     const {data:categories,isLoading:loadingcategoris,isError} = useGetCategoriesQuery();
+    const {media_url} = useSelector((state)=>state.auth);
     const [category, setCategory] = useState([]);
     const cate = categories?.data;
     useEffect(()=>{
@@ -13,7 +15,7 @@ const Categories = () => {
             setCategory(cate)
         }
     },[cate])
-    console.log("catagory",categories)
+    console.log("catagory",cate)
     const { t, isRTL } = useLanguage();
 
     const categoriess = [
@@ -49,6 +51,7 @@ const Categories = () => {
             </div>
 
             <div className={`categories-grid ${isRTL ? 'rtl-grid' : ''}`}>
+                
                 {category.map((category) => (
                     <Link
                         key={category.id}
@@ -56,7 +59,7 @@ const Categories = () => {
                         className="category-item"
                         aria-label={t('home.categories.accessibility.categoryLink', { categoryName: category.name })}
                     >
-                        <div className={`category-icon ${category.icon}`}></div>
+                        <img src={media_url+category.image} className={`category-icon `}/>
                         <span className="category-name">{category.name}</span>
                     </Link>
                 ))}
