@@ -8,6 +8,7 @@ import 'swiper/css/navigation';
 import './BestSellerGardenSupplies.scss';
 import { useSelector } from 'react-redux';
 import { useGetbestSellerQuery } from '../../../stores/apiSlice';
+import { useNavigate } from 'react-router-dom';
 
 const BestSellerGardenSupplies = () => {
     const { t, isRTL } = useLanguage();
