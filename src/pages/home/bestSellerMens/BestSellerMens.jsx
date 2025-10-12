@@ -8,6 +8,7 @@ import "swiper/css/navigation";
 import "./BestSellerMens.scss";
 import { useSelector } from "react-redux";
 import { useGetbestSellerQuery } from "../../../stores/apiSlice";
+import { useNavigate } from "react-router-dom";
 
 const BestSellerMens = () => {
   const { t, isRTL } = useLanguage();
@@ -22,7 +23,7 @@ const BestSellerMens = () => {
     isError,
   } = useGetbestSellerQuery();
   const bestSeller = bestselling?.data.config[1]?.products;
-
+const navigate = useNavigate();
   useEffect(() => {
     if (bestSeller) {
       setBestSellerData(bestSeller);
@@ -220,7 +221,9 @@ const BestSellerMens = () => {
           className={`products-swiper ${isRTL ? "rtl-swiper" : ""}`}
         >
           {bestsellerdata.map((product) => (
-            <SwiperSlide key={product.id}>
+            <SwiperSlide
+            onClick={()=>navigate(`/shop/product/${product.id}`)}
+            key={product.id}>
               <div className="product-item">
                 <div className="product-image-container">
                   <img

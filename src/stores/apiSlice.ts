@@ -14,8 +14,8 @@ import { userEndpoints } from "./endpoints/userendpoints";
 export const apiSlice = createApi({
   reducerPath: "user",
   baseQuery: fetchBaseQuery({
-    //baseUrl: "http://localhost:8000/api/",
-    baseUrl: "https://ecom.addisanalytics.com/api/",
+    baseUrl: "http://localhost:8000/api/",
+    //baseUrl: "https://ecom.addisanalytics.com/api/",
 
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {

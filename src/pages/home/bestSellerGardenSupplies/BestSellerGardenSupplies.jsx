@@ -16,6 +16,7 @@ const BestSellerGardenSupplies = () => {
     const [isEnd, setIsEnd] = useState(false);
   const { media_url } = useSelector((state) => state.auth);
   const [bestsellerdata, setBestSellerData] = useState([]);
+  const navigate = useNavigate();
   const {
     data: bestselling,
     isLoading: loadbestselling,
@@ -197,7 +198,9 @@ const BestSellerGardenSupplies = () => {
                     className={`products-swiper ${isRTL ? 'rtl-swiper' : ''}`}
                 >
                     {bestsellerdata.map((product) => (
-                        <SwiperSlide key={product.id}>
+                        <SwiperSlide
+                        onClick={()=>navigate(`/shop/product/${product.id}`)}
+                        key={product.id}>
                             <div className="product-item">
                                 <div className="product-image-container">
                                     <img
