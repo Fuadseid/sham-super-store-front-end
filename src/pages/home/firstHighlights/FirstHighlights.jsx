@@ -28,7 +28,7 @@ export const FirstHighlights = () => {
     <div className="firstHighlights-out-container">
       <div className="firstHighlights-container">
         {firsthighlightsdata.map((highlight) => (
-          <div className="product-out-container">
+          <div className="product-out-container w-screen">
             <div className="product-left-container">
               <h5>{highlight.short_description}</h5>
               <h3>{highlight.title}</h3>
