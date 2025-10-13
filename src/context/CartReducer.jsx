@@ -1,5 +1,4 @@
 import { createContext, useContext, useReducer } from 'react';
-import { useGetCartQuery } from '../stores/apiSlice';
 
 const CartContext = createContext();
 

@@ -80,7 +80,8 @@ export const {
   useFetchlocationQuery,
   useAddTocartMutation,
   useGetCartQuery,
-  useCheckoutMutation
+  useCheckoutMutation,
+  useGetPublicMethodsQuery
   
 
 

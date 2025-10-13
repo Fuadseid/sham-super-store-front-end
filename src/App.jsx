@@ -6,6 +6,7 @@ import SidebarCart from './components/sidebarCart/SidebarCart'
 import FloatingCart from './components/floatingCart/FloatingCart'
 import { AppRoutes } from './routes/AppRoutes'
 import { CartProvider } from './context/CartReducer'
+import { CartProviderr } from './context/Contexcart'
 import { LanguageProvider } from './context/LanguageContext'
 import { store } from './stores/store'
 import { Provider } from 'react-redux'
@@ -16,6 +17,7 @@ function App() {
     <LanguageProvider>
 
       <BrowserRouter>
+      <CartProviderr>
         <CartProvider>
           <div className="navbar-positioned">
             <Navbar />
@@ -27,6 +29,7 @@ function App() {
           <SidebarCart />
           <FloatingCart />
         </CartProvider>
+        </CartProviderr>
       </BrowserRouter>
     </LanguageProvider>
     </Provider>

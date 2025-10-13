@@ -96,7 +96,7 @@ const CartList = ({ carts, setOpen }) => {
 };
 
 const FloatingCart = () => {
-  const { data: carts, isLoading, isError } = useGetCartQuery();
+  const { data: carts, isLoading, isError,refetch:refetchCart } = useGetCartQuery();
   const [open, setOpen] = useState(false);
   const [cart, setCart] = useState();
 
@@ -105,8 +105,12 @@ const FloatingCart = () => {
       setCart(carts);
     }
   }, [carts]);
+  useEffect(()=>{
+    refetchCart();
+  },[carts])
 
   console.log("All cart data", cart);
+
 
   const handleToggle = () => {
     setOpen(!open);

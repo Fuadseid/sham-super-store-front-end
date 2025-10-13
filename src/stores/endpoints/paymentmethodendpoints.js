@@ -5,4 +5,10 @@ export const paymentMethodEndpoints = (builder) => ({
             method: "GET",
         }),
     }),
+    getPublicMethods: builder.query({
+        query: () => ({
+            url: "public/get-paymentmethod",  
+            method: "GET",
+        }),
+    }),
 });
