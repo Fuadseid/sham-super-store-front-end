@@ -20,10 +20,13 @@ const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState("about");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const { media_url } = useSelector((state) => state.auth);
-  const [addtocart, {data, isLoading, refeching, isError }] = useAddTocartMutation();
+  const [addtocart, {data, isLoading: addingToCart, refeching, isError }] = useAddTocartMutation();
   const [mount,setMount]=useState(false);
-    const { refetchCart } = useCart();
+  const { refetchCart } = useCart();
+  
   // Fetch product data
   const {
     data: productDetail,
@@ -31,17 +34,41 @@ const ProductDetails = () => {
     error,
     refetch: refechingProduct,
   } = useGetProductdetailQuery(productId);
-      useEffect(()=>{
-        setMount(true);
-    },[data])
 
   const [product, setProduct] = useState(null);
   const [variantId, setVariantId] = useState();
 
+  // Loading simulation with progress
+  useEffect(() => {
+    if (loadingProduct) {
+      setIsLoading(true);
+      setLoadingProgress(0);
+      
+      const interval = setInterval(() => {
+        setLoadingProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      return () => clearInterval(interval);
+    } else {
+      setLoadingProgress(100);
+      const timer = setTimeout(() => setIsLoading(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loadingProduct]);
+
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
   // Transform API data when it's loaded
   useEffect(() => {
-    console.log("Product Detail API Response:", productDetail);
     if (productDetail) {
+      console.log("Product Detail API Response:", productDetail);
       const detail = productDetail.data || productDetail; // Handle both {data: ...} and direct response
 
       // Log the full detail object for debugging
@@ -211,6 +238,11 @@ const ProductDetails = () => {
       }
     }
   }, [productDetail]);
+
+  useEffect(()=>{
+    setMount(true);
+  },[data])
+
   console.log("Variant Id", variantId);
 
   const handleQuantityChange = (type) => {
@@ -220,26 +252,6 @@ const ProductDetails = () => {
       setQuantity((prev) => prev - 1);
     }
   };
-
-  /*  const handleAddToCart = () => {
-        if (!product?.inStock) return;
-        
-        console.log('Added to cart:', {
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            quantity,
-            color: selectedColor,
-            size: selectedSize
-        });
-
-        
-        // Here you would typically dispatch an action to update the cart
-        // For example: dispatch(addToCart({ product, quantity, selectedColor, selectedSize }));
-        
-        // Show success message or notification
-        alert(`${quantity} ${quantity > 1 ? 'items' : 'item'} added to cart!`);
-    } */
 
   const handleCompare = () => {
     let existingProductIds = [];
@@ -262,11 +274,6 @@ const ProductDetails = () => {
     // Navigate to compare page with all products
     navigate(`/compare?products=${existingProductIds.join(",")}`);
   };
-
-  /*   const handleInquiry = () => {
-        // Implement inquiry logic here
-        console.log('Inquiry about product:', productId);
-    }; */
 
   const renderRatingStars = (rating) => {
     const stars = [];
@@ -439,42 +446,90 @@ const ProductDetails = () => {
     );
   };
 
-  // Handle loading state
-  if (loadingProduct) {
-    return (
-      <div className="product-details loading">
-        <div className="skeleton-loader">
-          <div className="skeleton-image"></div>
-          <div className="skeleton-info">
-            <div className="skeleton-title"></div>
-            <div className="skeleton-rating"></div>
-            <div className="skeleton-price"></div>
-            <div className="skeleton-options"></div>
-            <div className="skeleton-button"></div>
-          </div>
+  // Loading Component
+  const LoadingSpinner = () => (
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      {/* Animated Logo/Icon */}
+      <div className="relative mb-8">
+        <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center animate-pulse">
+          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+        <div className="absolute -inset-4 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="w-full max-w-md mb-6">
+        <div className="flex justify-between text-sm text-gray-600 mb-2">
+          <span>Loading Product Details</span>
+          <span>{loadingProgress}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${loadingProgress}%` }}
+          ></div>
         </div>
       </div>
-    );
+
+      {/* Loading Steps */}
+      <div className="space-y-3 text-center">
+        <div className="flex items-center justify-center space-x-2 text-gray-600">
+          <div className={`w-2 h-2 rounded-full animate-bounce ${loadingProgress > 20 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+          <span className="text-sm">Fetching product information...</span>
+        </div>
+        <div className="flex items-center justify-center space-x-2 text-gray-600">
+          <div className={`w-2 h-2 rounded-full animate-bounce ${loadingProgress > 50 ? 'bg-green-500' : 'bg-gray-300'}`} style={{animationDelay: '0.1s'}}></div>
+          <span className="text-sm">Loading images...</span>
+        </div>
+        <div className="flex items-center justify-center space-x-2 text-gray-600">
+          <div className={`w-2 h-2 rounded-full animate-bounce ${loadingProgress > 80 ? 'bg-green-500' : 'bg-gray-300'}`} style={{animationDelay: '0.2s'}}></div>
+          <span className="text-sm">Preparing details...</span>
+        </div>
+      </div>
+
+      {/* Loading Message */}
+      <div className="mt-8 text-center">
+        <p className="text-gray-500 text-sm">
+          Please wait while we load the product details for you...
+        </p>
+      </div>
+    </div>
+  );
+
+  // Handle loading state
+  if (isLoading || loadingProduct) {
+    return <LoadingSpinner />;
   }
 
   // Handle error state
   if (error) {
     return (
-      <div className="product-details error">
-        <div className="error-content">
-          <div className="error-icon">⚠️</div>
-          <h2>{t("shop.productDetails.errors.loadingError")}</h2>
-          <p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {t("shop.productDetails.errors.loadingError")}
+          </h2>
+          <p className="text-gray-600 mb-6">
             {error?.data?.message || t("shop.productDetails.errors.tryAgain")}
           </p>
-          <div className="error-actions">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
-              className="btn-retry"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               onClick={() => window.location.reload()}
             >
               {t("common.retry")}
             </button>
-            <button className="btn-back" onClick={() => navigate("/shop")}>
+            <button 
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              onClick={() => navigate("/shop")}
+            >
               {t("common.backToShop")}
             </button>
           </div>
@@ -486,17 +541,28 @@ const ProductDetails = () => {
   // Handle product not found or not loaded
   if (!product) {
     return (
-      <div className="product-details not-found">
-        <div className="not-found-content">
-          <div className="not-found-icon">🔍</div>
-          <h2>{t("shop.productDetails.errors.productNotFound")}</h2>
-          <p>{t("shop.productDetails.errors.productNotFoundDesc")}</p>
-          <div className="not-found-actions">
-            <button className="btn-back" onClick={() => navigate("/shop")}>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {t("shop.productDetails.errors.productNotFound")}
+          </h2>
+          <p className="text-gray-600 mb-6">
+            {t("shop.productDetails.errors.productNotFoundDesc")}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button 
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              onClick={() => navigate("/shop")}
+            >
               {t("common.backToShop")}
             </button>
             <button
-              className="btn-contact"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               onClick={() => navigate("/contact")}
             >
               {t("common.contactSupport")}
@@ -508,18 +574,19 @@ const ProductDetails = () => {
   }
 
   return (
-    <div>{mount&&<div className="container mx-auto px-4 py-8 max-w-7xl">
-      {loadingProduct ? (
-        <div>Loading...</div>
-      ) : (
-        <div>
+    <div className="min-h-screen bg-gray-50">
+      {mount && (
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Breadcrumb */}
           <div className="flex items-center text-sm text-gray-600 mb-6">
             <button
               onClick={() => navigate(-1)}
-              className="text-blue-600 hover:text-blue-800 mr-2"
+              className="text-blue-600 hover:text-blue-800 mr-2 flex items-center"
             >
-              &larr; {t("common.back")}
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              {t("common.back")}
             </button>
             <span className="mx-2">/</span>
             <span className="text-gray-500">{product.category}</span>
@@ -550,10 +617,10 @@ const ProductDetails = () => {
                   {product.images.map((image, index) => (
                     <button
                       key={index}
-                      className={`flex-shrink-0 w-20 h-20 border-2 rounded overflow-hidden ${
+                      className={`flex-shrink-0 w-20 h-20 border-2 rounded overflow-hidden transition-all ${
                         selectedImageIndex === index
-                          ? "border-blue-500"
-                          : "border-transparent"
+                          ? "border-blue-500 shadow-md"
+                          : "border-transparent hover:border-gray-300"
                       }`}
                       onClick={() => setSelectedImageIndex(index)}
                     >
@@ -665,11 +732,11 @@ const ProductDetails = () => {
                         {product.attributes.colors.map((color, index) => (
                           <button
                             key={index}
-                            className={`w-8 h-8 rounded-full border-2 ${
+                            className={`w-8 h-8 rounded-full border-2 transition-all ${
                               selectedColor === color.value
-                                ? "ring-2 ring-offset-2 ring-blue-500"
-                                : "border-gray-200"
-                            } transition-all`}
+                                ? "ring-2 ring-offset-2 ring-blue-500 scale-110"
+                                : "border-gray-200 hover:scale-105"
+                            }`}
                             style={{ backgroundColor: color.value }}
                             onClick={() => setSelectedColor(color.value)}
                             aria-label={color.name}
@@ -689,10 +756,10 @@ const ProductDetails = () => {
                         {product.attributes.sizes.map((size, index) => (
                           <button
                             key={index}
-                            className={`px-4 py-2 border rounded-md text-sm font-medium ${
+                            className={`px-4 py-2 border rounded-md text-sm font-medium transition-all ${
                               selectedSize === size
-                                ? "bg-blue-600 text-white border-blue-600"
-                                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                                ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                                : "border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
                             }`}
                             onClick={() => setSelectedSize(size)}
                           >
@@ -711,15 +778,15 @@ const ProductDetails = () => {
                 </label>
                 <div className="flex items-center border border-gray-300 rounded-md">
                   <button
-                    className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
                     disabled={quantity <= 1}
                   >
                     -
                   </button>
-                  <span className="w-12 text-center">{quantity}</span>
+                  <span className="w-12 text-center font-medium">{quantity}</span>
                   <button
-                    className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     onClick={() => setQuantity((prev) => prev + 1)}
                     disabled={quantity >= product.stockQuantity}
                     aria-label="Increase quantity"
@@ -743,38 +810,47 @@ const ProductDetails = () => {
 
                 <button
                   type="button"
-                  className={`flex-1 px-6 py-3 rounded-md font-medium text-white transition-colors ${
+                  className={`flex-1 px-6 py-3 rounded-md font-medium text-white transition-all ${
                     product.inStock
-                      ? "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      ? "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg"
                       : "bg-gray-400 cursor-not-allowed"
                   }`}
                   onClick={handleAddToCart}
-                  disabled={!product.inStock}
+                  disabled={!product.inStock || addingToCart}
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    {product.inStock
-                      ? t("shop.productDetails.actions.addToCart")
-                      : t("shop.productDetails.actions.outOfStock")}
+                    {addingToCart ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                          />
+                        </svg>
+                        {product.inStock
+                          ? t("shop.productDetails.actions.addToCart")
+                          : t("shop.productDetails.actions.outOfStock")}
+                      </>
+                    )}
                   </div>
                 </button>
 
                 <button
                   type="button"
-                  className="px-4 py-3 border border-gray-300 bg-white text-gray-700 rounded-md font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="px-4 py-3 border border-gray-300 bg-white text-gray-700 rounded-md font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                   onClick={handleCompare}
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -835,7 +911,7 @@ const ProductDetails = () => {
                         {product.store.contact?.email && (
                           <a
                             href={`mailto:${product.store.contact.email}`}
-                            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                           >
                             <svg
                               className="w-4 h-4 mr-1"
@@ -861,7 +937,7 @@ const ProductDetails = () => {
                               /\D/g,
                               ""
                             )}`}
-                            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                           >
                             <svg
                               className="w-4 h-4 mr-1"
@@ -886,7 +962,7 @@ const ProductDetails = () => {
                             href={product.store.contact.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                           >
                             <svg
                               className="w-4 h-4 mr-1"
@@ -908,7 +984,7 @@ const ProductDetails = () => {
                       </div>
 
                       <button
-                        className="mt-4 w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="mt-4 w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                         onClick={() => {
                           // TODO: Navigate to store page
                           console.log("Visit store:", product.store.id);
@@ -934,7 +1010,7 @@ const ProductDetails = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                       activeTab === tab.id
                         ? "border-blue-500 text-blue-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -964,7 +1040,7 @@ const ProductDetails = () => {
                 {product.relatedProducts.map((related) => (
                   <div
                     key={related.id}
-                    className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                    className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
                   >
                     <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg bg-gray-100">
                       <img
@@ -980,7 +1056,7 @@ const ProductDetails = () => {
                     </div>
                     <div className="p-4">
                       <h3
-                        className="text-sm font-medium text-gray-900 line-clamp-2 h-10 overflow-hidden cursor-pointer hover:text-blue-600"
+                        className="text-sm font-medium text-gray-900 line-clamp-2 h-10 overflow-hidden cursor-pointer hover:text-blue-600 transition-colors"
                         onClick={() => navigate(`/product/${related.id}`)}
                       >
                         {related.name}
@@ -1005,7 +1081,7 @@ const ProductDetails = () => {
                       </div>
                       <div className="mt-3">
                         <button
-                          className="w-full py-2 px-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          className="w-full py-2 px-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             // TODO: Add to cart functionality
@@ -1040,7 +1116,7 @@ const ProductDetails = () => {
                     </h2>
                     <button
                       type="button"
-                      className="text-gray-400 hover:text-gray-500"
+                      className="text-gray-400 hover:text-gray-500 transition-colors"
                       onClick={() =>
                         document.getElementById("review-form-modal")?.close()
                       }
@@ -1079,7 +1155,7 @@ const ProductDetails = () => {
                             />
                             <label
                               htmlFor={`star${star}`}
-                              className="text-2xl cursor-pointer text-gray-300 hover:text-yellow-400 peer-hover:text-yellow-400 peer-focus-visible:text-yellow-400"
+                              className="text-2xl cursor-pointer text-gray-300 hover:text-yellow-400 peer-hover:text-yellow-400 peer-focus-visible:text-yellow-400 transition-colors"
                               aria-label={`${star} ${
                                 star === 1 ? "star" : "stars"
                               }`}
@@ -1101,7 +1177,7 @@ const ProductDetails = () => {
                       <input
                         type="text"
                         id="review-title"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-colors"
                         placeholder={t(
                           "shop.productDetails.reviewTitlePlaceholder"
                         )}
@@ -1119,7 +1195,7 @@ const ProductDetails = () => {
                       <textarea
                         id="review-text"
                         rows={5}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-colors"
                         placeholder={t("shop.productDetails.reviewPlaceholder")}
                         required
                       ></textarea>
@@ -1130,8 +1206,8 @@ const ProductDetails = () => {
                         {t("shop.productDetails.uploadPhotos")}
                       </label>
                       <div className="mt-1 flex items-center">
-                        <label className="group relative cursor-pointer rounded-md bg-white font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                          <span className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <label className="group relative cursor-pointer rounded-md bg-white font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none transition-colors">
+                          <span className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                             <svg
                               className="-ml-1 mr-2 h-4 w-4 text-gray-500"
                               xmlns="http://www.w3.org/2000/svg"
@@ -1171,7 +1247,7 @@ const ProductDetails = () => {
                     <div className="flex justify-end space-x-3 pt-4">
                       <button
                         type="button"
-                        className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                         onClick={() =>
                           document.getElementById("review-form-modal")?.close()
                         }
@@ -1180,7 +1256,7 @@ const ProductDetails = () => {
                       </button>
                       <button
                         type="submit"
-                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                       >
                         {t("shop.productDetails.submitReview")}
                       </button>
@@ -1192,7 +1268,7 @@ const ProductDetails = () => {
           </dialog>
         </div>
       )}
-    </div>}</div>
+    </div>
   );
 };
 

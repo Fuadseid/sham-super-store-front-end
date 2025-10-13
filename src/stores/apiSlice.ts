@@ -81,7 +81,11 @@ export const {
   useAddTocartMutation,
   useGetCartQuery,
   useCheckoutMutation,
-  useGetPublicMethodsQuery
+  useGetPublicMethodsQuery,
+  useAddCustomerAddressMutation,
+  useUpdateCustomerAddressMutation,
+  useDeleteCustomerAddressMutation,
+  useDeleteCustomerAddressbyIdMutation
   
 
 
