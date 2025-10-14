@@ -9,9 +9,14 @@ import {
     useDeleteCustomerAddressbyIdMutation,
     useGetCustomerAddressesQuery,
     useGetCartQuery, 
-    useGetPublicMethodsQuery 
+    useGetPublicMethodsQuery,
+    useCreateCheckoutSessionMutation,
+    useProcessCheckoutMutation
 } from '../../stores/apiSlice';
 import { BsStripe } from 'react-icons/bs';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const Checkout = () => {
     const { t, isRTL } = useLanguage();
@@ -29,7 +34,7 @@ const Checkout = () => {
     const [receiptFile, setReceiptFile] = useState(null);
     const [receiptPreview, setReceiptPreview] = useState(null);
     const [isDragOver, setIsDragOver] = useState(false);
-    const [paymentMethodsData, setPaymentMethodsData] = useState();
+    const [paymentMethodsData, setPaymentMethodsData] = useState([]);
     const [showBillingDropdown, setShowBillingDropdown] = useState(false);
     const [showShippingDropdown, setShowShippingDropdown] = useState(false);
     const [showAddressForm, setShowAddressForm] = useState(false);
@@ -42,12 +47,15 @@ const Checkout = () => {
     const { data: addressesData, refetch: refetchAddresses } = useGetCustomerAddressesQuery();
     const { data: paymentMethodsDatas } = useGetPublicMethodsQuery();
     const { data: carts, isLoading, isError } = useGetCartQuery();
+    const [createCheckoutSession] = useCreateCheckoutSessionMutation();
+    const [processCheckout] = useProcessCheckoutMutation();
 
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [billingDetails, setBillingDetails] = useState(null);
     const [shippingDetails, setShippingDetails] = useState(null);
     const [cartData, setCartData] = useState();
     const [errors, setErrors] = useState({});
+    const [stripePaymentMethodId, setStripePaymentMethodId] = useState('');
     
     const [newAddress, setNewAddress] = useState({
         type: 'billing',
@@ -58,8 +66,8 @@ const Checkout = () => {
     });
 
     const [shippingToBilling, setShippingToBilling] = useState(false);
-    const [shippingMethod, setShippingMethod] = useState('free');
-    const [paymentMethod, setPaymentMethod] = useState('card');
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [notes, setNotes] = useState('');
 
     // Load addresses from API
     useEffect(() => {
@@ -80,10 +88,14 @@ const Checkout = () => {
     }, [addressesData, billingDetails, shippingDetails]);
 
     useEffect(() => {
-        if (paymentMethodsDatas) {
-            setPaymentMethodsData(paymentMethodsDatas?.data);
+        if (paymentMethodsDatas?.data) {
+            setPaymentMethodsData(paymentMethodsDatas.data);
+            // Set default payment method to the first one
+            if (paymentMethodsDatas.data.length > 0 && !paymentMethod) {
+                setPaymentMethod(paymentMethodsDatas.data[0].id.toString());
+            }
         }
-    }, [paymentMethodsDatas]);
+    }, [paymentMethodsDatas, paymentMethod]);
 
     useEffect(() => {
         if (carts) {
@@ -105,53 +117,14 @@ const Checkout = () => {
         }, 0);
     };
 
-    const shippingOptions = {
-        free: { 
-            price: 0, 
-            label: t('checkout.order.freeShipping') || 'Free Shipping',
-            duration: '5-7 business days',
-            icon: Truck
-        },
-        standard: { 
-            price: 5.99, 
-            label: t('checkout.order.standardShipping') || 'Standard Shipping',
-            duration: '3-5 business days',
-            icon: Truck
-        },
-        express: { 
-            price: 15.99, 
-            label: t('checkout.order.expressShipping') || 'Express Shipping',
-            duration: '1-2 business days',
-            icon: Truck
-        }
-    };
-
-    const paymentMethods = [
-        {
-            id: paymentMethodsData?.[0]?.id,
-            name: 'Cash on Delivery',
-            icon: CreditCard,
-            description: 'Pay with cash upon delivery'
-        },
-        {
-            id: paymentMethodsData?.[1]?.id,
-            name: 'Stripe',
-            icon: BsStripe,
-            description: 'Pay securely with your PayPal account'
-        },
-        {
-            id: paymentMethodsData?.[2]?.id,
-            name: 'Bank Transfer',
-            icon: Building,
-            description: 'Direct bank transfer'
-        }
-    ];
+    const subtotal = getTotalPrice();
+    const total = subtotal; // Delivery fee will be calculated by backend
 
     // Country options
     const countries = [
         'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 
         'France', 'Japan', 'South Korea', 'Singapore', 'United Arab Emirates',
-        'Saudi Arabia', 'India', 'China', 'Brazil', 'Mexico'
+        'Saudi Arabia', 'India', 'China', 'Brazil', 'Mexico', 'Ethiopia'
     ];
 
     // Address type options
@@ -286,7 +259,7 @@ const Checkout = () => {
         setShowAddressForm(true);
     };
 
-    // Drag and drop handlers
+    // File upload handlers
     const handleDragOver = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -366,7 +339,8 @@ const Checkout = () => {
                 newErrors.paymentMethod = 'Please select a payment method';
             }
             
-            if (paymentMethod === 'bank' && !receiptFile) {
+            const selectedPaymentMethod = paymentMethodsData.find(pm => pm.id.toString() === paymentMethod);
+            if (selectedPaymentMethod?.payment_type === 'bank' && !receiptFile) {
                 newErrors.receipt = 'Please upload your bank transfer receipt';
             }
         }
@@ -377,15 +351,11 @@ const Checkout = () => {
 
     const handleNextStep = async () => {
         if (activeStep === 1) {
-            // When moving from step 1, ensure we have valid addresses
             if (!validateStep(1)) {
                 return;
             }
-            
-            // If we're on step 1 and have valid addresses, proceed to step 2
             setActiveStep(2);
         } else if (activeStep === 2) {
-            // When moving from step 2, validate payment method
             if (!validateStep(2)) {
                 return;
             }
@@ -397,6 +367,35 @@ const Checkout = () => {
         setActiveStep(prev => Math.max(prev - 1, 1));
     };
 
+    // Convert file to base64 for API
+    const fileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    };
+
+    // Handle Stripe Checkout
+    const handleStripeCheckout = async (sessionId) => {
+        try {
+            const stripe = await stripePromise;
+            const { error } = await stripe.redirectToCheckout({
+                sessionId: sessionId,
+            });
+
+            if (error) {
+                console.error('Stripe checkout error:', error);
+                alert('Error redirecting to Stripe checkout. Please try again.');
+            }
+        } catch (error) {
+            console.error('Stripe checkout error:', error);
+            alert('Error processing Stripe payment. Please try again.');
+        }
+    };
+
+    // Main checkout submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -404,31 +403,72 @@ const Checkout = () => {
             return;
         }
 
-        const orderData = {
-            billing_address: billingDetails,
-            shipping_address: shippingToBilling ? billingDetails : shippingDetails,
-            shipping_method: shippingMethod,
-            payment_method: paymentMethod,
-            receipt_file: receiptFile,
-            items: items,
-            total: total
-        };
-
-        console.log('Order Data:', orderData);
-
         setIsProcessing(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            const newOrderNumber = 'ORD-' + Date.now();
-            setOrderNumber(newOrderNumber);
-            setIsProcessing(false);
-            setOrderComplete(true);
+        try {
+            const selectedPaymentMethod = paymentMethodsData.find(pm => pm.id.toString() === paymentMethod);
+            
+            if (!selectedPaymentMethod) {
+                throw new Error('Invalid payment method selected');
+            }
 
-            setTimeout(() => {
-                setShowReviewPopup(true);
-            }, 2000);
-        }, 3000);
+            const checkoutData = {
+                payment_method_id: parseInt(paymentMethod),
+                notes: notes || '',
+            };
+
+            // Add payment image for bank transfer
+            if (selectedPaymentMethod.payment_type === 'bank' && receiptFile) {
+                const base64Image = await fileToBase64(receiptFile);
+                checkoutData.payment_image = base64Image;
+            }
+
+            // For Stripe payment method, use the checkout session endpoint
+            if (selectedPaymentMethod.payment_type === 'stripe') {
+                const result = await createCheckoutSession(checkoutData).unwrap();
+                
+                if (result.success) {
+                    if (result.payment_type === 'cash_on_delivery') {
+                        // Cash on delivery success
+                        setOrderNumber(result.order_id);
+                        setOrderComplete(true);
+                        setIsProcessing(false);
+                        
+                        setTimeout(() => {
+                            setShowReviewPopup(true);
+                        }, 2000);
+                    } else if (result.payment_type === 'stripe_checkout' && result.redirect_url) {
+                        // Redirect to Stripe Checkout
+                        window.location.href = result.redirect_url;
+                    } else if (result.sessionId) {
+                        // Handle Stripe Checkout with session ID
+                        await handleStripeCheckout(result.sessionId);
+                    }
+                } else {
+                    throw new Error(result.message || 'Failed to create checkout session');
+                }
+            } else {
+                // For other payment methods (cash, bank), use process checkout
+                const result = await processCheckout(checkoutData).unwrap();
+                
+                if (result.success) {
+                    setOrderNumber(result.order_id);
+                    setOrderComplete(true);
+                    setIsProcessing(false);
+                    
+                    setTimeout(() => {
+                        setShowReviewPopup(true);
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Failed to process checkout');
+                }
+            }
+
+        } catch (error) {
+            console.error('Checkout error:', error);
+            alert(error.message || 'An error occurred while processing your order. Please try again.');
+            setIsProcessing(false);
+        }
     };
 
     const handleContinueShopping = () => {
@@ -443,10 +483,6 @@ const Checkout = () => {
 
     const displayedItems = showAllItems ? items : items.slice(0, 5);
     const hasMoreItems = items.length > 5;
-
-    const subtotal = getTotalPrice();
-    const shippingCost = shippingOptions[shippingMethod].price;
-    const total = subtotal + shippingCost;
 
     if (items.length === 0 && !orderComplete) {
         return (
@@ -642,18 +678,6 @@ const Checkout = () => {
                                     <h4 className="font-medium text-gray-900 mb-2">Selected Billing Address:</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                         <div>
-                                            <span className="font-medium text-gray-700">Name:</span>
-                                            <p className="text-gray-900">{billingDetails.name}</p>
-                                        </div>
-                                        <div>
-                                            <span className="font-medium text-gray-700">Email:</span>
-                                            <p className="text-gray-900">{billingDetails.email}</p>
-                                        </div>
-                                        <div>
-                                            <span className="font-medium text-gray-700">Phone:</span>
-                                            <p className="text-gray-900">{billingDetails.phone}</p>
-                                        </div>
-                                        <div>
                                             <span className="font-medium text-gray-700">Address:</span>
                                             <p className="text-gray-900">{billingDetails.physical_address}</p>
                                         </div>
@@ -786,18 +810,6 @@ const Checkout = () => {
                                             <h4 className="font-medium text-gray-900 mb-2">Selected Shipping Address:</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                                 <div>
-                                                    <span className="font-medium text-gray-700">Name:</span>
-                                                    <p className="text-gray-900">{shippingDetails.name}</p>
-                                                </div>
-                                                <div>
-                                                    <span className="font-medium text-gray-700">Email:</span>
-                                                    <p className="text-gray-900">{shippingDetails.email}</p>
-                                                </div>
-                                                <div>
-                                                    <span className="font-medium text-gray-700">Phone:</span>
-                                                    <p className="text-gray-900">{shippingDetails.phone}</p>
-                                                </div>
-                                                <div>
                                                     <span className="font-medium text-gray-700">Address:</span>
                                                     <p className="text-gray-900">{shippingDetails.physical_address}</p>
                                                 </div>
@@ -814,6 +826,30 @@ const Checkout = () => {
                                     )}
                                 </>
                             )}
+                        </div>
+
+                        {/* Order Notes */}
+                        <div className="bg-white rounded-2xl shadow-sm p-6">
+                            <div className="flex items-center mb-6">
+                                <FileText className="w-6 h-6 text-blue-600 mr-3" />
+                                <h2 className="text-xl font-semibold text-gray-900">Order Notes</h2>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Additional Notes (Optional)
+                                </label>
+                                <textarea
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    rows={4}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Any special instructions or notes for your order..."
+                                    maxLength={500}
+                                />
+                                <p className="text-sm text-gray-500 mt-1">
+                                    {notes.length}/500 characters
+                                </p>
+                            </div>
                         </div>
 
                         {/* Add/Edit Address Form Modal */}
@@ -938,46 +974,6 @@ const Checkout = () => {
                                 </div>
                             </div>
                         )}
-
-                        {/* Shipping Method */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <div className="flex items-center mb-6">
-                                <Truck className="w-6 h-6 text-blue-600 mr-3" />
-                                <h2 className="text-xl font-semibold text-gray-900">Shipping Method</h2>
-                            </div>
-                            <div className="space-y-4">
-                                {Object.entries(shippingOptions).map(([key, option]) => {
-                                    const IconComponent = option.icon;
-                                    return (
-                                        <label
-                                            key={key}
-                                            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                                                shippingMethod === key
-                                                    ? 'border-blue-500 bg-blue-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="shippingMethod"
-                                                value={key}
-                                                checked={shippingMethod === key}
-                                                onChange={(e) => setShippingMethod(e.target.value)}
-                                                className="text-blue-600 focus:ring-blue-500"
-                                            />
-                                            <IconComponent className="w-5 h-5 text-gray-600 mx-4" />
-                                            <div className="flex-1">
-                                                <div className="font-medium text-gray-900">{option.label}</div>
-                                                <div className="text-sm text-gray-600">{option.duration}</div>
-                                            </div>
-                                            <div className="font-semibold text-gray-900">
-                                                {option.price === 0 ? 'Free' : `$${option.price.toFixed(2)}`}
-                                            </div>
-                                        </label>
-                                    );
-                                })}
-                            </div>
-                        </div>
                     </>
                 );
 
@@ -991,33 +987,34 @@ const Checkout = () => {
                                 <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
                             </div>
                             <div className="space-y-4">
-                                {paymentMethods.map((method) => {
-                                    const IconComponent = method.icon;
-                                    return (
-                                        <label
-                                            key={method.id}
-                                            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                                                paymentMethod === method.id
-                                                    ? 'border-blue-500 bg-blue-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="paymentMethod"
-                                                value={method.id}
-                                                checked={paymentMethod === method.id}
-                                                onChange={(e) => setPaymentMethod(method.id)}
-                                                className="text-blue-600 focus:ring-blue-500"
-                                            />
-                                            <IconComponent className="w-5 h-5 text-gray-600 mx-4" />
-                                            <div className="flex-1">
-                                                <div className="font-medium text-gray-900">{method.name}</div>
-                                                <div className="text-sm text-gray-600">{method.description}</div>
-                                            </div>
-                                        </label>
-                                    );
-                                })}
+                                {paymentMethodsData.map((method) => (
+                                    <label
+                                        key={method.id}
+                                        className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                            paymentMethod === method.id.toString()
+                                                ? 'border-blue-500 bg-blue-50'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value={method.id}
+                                            checked={paymentMethod === method.id.toString()}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className="text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <div className="flex items-center mx-4">
+                                            {method.payment_type === 'stripe' && <BsStripe className="w-5 h-5 text-gray-600 mr-2" />}
+                                            {method.payment_type === 'cash' && <CreditCard className="w-5 h-5 text-gray-600 mr-2" />}
+                                            {method.payment_type === 'bank' && <Building className="w-5 h-5 text-gray-600 mr-2" />}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="font-medium text-gray-900">{method.name}</div>
+                                            <div className="text-sm text-gray-600">{method.description}</div>
+                                        </div>
+                                    </label>
+                                ))}
                                 {errors.paymentMethod && (
                                     <p className="text-red-500 text-sm mt-1">{errors.paymentMethod}</p>
                                 )}
@@ -1025,7 +1022,7 @@ const Checkout = () => {
                         </div>
 
                         {/* Receipt Upload for Bank Transfer */}
-                        {paymentMethod === 3 && (
+                        {paymentMethod && paymentMethodsData.find(pm => pm.id.toString() === paymentMethod)?.payment_type === 'bank' && (
                             <div className="bg-white rounded-2xl shadow-sm p-6">
                                 <div className="flex items-center mb-6">
                                     <Upload className="w-6 h-6 text-blue-600 mr-3" />
@@ -1133,6 +1130,8 @@ const Checkout = () => {
                 );
 
             case 3:
+                const selectedPaymentMethod = paymentMethodsData.find(pm => pm.id.toString() === paymentMethod);
+                
                 return (
                     <>
                         {/* Order Review */}
@@ -1146,9 +1145,6 @@ const Checkout = () => {
                             <div className="mb-6">
                                 <h3 className="text-lg font-medium text-gray-900 mb-3">Billing Information</h3>
                                 <div className="bg-gray-50 rounded-lg p-4">
-                                    <p className="text-gray-700"><strong>Name:</strong> {billingDetails?.name}</p>
-                                    <p className="text-gray-700"><strong>Email:</strong> {billingDetails?.email}</p>
-                                    <p className="text-gray-700"><strong>Phone:</strong> {billingDetails?.phone}</p>
                                     <p className="text-gray-700"><strong>Address:</strong> {billingDetails?.physical_address}</p>
                                     <p className="text-gray-700"><strong>City:</strong> {billingDetails?.city}</p>
                                     <p className="text-gray-700"><strong>Country:</strong> {billingDetails?.country}</p>
@@ -1166,9 +1162,6 @@ const Checkout = () => {
                                         </>
                                     ) : (
                                         <>
-                                            <p className="text-gray-700"><strong>Name:</strong> {shippingDetails?.name}</p>
-                                            <p className="text-gray-700"><strong>Email:</strong> {shippingDetails?.email}</p>
-                                            <p className="text-gray-700"><strong>Phone:</strong> {shippingDetails?.phone}</p>
                                             <p className="text-gray-700"><strong>Address:</strong> {shippingDetails?.physical_address}</p>
                                             <p className="text-gray-700"><strong>City:</strong> {shippingDetails?.city}</p>
                                             <p className="text-gray-700"><strong>Country:</strong> {shippingDetails?.country}</p>
@@ -1182,28 +1175,30 @@ const Checkout = () => {
                                 <h3 className="text-lg font-medium text-gray-900 mb-3">Payment Method</h3>
                                 <div className="bg-gray-50 rounded-lg p-4">
                                     <p className="text-gray-700">
-                                        {paymentMethods.find(m => m.id === paymentMethod)?.name}
+                                        {selectedPaymentMethod?.name}
                                     </p>
-                                    {paymentMethod === 3 && receiptFile && (
+                                    {selectedPaymentMethod?.payment_type === 'bank' && receiptFile && (
                                         <p className="text-green-600 text-sm mt-2">
                                             ✓ Receipt uploaded: {receiptFile.name}
+                                        </p>
+                                    )}
+                                    {selectedPaymentMethod?.payment_type === 'cash' && (
+                                        <p className="text-blue-600 text-sm mt-2">
+                                            Payment will be collected on delivery
                                         </p>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Shipping Method Review */}
-                            <div>
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">Shipping Method</h3>
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <p className="text-gray-700">
-                                        {shippingOptions[shippingMethod].label}
-                                    </p>
-                                    <p className="text-gray-600">
-                                        {shippingOptions[shippingMethod].duration}
-                                    </p>
+                            {/* Order Notes Review */}
+                            {notes && (
+                                <div className="mb-6">
+                                    <h3 className="text-lg font-medium text-gray-900 mb-3">Order Notes</h3>
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <p className="text-gray-700">{notes}</p>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </>
                 );
@@ -1376,16 +1371,13 @@ const Checkout = () => {
                                         <span className="text-gray-600">{t('checkout.order.subtotal') || 'Subtotal'}</span>
                                         <span className="font-medium">${subtotal.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">{t('checkout.order.shipping') || 'Shipping'}</span>
-                                        <span className="font-medium">
-                                            {shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}
-                                        </span>
-                                    </div>
                                     <div className="flex justify-between text-lg font-semibold border-t border-gray-200 pt-3">
                                         <span>{t('checkout.order.total') || 'Total'}</span>
                                         <span className="text-blue-600">${total.toFixed(2)}</span>
                                     </div>
+                                    <p className="text-sm text-gray-500 text-center">
+                                        * Delivery fee will be calculated and added by the system
+                                    </p>
                                 </div>
 
                                 {/* Security Badge */}

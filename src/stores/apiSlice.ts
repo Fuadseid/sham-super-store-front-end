@@ -10,6 +10,7 @@ import { orderEndpoints } from "./endpoints/orderendpoints";
 import { customerAddressEndpoints } from "./endpoints/customeraddress";
 import { paymentMethodEndpoints } from "./endpoints/paymentmethodendpoints";
 import { userEndpoints } from "./endpoints/userendpoints";
+import { paymentEndpoints } from "./endpoints/paymentendpoint";
 
 export const apiSlice = createApi({
   reducerPath: "user",
@@ -43,7 +44,7 @@ export const apiSlice = createApi({
     ...customerAddressEndpoints(builder),
     ...paymentMethodEndpoints(builder),
     ...userEndpoints(builder),
-
+    ...paymentEndpoints(builder),
   }),
 });
 
@@ -85,8 +86,8 @@ export const {
   useAddCustomerAddressMutation,
   useUpdateCustomerAddressMutation,
   useDeleteCustomerAddressMutation,
-  useDeleteCustomerAddressbyIdMutation
-  
-
-
+  useDeleteCustomerAddressbyIdMutation,
+  useCreateCheckoutSessionMutation,
+  useProcessCheckoutMutation,
+  useVerifyStripeOrderMutation
 } = apiSlice;
