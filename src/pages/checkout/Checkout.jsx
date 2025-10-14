@@ -3,7 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { MapPin, CreditCard, Truck, Check, Lock, Shield, ArrowLeft, User, Mail, Phone, Building, ChevronDown, ChevronUp, Upload, FileText, X, Globe, Plus, Edit, Trash2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import ReviewPopup from '../../components/reviewPopup/ReviewPopup';
-import { useGetCartQuery, useGetPublicMethodsQuery } from '../../stores/apiSlice';
+import { 
+    useAddCustomerAddressMutation, 
+    useDeleteCustomerAddressMutation, 
+    useDeleteCustomerAddressbyIdMutation,
+    useGetCustomerAddressesQuery,
+    useGetCartQuery, 
+    useGetPublicMethodsQuery 
+} from '../../stores/apiSlice';
 import { BsStripe } from 'react-icons/bs';
 
 const Checkout = () => {
@@ -27,73 +34,21 @@ const Checkout = () => {
     const [showShippingDropdown, setShowShippingDropdown] = useState(false);
     const [showAddressForm, setShowAddressForm] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
+    
+    // API mutations and queries
+    const [createAddress, { isLoading: createAddressLoading }] = useAddCustomerAddressMutation();
+    const [deleteAllAddresses, { isLoading: deleteAllAddressesLoading }] = useDeleteCustomerAddressMutation();
+    const [deleteAddressById, { isLoading: deleteAddressByIdLoading }] = useDeleteCustomerAddressbyIdMutation();
+    const { data: addressesData, refetch: refetchAddresses } = useGetCustomerAddressesQuery();
+    const { data: paymentMethodsDatas } = useGetPublicMethodsQuery();
+    const { data: carts, isLoading, isError } = useGetCartQuery();
 
-    const {data: paymentMethodsDatas } = useGetPublicMethodsQuery();
-    useEffect(()=>{
-        if(paymentMethodsDatas){
-            setPaymentMethodsData(paymentMethodsDatas?.data);
-        }
-    },[paymentMethodsDatas]);
-
-    // Sample saved addresses from API
-    const [savedAddresses, setSavedAddresses] = useState([
-        {
-            id: 1,
-            type: 'billing',
-            name: 'John Doe',
-            email: 'john@example.com',
-            phone: '+1 (555) 123-4567',
-            physical_address: '123 Main Street',
-            city: 'New York',
-            country: 'United States',
-            created_at: '2024-01-01'
-        },
-        {
-            id: 2,
-            type: 'shipping',
-            name: 'John Doe',
-            email: 'john@example.com',
-            phone: '+1 (555) 123-4567',
-            physical_address: '456 Business Ave',
-            city: 'New York',
-            country: 'United States',
-            created_at: '2024-01-02'
-        },
-        {
-            id: 3,
-            type: 'billing',
-            name: 'John Doe',
-            email: 'john@example.com',
-            phone: '+1 (555) 456-7890',
-            physical_address: '789 Family Road',
-            city: 'Boston',
-            country: 'United States',
-            created_at: '2024-01-03'
-        }
-    ]);
-
-    const [billingDetails, setBillingDetails] = useState({
-        type: 'billing',
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+1 (555) 123-4567',
-        physical_address: '123 Main Street',
-        city: 'New York',
-        country: 'United States',
-        created_at: new Date().toISOString().split('T')[0]
-    });
-
-    const [shippingDetails, setShippingDetails] = useState({
-        type: 'shipping',
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+1 (555) 123-4567',
-        physical_address: '456 Business Ave',
-        city: 'New York',
-        country: 'United States',
-        created_at: new Date().toISOString().split('T')[0]
-    });
-
+    const [savedAddresses, setSavedAddresses] = useState([]);
+    const [billingDetails, setBillingDetails] = useState(null);
+    const [shippingDetails, setShippingDetails] = useState(null);
+    const [cartData, setCartData] = useState();
+    const [errors, setErrors] = useState({});
+    
     const [newAddress, setNewAddress] = useState({
         type: 'billing',
         physical_address: '',
@@ -105,10 +60,31 @@ const Checkout = () => {
     const [shippingToBilling, setShippingToBilling] = useState(false);
     const [shippingMethod, setShippingMethod] = useState('free');
     const [paymentMethod, setPaymentMethod] = useState('card');
-    const { data: carts, isLoading, isError } = useGetCartQuery(); 
-    const [cartData, setCartData] = useState();
-    const [errors, setErrors] = useState({});
-    
+
+    // Load addresses from API
+    useEffect(() => {
+        if (addressesData?.data) {
+            setSavedAddresses(addressesData.data);
+            
+            // Auto-select first billing and shipping addresses if available
+            const billingAddresses = addressesData.data.filter(addr => addr.type === 'billing');
+            const shippingAddresses = addressesData.data.filter(addr => addr.type === 'shipping');
+            
+            if (billingAddresses.length > 0 && !billingDetails) {
+                setBillingDetails(billingAddresses[0]);
+            }
+            if (shippingAddresses.length > 0 && !shippingDetails) {
+                setShippingDetails(shippingAddresses[0]);
+            }
+        }
+    }, [addressesData, billingDetails, shippingDetails]);
+
+    useEffect(() => {
+        if (paymentMethodsDatas) {
+            setPaymentMethodsData(paymentMethodsDatas?.data);
+        }
+    }, [paymentMethodsDatas]);
+
     useEffect(() => {
         if (carts) {
             setCartData(carts);
@@ -190,18 +166,12 @@ const Checkout = () => {
 
     // Address management functions
     const handleSelectBillingAddress = (address) => {
-        setBillingDetails({
-            ...billingDetails,
-            ...address
-        });
+        setBillingDetails(address);
         setShowBillingDropdown(false);
     };
 
     const handleSelectShippingAddress = (address) => {
-        setShippingDetails({
-            ...shippingDetails,
-            ...address
-        });
+        setShippingDetails(address);
         setShowShippingDropdown(false);
     };
 
@@ -217,55 +187,25 @@ const Checkout = () => {
         }
 
         try {
-            // Here you would make the actual API call
-            // const response = await api.post('/add_my_customeraddress', newAddress);
+            const response = await createAddress(newAddress).unwrap();
             
-            // For now, we'll simulate the API response
-            const savedAddress = {
-                id: editingAddress ? editingAddress.id : Date.now(),
-                name: 'John Doe', // From user data
-                email: 'john@example.com', // From user data
-                phone: '+1 (555) 000-0000', // From user data
-                ...newAddress
-            };
-
-            if (editingAddress) {
-                // Update existing address
-                setSavedAddresses(prev => 
-                    prev.map(addr => addr.id === editingAddress.id ? savedAddress : addr)
-                );
+            if (response.success) {
+                // Refetch addresses to get updated list
+                await refetchAddresses();
                 
-                // Update billing/shipping if this address was selected
-                if (billingDetails.id === editingAddress.id && savedAddress.type === 'billing') {
-                    setBillingDetails(savedAddress);
-                }
-                if (shippingDetails.id === editingAddress.id && savedAddress.type === 'shipping') {
-                    setShippingDetails(savedAddress);
-                }
-            } else {
-                // Add new address
-                setSavedAddresses(prev => [...prev, savedAddress]);
+                // Reset form
+                setNewAddress({
+                    type: 'billing',
+                    physical_address: '',
+                    city: '',
+                    country: '',
+                    created_at: new Date().toISOString().split('T')[0]
+                });
+                setShowAddressForm(false);
+                setEditingAddress(null);
                 
-                // Auto-select the new address if it's the first one of its type
-                if (savedAddress.type === 'billing' && billingAddresses.length === 0) {
-                    setBillingDetails(savedAddress);
-                }
-                if (savedAddress.type === 'shipping' && shippingAddresses.length === 0) {
-                    setShippingDetails(savedAddress);
-                }
+                alert('Address saved successfully!');
             }
-
-            // Reset form
-            setNewAddress({
-                type: 'billing',
-                physical_address: '',
-                city: '',
-                country: '',
-                created_at: new Date().toISOString().split('T')[0]
-            });
-            setShowAddressForm(false);
-            setEditingAddress(null);
-            
         } catch (error) {
             console.error('Error saving address:', error);
             alert('Error saving address. Please try again.');
@@ -284,31 +224,53 @@ const Checkout = () => {
             return;
         }
 
+        if (!window.confirm('Are you sure you want to delete this address?')) {
+            return;
+        }
+
         try {
-            // Here you would make the actual API call to delete
-            // await api.delete(`/customeraddress/${addressId}`);
+            const response = await deleteAddressById(addressId).unwrap();
             
-            setSavedAddresses(prev => prev.filter(addr => addr.id !== addressId));
-            
-            // If deleted address was selected in billing or shipping, switch to another address
-            const deletedAddress = savedAddresses.find(addr => addr.id === addressId);
-            if (billingDetails.id === addressId) {
-                const newBillingAddress = savedAddresses.find(addr => addr.id !== addressId && addr.type === 'billing');
-                if (newBillingAddress) {
-                    setBillingDetails(newBillingAddress);
+            if (response.success) {
+                // Refetch addresses to get updated list
+                await refetchAddresses();
+                
+                // If deleted address was selected in billing or shipping, switch to another address
+                if (billingDetails?.id === addressId) {
+                    const newBillingAddress = billingAddresses.find(addr => addr.id !== addressId);
+                    setBillingDetails(newBillingAddress || null);
                 }
-            }
-            
-            if (shippingDetails.id === addressId) {
-                const newShippingAddress = savedAddresses.find(addr => addr.id !== addressId && addr.type === 'shipping');
-                if (newShippingAddress) {
-                    setShippingDetails(newShippingAddress);
+                
+                if (shippingDetails?.id === addressId) {
+                    const newShippingAddress = shippingAddresses.find(addr => addr.id !== addressId);
+                    setShippingDetails(newShippingAddress || null);
                 }
+                
+                alert('Address deleted successfully!');
             }
-            
         } catch (error) {
             console.error('Error deleting address:', error);
             alert('Error deleting address. Please try again.');
+        }
+    };
+
+    const handleDeleteAllAddresses = async () => {
+        if (!window.confirm('Are you sure you want to delete all addresses?')) {
+            return;
+        }
+
+        try {
+            const response = await deleteAllAddresses().unwrap();
+            
+            if (response.success) {
+                await refetchAddresses();
+                setBillingDetails(null);
+                setShippingDetails(null);
+                alert('All addresses deleted successfully!');
+            }
+        } catch (error) {
+            console.error('Error deleting all addresses:', error);
+            alert('Error deleting addresses. Please try again.');
         }
     };
 
@@ -390,11 +352,11 @@ const Checkout = () => {
         const newErrors = {};
         
         if (step === 1) {
-            if (!billingDetails.physical_address) {
+            if (!billingDetails) {
                 newErrors.billing_address = 'Please select a billing address';
             }
 
-            if (!shippingToBilling && !shippingDetails.physical_address) {
+            if (!shippingToBilling && !shippingDetails) {
                 newErrors.shipping_address = 'Please select a shipping address';
             }
         }
@@ -413,9 +375,21 @@ const Checkout = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleNextStep = () => {
-        if (validateStep(activeStep)) {
-            setActiveStep(prev => Math.min(prev + 1, 3));
+    const handleNextStep = async () => {
+        if (activeStep === 1) {
+            // When moving from step 1, ensure we have valid addresses
+            if (!validateStep(1)) {
+                return;
+            }
+            
+            // If we're on step 1 and have valid addresses, proceed to step 2
+            setActiveStep(2);
+        } else if (activeStep === 2) {
+            // When moving from step 2, validate payment method
+            if (!validateStep(2)) {
+                return;
+            }
+            setActiveStep(3);
         }
     };
 
@@ -444,6 +418,7 @@ const Checkout = () => {
 
         setIsProcessing(true);
 
+        // Simulate API call
         setTimeout(() => {
             const newOrderNumber = 'ORD-' + Date.now();
             setOrderNumber(newOrderNumber);
@@ -550,14 +525,27 @@ const Checkout = () => {
                                     <h2 className="text-2xl font-bold text-gray-900">Address Information</h2>
                                     <p className="text-gray-600 mt-1">Manage your billing and shipping addresses</p>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={openAddAddressForm}
-                                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    <span>Add New Address</span>
-                                </button>
+                                <div className="flex space-x-2">
+                                    {savedAddresses.length > 0 && (
+                                        <button
+                                            type="button"
+                                            onClick={handleDeleteAllAddresses}
+                                            disabled={deleteAllAddressesLoading}
+                                            className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            <span>Delete All</span>
+                                        </button>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={openAddAddressForm}
+                                        className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        <span>Add New Address</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -583,9 +571,9 @@ const Checkout = () => {
                                     >
                                         <div className="text-left">
                                             <div className="font-medium text-gray-900">
-                                                {billingDetails.physical_address ? `${billingDetails.physical_address}, ${billingDetails.city}` : 'Select billing address'}
+                                                {billingDetails ? `${billingDetails.physical_address}, ${billingDetails.city}` : 'Select billing address'}
                                             </div>
-                                            <div className="text-sm text-gray-600">{billingDetails.country}</div>
+                                            <div className="text-sm text-gray-600">{billingDetails?.country}</div>
                                         </div>
                                         <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showBillingDropdown ? 'rotate-180' : ''}`} />
                                     </button>
@@ -602,7 +590,7 @@ const Checkout = () => {
                                                         key={address.id}
                                                         onClick={() => handleSelectBillingAddress(address)}
                                                         className={`p-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
-                                                            billingDetails.id === address.id ? 'bg-blue-50 border-blue-200' : ''
+                                                            billingDetails?.id === address.id ? 'bg-blue-50 border-blue-200' : ''
                                                         }`}
                                                     >
                                                         <div className="flex items-start justify-between">
@@ -649,7 +637,7 @@ const Checkout = () => {
                             </div>
 
                             {/* Selected Billing Address Details */}
-                            {billingDetails.physical_address && (
+                            {billingDetails && (
                                 <div className="bg-gray-50 rounded-lg p-4">
                                     <h4 className="font-medium text-gray-900 mb-2">Selected Billing Address:</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -727,9 +715,9 @@ const Checkout = () => {
                                             >
                                                 <div className="text-left">
                                                     <div className="font-medium text-gray-900">
-                                                        {shippingDetails.physical_address ? `${shippingDetails.physical_address}, ${shippingDetails.city}` : 'Select shipping address'}
+                                                        {shippingDetails ? `${shippingDetails.physical_address}, ${shippingDetails.city}` : 'Select shipping address'}
                                                     </div>
-                                                    <div className="text-sm text-gray-600">{shippingDetails.country}</div>
+                                                    <div className="text-sm text-gray-600">{shippingDetails?.country}</div>
                                                 </div>
                                                 <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showShippingDropdown ? 'rotate-180' : ''}`} />
                                             </button>
@@ -746,7 +734,7 @@ const Checkout = () => {
                                                                 key={address.id}
                                                                 onClick={() => handleSelectShippingAddress(address)}
                                                                 className={`p-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
-                                                                    shippingDetails.id === address.id ? 'bg-blue-50 border-blue-200' : ''
+                                                                    shippingDetails?.id === address.id ? 'bg-blue-50 border-blue-200' : ''
                                                                 }`}
                                                             >
                                                                 <div className="flex items-start justify-between">
@@ -793,7 +781,7 @@ const Checkout = () => {
                                     </div>
 
                                     {/* Selected Shipping Address Details */}
-                                    {shippingDetails.physical_address && (
+                                    {shippingDetails && (
                                         <div className="bg-gray-50 rounded-lg p-4">
                                             <h4 className="font-medium text-gray-900 mb-2">Selected Shipping Address:</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -940,9 +928,10 @@ const Checkout = () => {
                                             <button
                                                 type="button"
                                                 onClick={handleSaveAddress}
-                                                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                                disabled={createAddressLoading}
+                                                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-medium"
                                             >
-                                                {editingAddress ? 'Update Address' : 'Save Address'}
+                                                {createAddressLoading ? 'Saving...' : (editingAddress ? 'Update Address' : 'Save Address')}
                                             </button>
                                         </div>
                                     </div>
@@ -1157,12 +1146,12 @@ const Checkout = () => {
                             <div className="mb-6">
                                 <h3 className="text-lg font-medium text-gray-900 mb-3">Billing Information</h3>
                                 <div className="bg-gray-50 rounded-lg p-4">
-                                    <p className="text-gray-700"><strong>Name:</strong> {billingDetails.name}</p>
-                                    <p className="text-gray-700"><strong>Email:</strong> {billingDetails.email}</p>
-                                    <p className="text-gray-700"><strong>Phone:</strong> {billingDetails.phone}</p>
-                                    <p className="text-gray-700"><strong>Address:</strong> {billingDetails.physical_address}</p>
-                                    <p className="text-gray-700"><strong>City:</strong> {billingDetails.city}</p>
-                                    <p className="text-gray-700"><strong>Country:</strong> {billingDetails.country}</p>
+                                    <p className="text-gray-700"><strong>Name:</strong> {billingDetails?.name}</p>
+                                    <p className="text-gray-700"><strong>Email:</strong> {billingDetails?.email}</p>
+                                    <p className="text-gray-700"><strong>Phone:</strong> {billingDetails?.phone}</p>
+                                    <p className="text-gray-700"><strong>Address:</strong> {billingDetails?.physical_address}</p>
+                                    <p className="text-gray-700"><strong>City:</strong> {billingDetails?.city}</p>
+                                    <p className="text-gray-700"><strong>Country:</strong> {billingDetails?.country}</p>
                                 </div>
                             </div>
 
@@ -1173,16 +1162,16 @@ const Checkout = () => {
                                     {shippingToBilling ? (
                                         <>
                                             <p className="text-gray-700 text-sm mb-2">Same as billing address</p>
-                                            <p className="text-gray-700"><strong>Address:</strong> {billingDetails.physical_address}, {billingDetails.city}, {billingDetails.country}</p>
+                                            <p className="text-gray-700"><strong>Address:</strong> {billingDetails?.physical_address}, {billingDetails?.city}, {billingDetails?.country}</p>
                                         </>
                                     ) : (
                                         <>
-                                            <p className="text-gray-700"><strong>Name:</strong> {shippingDetails.name}</p>
-                                            <p className="text-gray-700"><strong>Email:</strong> {shippingDetails.email}</p>
-                                            <p className="text-gray-700"><strong>Phone:</strong> {shippingDetails.phone}</p>
-                                            <p className="text-gray-700"><strong>Address:</strong> {shippingDetails.physical_address}</p>
-                                            <p className="text-gray-700"><strong>City:</strong> {shippingDetails.city}</p>
-                                            <p className="text-gray-700"><strong>Country:</strong> {shippingDetails.country}</p>
+                                            <p className="text-gray-700"><strong>Name:</strong> {shippingDetails?.name}</p>
+                                            <p className="text-gray-700"><strong>Email:</strong> {shippingDetails?.email}</p>
+                                            <p className="text-gray-700"><strong>Phone:</strong> {shippingDetails?.phone}</p>
+                                            <p className="text-gray-700"><strong>Address:</strong> {shippingDetails?.physical_address}</p>
+                                            <p className="text-gray-700"><strong>City:</strong> {shippingDetails?.city}</p>
+                                            <p className="text-gray-700"><strong>Country:</strong> {shippingDetails?.country}</p>
                                         </>
                                     )}
                                 </div>
@@ -1195,7 +1184,7 @@ const Checkout = () => {
                                     <p className="text-gray-700">
                                         {paymentMethods.find(m => m.id === paymentMethod)?.name}
                                     </p>
-                                    {paymentMethod === 'bank' && receiptFile && (
+                                    {paymentMethod === 3 && receiptFile && (
                                         <p className="text-green-600 text-sm mt-2">
                                             ✓ Receipt uploaded: {receiptFile.name}
                                         </p>
