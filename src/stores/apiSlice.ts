@@ -89,5 +89,6 @@ export const {
   useDeleteCustomerAddressbyIdMutation,
   useCreateCheckoutSessionMutation,
   useProcessCheckoutMutation,
-  useVerifyStripeOrderMutation
+  useVerifyStripeOrderMutation,
+  useCalculateFeesQuery,
 } = apiSlice;

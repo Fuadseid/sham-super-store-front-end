@@ -22,6 +22,12 @@ verifyStripeOrder: builder.mutation({
     body: { session_id, order_id },
   }),
 }),
+calculateFees:builder.query({
+  query:()=>({
+    url:"/checkout/calculate-delivery-fee",
+    method:"GET"
+  })
+})
 
 
 })
